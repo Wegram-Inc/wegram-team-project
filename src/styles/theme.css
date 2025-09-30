@@ -1,0 +1,245 @@
+/* WEGRAM Theme Variables */
+:root {
+  /* Dark mode defaults */
+  --bg: #0A0F1D;
+  --card: #0F1528;
+  --border: #1C2440;
+  --text: #E6ECFF;
+  --sub: #9AA5C6;
+  --gradA: #00D4FF;
+  --gradB: #9945FF;
+  --accent: #7B2CFF;
+  --glow: rgba(153, 69, 255, 0.4);
+  --error: #FF6B6B;
+  
+  /* Spacing */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  
+  /* Radii */
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --radius-pill: 999px;
+  
+  /* Typography */
+  --font-base: system-ui, 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  --font-size: 14px;
+  --line-height: 1.45;
+}
+
+/* Explicit dark theme class (same as :root defaults) */
+.dark {
+  --bg: #0A0F1D;
+  --card: #0F1528;
+  --border: #1C2440;
+  --text: #E6ECFF;
+  --sub: #9AA5C6;
+  --gradA: #00D4FF;
+  --gradB: #9945FF;
+  --accent: #7B2CFF;
+  --glow: rgba(153, 69, 255, 0.4);
+  --error: #FF6B6B;
+}
+
+/* Light theme overrides */
+.light {
+  --bg: #ffffff;
+  --card: #ffffff;
+  --border: #E5E7EB; /* gray-200 */
+  --text: #0F172A; /* slate-900 */
+  --sub: #475569; /* slate-600 */
+  --gradA: #6EE7F9; /* cyan-300 */
+  --gradB: #A78BFA; /* violet-400 */
+  --accent: #7C3AED; /* violet-600 */
+  --glow: rgba(124, 58, 237, 0.25);
+  --error: #DC2626; /* red-600 */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-base);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  overflow-x: hidden;
+}
+
+/* Utility Classes */
+.gradient-bg {
+  background: linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%);
+}
+
+.card {
+  background-color: var(--card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  padding: 20px;
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px var(--glow);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-input);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-base);
+  font-size: var(--font-size);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-base);
+  font-size: var(--font-size);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+.input {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text);
+  font-family: var(--font-base);
+  font-size: var(--font-size);
+  width: 100%;
+  min-height: 44px;
+}
+
+.input::placeholder {
+  color: var(--sub);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.text-primary {
+  color: var(--text);
+}
+
+.text-secondary {
+  color: var(--sub);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fab {
+  position: fixed;
+  bottom: 80px;
+  right: var(--space-lg);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%);
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 0 20px var(--glow);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.fab:hover {
+  transform: scale(1.05);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+.ai-dot {
+  position: fixed;
+  top: var(--space-md);
+  right: 60px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--glow);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ai-dot:hover {
+  transform: scale(1.1);
+}
+
+/* Theme-adaptive background utilities to replace bg-black bg-opacity */
+.bg-overlay-light {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-overlay-medium {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.bg-overlay-strong {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme overrides for overlays */
+.dark .bg-overlay-light {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark .bg-overlay-medium {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark .bg-overlay-strong {
+  background-color: rgba(0, 0, 0, 0.4);
+}

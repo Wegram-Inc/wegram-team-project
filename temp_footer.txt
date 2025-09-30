@@ -1,0 +1,4 @@
+      {/* Footer */}
+      <footer className="text-center text-xs text-gray-500 py-2">
+        © 2025 WEGRAM. All rights reserved.
+      </footer>
