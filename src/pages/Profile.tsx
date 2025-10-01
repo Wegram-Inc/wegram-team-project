@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { mockPosts } from '../data/mockData';
+import { useAuth } from '../hooks/useAuth';
 
 // Mock user data for the logged-in user
 const mockLoggedInUser = {
@@ -99,9 +100,23 @@ export const Profile: React.FC = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'nft' | 'stats'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const { profile, twitterUser } = useAuth();
 
-  // Use the logged-in user data
-  const user = mockLoggedInUser;
+  // Use real Twitter data if available, otherwise fallback to mock
+  const user = profile ? {
+    id: profile.id,
+    username: profile.username,
+    displayName: profile.username.replace('@', ''),
+    avatar: profile.avatar_url || profile.username.charAt(1).toUpperCase(),
+    verified: profile.verified,
+    bio: profile.bio || 'Twitter user on WEGRAM',
+    followers: profile.followers_count || 0,
+    following: profile.following_count || 0,
+    posts: profile.posts_count || 0,
+    isFollowing: false,
+    connections: [],
+    mutualConnections: 0
+  } : mockLoggedInUser;
 
   // Memoize posts to avoid re-rendering
   const posts = useMemo(() => mockUserPosts, []);

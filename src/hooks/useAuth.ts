@@ -1,3 +1,4 @@
+// Simple Authentication with localStorage (no MongoDB complexity)
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
@@ -10,6 +11,10 @@ export interface Profile {
   email: string | null;
   avatar_url: string | null;
   bio: string | null;
+  verified: boolean;
+  followers_count: number;
+  following_count: number;
+  posts_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -19,77 +24,89 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [twitterUser, setTwitterUser] = useState<TwitterUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMongoConnected, setIsMongoConnected] = useState(false); // Keep for UI
 
   useEffect(() => {
-    // Check for JWT token from Twitter auth
-    const jwtToken = localStorage.getItem('wegram_jwt_token');
-    const storedUser = localStorage.getItem('wegram_user');
-    
-    if (jwtToken && storedUser) {
+    const initializeAuth = async () => {
       try {
-        const userData = JSON.parse(storedUser);
-        console.log('Found JWT user data:', userData); // Debug log
-        setProfile(userData);
-        setUser(null); // No Supabase user for JWT auth
-        setLoading(false);
-        return;
-      } catch (error) {
-        console.error('Error parsing stored user:', error);
-        // Fall through to normal flow
-      }
-    } else {
-      console.log('No JWT token or stored user found'); // Debug log
-    }
+        // Check for stored user data
+        const storedUser = localStorage.getItem('wegram_user');
+        const storedTwitterUser = localStorage.getItem('wegram_twitter_user');
+        
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          console.log('Found stored user:', userData);
+          setProfile(userData);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
 
-    // If no Supabase and no JWT token, don't set any user
-    if (!supabase) {
-      setUser(null);
-      setProfile(null); // Don't use mock user
-      setLoading(false);
-      return;
-    }
+        if (storedTwitterUser) {
+          const twitterData = JSON.parse(storedTwitterUser);
+          console.log('Found stored Twitter user:', twitterData);
+          setTwitterUser(twitterData);
+          setLoading(false);
+          return;
+        }
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
+        // If no Supabase, just show demo mode
+        if (!supabase) {
+          setUser(null);
           setProfile(null);
           setLoading(false);
+          return;
         }
-      }
-    );
 
-    return () => subscription.unsubscribe();
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            fetchProfile(session.user.id);
+          } else {
+            setLoading(false);
+          }
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            setUser(session?.user ?? null);
+            if (session?.user) {
+              await fetchProfile(session.user.id);
+            } else {
+              setProfile(null);
+              setLoading(false);
+            }
+          }
+        );
+
+        return () => subscription.unsubscribe();
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist, create one
-        await createProfile(userId);
-      } else if (error) {
-        console.error('Error fetching profile:', error);
-      } else {
-        setProfile(data);
+        if (error && error.code === 'PGRST116') {
+          await createProfile(userId);
+        } else if (error) {
+          console.error('Error fetching profile:', error);
+        } else {
+          setProfile(data);
+        }
       }
     } catch (error) {
       console.error('Error in fetchProfile:', error);
@@ -101,20 +118,23 @@ export const useAuth = () => {
   const createProfile = async (userId: string) => {
     try {
       const username = `user_${userId.slice(0, 8)}`;
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          username,
-          email: user?.email || null,
-        })
-        .select()
-        .single();
+      
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            username,
+            email: user?.email || null,
+          })
+          .select()
+          .single();
 
-      if (error) {
-        console.error('Error creating profile:', error);
-      } else {
-        setProfile(data);
+        if (error) {
+          console.error('Error creating profile:', error);
+        } else {
+          setProfile(data);
+        }
       }
     } catch (error) {
       console.error('Error in createProfile:', error);
@@ -163,25 +183,48 @@ export const useAuth = () => {
 
   const signInWithTwitter = async () => {
     try {
-      // For demo purposes, simulate Twitter auth
+      // Simulate Twitter auth
       const result = await twitterAuth.simulateTwitterAuth();
       
       if (result.success && result.user) {
         setTwitterUser(result.user);
         
-        // Create or update profile with Twitter data
+        // Create profile with Twitter data
         const twitterProfile: Profile = {
           id: result.user.id,
           username: `@${result.user.username}`,
           email: null,
           avatar_url: result.user.profile_image_url || null,
           bio: `Twitter user ${result.user.name}`,
+          verified: result.user.verified || false,
+          followers_count: result.user.followers_count || 0,
+          following_count: result.user.following_count || 0,
+          posts_count: result.user.tweet_count || 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
         
+        // Save to MongoDB (your Vercel database)
+        try {
+          const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(twitterProfile)
+          });
+          
+          if (response.ok) {
+            console.log('✅ User saved to MongoDB');
+          }
+        } catch (dbError) {
+          console.log('Using localStorage fallback:', dbError);
+        }
+        
+        // Store in localStorage as backup
+        localStorage.setItem('wegram_user', JSON.stringify(twitterProfile));
+        localStorage.setItem('wegram_twitter_user', JSON.stringify(result.user));
+        
         setProfile(twitterProfile);
-        setUser(null); // No Supabase user for Twitter auth
+        setUser(null);
         return { success: true, user: result.user };
       } else {
         throw new Error(result.error || 'Twitter authentication failed');
@@ -192,10 +235,54 @@ export const useAuth = () => {
     }
   };
 
+  const signInWithRealTwitter = async () => {
+    try {
+      await twitterAuth.startRealOAuth();
+    } catch (error) {
+      console.error('Real Twitter auth error:', error);
+      return { success: false, error: 'Failed to start Twitter authentication' };
+    }
+  };
+
+  const handleTwitterCallback = async (code: string, state: string) => {
+    try {
+      const result = await twitterAuth.handleCallback(code, state);
+      
+      if (result.success && result.user) {
+        setTwitterUser(result.user);
+        
+        const twitterProfile: Profile = {
+          id: result.user.id,
+          username: `@${result.user.username}`,
+          email: null,
+          avatar_url: result.user.profile_image_url || null,
+          bio: `Twitter user ${result.user.name}`,
+          verified: result.user.verified || false,
+          followers_count: result.user.followers_count || 0,
+          following_count: result.user.following_count || 0,
+          posts_count: result.user.tweet_count || 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        localStorage.setItem('wegram_user', JSON.stringify(twitterProfile));
+        localStorage.setItem('wegram_twitter_user', JSON.stringify(result.user));
+        
+        setProfile(twitterProfile);
+        setUser(null);
+        return { success: true, user: result.user };
+      } else {
+        throw new Error(result.error || 'Twitter authentication failed');
+      }
+    } catch (error) {
+      console.error('Twitter callback error:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Authentication failed' };
+    }
+  };
+
   const signOut = async () => {
-    // Clear JWT token and stored user data
-    localStorage.removeItem('wegram_jwt_token');
     localStorage.removeItem('wegram_user');
+    localStorage.removeItem('wegram_twitter_user');
     
     if (!supabase) {
       console.log('Demo mode: Sign-out simulated');
@@ -214,10 +301,13 @@ export const useAuth = () => {
     profile,
     twitterUser,
     loading,
+    isMongoConnected: false, // Always false for now
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
     signInWithTwitter,
+    signInWithRealTwitter,
+    handleTwitterCallback,
     signOut,
   };
 };

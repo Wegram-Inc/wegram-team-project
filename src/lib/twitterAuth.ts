@@ -1,5 +1,5 @@
 // Twitter OAuth integration
-import { mockTwitterAPI } from './mockTwitterAPI';
+import { realTwitterAPI } from './realTwitterAPI';
 
 export interface TwitterUser {
   id: string;
@@ -19,8 +19,10 @@ export interface TwitterAuthResponse {
 }
 
 class TwitterAuthService {
-  private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'YOUR_TWITTER_API_KEY_HERE';
-  private readonly redirectUri = `${window.location.origin}/auth/callback`;
+  private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
+  private readonly redirectUri = window.location.hostname === 'localhost' 
+    ? `${window.location.origin}/twitter/callback`
+    : 'https://wegram-sept31.vercel.app/twitter/callback';
   private readonly scope = 'tweet.read users.read offline.access';
 
   // Generate OAuth URL for Twitter authorization
@@ -83,14 +85,16 @@ class TwitterAuthService {
 
   // Exchange authorization code for access token
   private async exchangeCodeForToken(code: string): Promise<any> {
-    // Use mock API for demo purposes
-    return await mockTwitterAPI.exchangeCodeForToken(code, this.redirectUri);
+    // Get the code verifier from storage
+    const codeVerifier = localStorage.getItem('twitter_code_verifier') || '';
+    // Use real Twitter API
+    return await realTwitterAPI.exchangeCodeForToken(code, this.redirectUri, codeVerifier);
   }
 
   // Get user information from Twitter API
   private async getUserInfo(accessToken: string): Promise<TwitterUser> {
-    // Use mock API for demo purposes
-    const data = await mockTwitterAPI.getUserInfo(accessToken);
+    // Use real Twitter API
+    const data = await realTwitterAPI.getUserInfo(accessToken);
     return {
       id: data.data.id,
       username: data.data.username,
@@ -124,32 +128,23 @@ class TwitterAuthService {
     return codeVerifier;
   }
 
-  // Demo mode - simulate Twitter authentication
+  // Demo mode - simulate Twitter authentication (for testing without real OAuth)
   async simulateTwitterAuth(): Promise<TwitterAuthResponse> {
     try {
-      // Check if API credentials are valid
-      const apiStatus = mockTwitterAPI.getAPIStatus();
-      if (!apiStatus.connected) {
-        throw new Error('Twitter API credentials are not configured');
-      }
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Get user info using mock API
-      const userInfo = await mockTwitterAPI.getUserInfo('mock_access_token');
+      // For demo mode, return mock data (don't actually call Twitter API)
+      console.log('🎭 Demo mode: Using mock Twitter data');
       
       return {
         success: true,
         user: {
-          id: userInfo.data.id,
-          username: userInfo.data.username,
-          name: userInfo.data.name,
-          profile_image_url: userInfo.data.profile_image_url,
-          verified: userInfo.data.verified,
-          followers_count: userInfo.data.public_metrics?.followers_count,
-          following_count: userInfo.data.public_metrics?.following_count,
-          tweet_count: userInfo.data.public_metrics?.tweet_count
+          id: 'demo_' + Date.now(),
+          username: 'demo_user',
+          name: 'Demo User',
+          profile_image_url: 'https://via.placeholder.com/150',
+          verified: false,
+          followers_count: 1234,
+          following_count: 567,
+          tweet_count: 42
         }
       };
     } catch (error) {

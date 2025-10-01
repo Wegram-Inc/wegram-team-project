@@ -4,16 +4,18 @@ import { useAuth } from '../hooks/useAuth';
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signInWithTwitter } = useAuth();
+  const { signInWithRealTwitter } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAuthorize = async () => {
     setIsLoading(true);
     try {
-      // Redirect to client's backend for OAuth 2.0 authentication
-      window.location.href = 'https://wegram.onrender.com/api/auth/twitter';
+      // Use REAL Twitter OAuth
+      await signInWithRealTwitter();
+      // The redirect to Twitter will happen automatically
+      // User will come back via /twitter/callback
     } catch (error) {
-      console.error('Real Twitter auth error:', error);
+      console.error('Twitter auth error:', error);
       alert('Failed to start Twitter authentication');
       setIsLoading(false);
     }
@@ -83,7 +85,7 @@ export const AuthPage: React.FC = () => {
             disabled={isLoading}
             className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-full text-lg transition-colors"
           >
-            {isLoading ? 'Authorizing...' : 'Authorize app'}
+            {isLoading ? 'Authorizing...' : 'Authorize with Real X Account'}
           </button>
           
           <button
@@ -97,8 +99,13 @@ export const AuthPage: React.FC = () => {
             onClick={() => navigate('/home')}
             className="w-full text-gray-500 hover:text-gray-600 font-medium py-2 px-6 text-sm transition-colors"
           >
-            Enter as guest
+            Continue as guest (demo mode)
           </button>
+          
+          <p className="text-xs text-gray-400 text-center mt-4">
+            Note: Real Twitter auth requires setup in Twitter Developer Portal.<br/>
+            See TWITTER_SETUP.md for instructions.
+          </p>
         </div>
       </div>
 

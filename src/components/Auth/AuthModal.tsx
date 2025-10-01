@@ -10,7 +10,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth }) => {
-  const { signInWithGoogle, signInWithTwitter } = useAuth();
+  const { signInWithGoogle, signInWithTwitter, signInWithRealTwitter, isMongoConnected } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,11 +48,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth })
   const handleRealTwitterAuth = async () => {
     setIsLoading(true);
     try {
-      // Redirect to client's backend for OAuth 2.0 authentication
-      window.location.href = 'https://wegram.onrender.com/api/auth/twitter';
+      const result = await signInWithRealTwitter();
+      if (result.success) {
+        onClose();
+        navigate('/home');
+      } else {
+        alert(result.error || 'Real Twitter authentication failed');
+      }
     } catch (error) {
       console.error('Real Twitter auth error:', error);
       alert('Failed to start Twitter authentication');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -102,22 +108,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth })
             <Search className="w-5 h-5" />
             Continue with Google
           </button>
-          <button
-            onClick={handleTwitterAuth}
-            disabled={isLoading}
-            className="btn-primary w-full flex items-center justify-center gap-3 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="w-5 h-5 flex items-center justify-center font-bold text-lg">𝕏</div>
-            {isLoading ? 'Connecting...' : 'Continue with X (Demo)'}
-          </button>
-          <button
-            onClick={handleRealTwitterAuth}
-            disabled={isLoading}
-            className="btn-secondary w-full flex items-center justify-center gap-3 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="w-5 h-5 flex items-center justify-center font-bold text-lg">𝕏</div>
-            {isLoading ? 'Redirecting...' : 'Continue with Real X Account'}
-          </button>
+                  <button
+                    onClick={handleTwitterAuth}
+                    disabled={isLoading}
+                    className="btn-secondary w-full flex items-center justify-center gap-3 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="w-5 h-5 flex items-center justify-center font-bold text-lg">𝕏</div>
+                    {isLoading ? 'Connecting...' : 'Continue with X (Demo Mode)'}
+                  </button>
+                  <button
+                    onClick={handleRealTwitterAuth}
+                    disabled={isLoading}
+                    className="btn-primary w-full flex items-center justify-center gap-3 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="w-5 h-5 flex items-center justify-center font-bold text-lg">𝕏</div>
+                    {isLoading ? 'Redirecting...' : '🔐 Sign in with Your Real X Account'}
+                  </button>
           <button
             onClick={handleEmailAuth}
             className="btn-primary w-full flex items-center justify-center gap-3 py-4"
