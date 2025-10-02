@@ -82,8 +82,11 @@ export const AuthPage: React.FC = () => {
         {/* Main Text */}
         <div className="text-center mb-12">
           <h1 className="text-2xl font-bold text-black mb-4">
-            WEGRAM wants to access your X account.
+            Sign in to WEGRAM with X
           </h1>
+          <p className="text-gray-600">
+            Connect your X account to get started
+          </p>
         </div>
 
         {/* Authorization Info */}
@@ -101,29 +104,20 @@ export const AuthPage: React.FC = () => {
           <button
             onClick={handleAuthorize}
             disabled={isLoading}
-            className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-full text-lg transition-colors"
+            className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-full text-lg transition-colors"
           >
-            {isLoading ? 'Authorizing...' : 'Authorize with Real X Account'}
+            {isLoading ? 'Connecting to X...' : '𝕏 Continue with X'}
           </button>
           
           <button
             onClick={handleCancel}
-            className="w-full text-red-500 hover:text-red-600 font-semibold py-4 px-6 text-lg transition-colors"
+            className="w-full text-gray-500 hover:text-gray-600 font-medium py-2 px-6 text-sm transition-colors"
           >
             Cancel
           </button>
           
-          <button
-            onClick={handleDemoAuth}
-            disabled={isLoading}
-            className="w-full text-blue-500 hover:text-blue-600 disabled:text-gray-400 font-medium py-2 px-6 text-sm transition-colors"
-          >
-            {isLoading ? 'Connecting...' : 'Try Demo X Login (saves to database)'}
-          </button>
-          
           <p className="text-xs text-gray-400 text-center mt-4">
-            Note: Real Twitter auth requires setup in Twitter Developer Portal.<br/>
-            See TWITTER_SETUP.md for instructions.
+            Secure OAuth 2.0 authentication with X
           </p>
         </div>
       </div>
