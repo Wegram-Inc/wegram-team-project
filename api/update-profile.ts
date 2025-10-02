@@ -14,19 +14,19 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    // Get database connection - check multiple possible environment variable names
-    const DATABASE_URL = process.env.DATABASE_URL || 
-                         process.env.POSTGRES_URL || 
-                         process.env.POSTGRES_PRISMA_URL ||
-                         process.env.NEON_DATABASE_URL;
+    // Get database connection - Vercel Neon integration uses POSTGRES_URL
+    const DATABASE_URL = process.env.POSTGRES_URL || 
+                         process.env.DATABASE_URL || 
+                         process.env.POSTGRES_PRISMA_URL;
     
     if (!DATABASE_URL) {
-      console.error('No database URL found. Available env vars:', Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('POSTGRES')));
+      console.error('❌ No database URL found in environment variables');
       return res.status(500).json({ 
-        error: 'Database configuration error',
-        debug: 'No DATABASE_URL, POSTGRES_URL, or POSTGRES_PRISMA_URL found'
+        error: 'Database not configured. Please check Vercel Neon integration.'
       });
     }
+    
+    console.log('✅ Database URL found, connecting...');
 
     const sql = neon(DATABASE_URL);
 
