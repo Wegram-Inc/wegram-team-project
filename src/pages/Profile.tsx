@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
@@ -101,6 +101,10 @@ export const Profile: React.FC = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'nft' | 'stats'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editBio, setEditBio] = useState('');
+  const [editAvatar, setEditAvatar] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   const { profile, twitterUser } = useAuth();
 
   // Use real Twitter data if available, otherwise fallback to mock
@@ -136,7 +140,58 @@ export const Profile: React.FC = () => {
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Intentionally do nothing
+    // Initialize edit form with current data
+    setEditBio(user.bio || '');
+    setEditAvatar(user.avatar || '');
+    setShowEditModal(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profile) return;
+    
+    setIsUpdating(true);
+    try {
+      // Update profile in database
+      const response = await fetch('/api/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: profile.id,
+          bio: editBio,
+          avatar_url: editAvatar
+        })
+      });
+
+      if (response.ok) {
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        alert('Failed to update profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setIsUpdating(false);
+      setShowEditModal(false);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // For now, we'll use a simple file reader to convert to base64
+      // In production, you'd upload to a service like Cloudinary or AWS S3
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setEditAvatar(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleProfileMenu = () => {
@@ -339,6 +394,96 @@ export const Profile: React.FC = () => {
         </div>
       )}
 
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowEditModal(false)}
+          />
+
+          {/* Modal */}
+          <div
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden w-full max-w-md mx-4"
+            style={{ backgroundColor: 'var(--card)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-primary">Edit Profile</h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-secondary" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Avatar Upload */}
+              <div className="text-center">
+                <div className="relative inline-block">
+                  {editAvatar && editAvatar.startsWith('http') || editAvatar.startsWith('data:') ? (
+                    <img 
+                      src={editAvatar} 
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover mx-auto"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl mx-auto">
+                      {user.avatarInitial || user.displayName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  
+                  <label className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full cursor-pointer transition-colors">
+                    <Camera className="w-4 h-4" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-secondary text-sm mt-2">Click camera to change photo</p>
+              </div>
+
+              {/* Bio Input */}
+              <div>
+                <label className="block text-primary font-medium mb-2">Bio</label>
+                <textarea
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                  placeholder="Tell people about yourself..."
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary resize-none"
+                  rows={4}
+                  maxLength={160}
+                />
+                <p className="text-secondary text-xs mt-1">{editBio.length}/160 characters</p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={isUpdating}
+                  className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUpdating ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="sticky top-0 z-50 bg-opacity-95 backdrop-blur-sm px-4 py-3 flex items-center gap-3" style={{ backgroundColor: 'var(--bg)' }}>
         <button
@@ -419,7 +564,10 @@ export const Profile: React.FC = () => {
               >
                 <div className="flex items-center gap-1">
                   <div className="text-lg font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
-                  <Twitter className="w-4 h-4 text-blue-500" />
+                  {/* Real X Logo */}
+                  <svg className="w-4 h-4 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
                 </div>
                 <div className="text-secondary text-xs flex items-center gap-1">
                   X
