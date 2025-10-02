@@ -1,12 +1,12 @@
 // Twitter OAuth Callback Page
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const TwitterCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { handleTwitterCallback } = useAuth();
+  const { handleXCallback } = useNeonAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [error, setError] = useState<string>('');
 
@@ -29,7 +29,7 @@ export const TwitterCallback: React.FC = () => {
           return;
         }
 
-        const result = await handleTwitterCallback(code, state);
+        const result = await handleXCallback(code, state);
         
         if (result.success) {
           setStatus('success');
@@ -49,7 +49,7 @@ export const TwitterCallback: React.FC = () => {
     };
 
     handleCallback();
-  }, [searchParams, handleTwitterCallback, navigate]);
+  }, [searchParams, handleXCallback, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
