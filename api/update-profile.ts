@@ -14,11 +14,18 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    // Get database connection
-    const DATABASE_URL = process.env.DATABASE_URL;
+    // Get database connection - check multiple possible environment variable names
+    const DATABASE_URL = process.env.DATABASE_URL || 
+                         process.env.POSTGRES_URL || 
+                         process.env.POSTGRES_PRISMA_URL ||
+                         process.env.NEON_DATABASE_URL;
+    
     if (!DATABASE_URL) {
-      console.error('DATABASE_URL not found');
-      return res.status(500).json({ error: 'Database configuration error' });
+      console.error('No database URL found. Available env vars:', Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('POSTGRES')));
+      return res.status(500).json({ 
+        error: 'Database configuration error',
+        debug: 'No DATABASE_URL, POSTGRES_URL, or POSTGRES_PRISMA_URL found'
+      });
     }
 
     const sql = neon(DATABASE_URL);
