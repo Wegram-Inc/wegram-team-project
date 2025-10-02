@@ -52,23 +52,7 @@ export class NeonSimpleService {
   // 🚀 Create user from Twitter data
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
     if (!sql) {
-      // Fallback: create user object without database
-      const fallbackUser: Profile = {
-        id: `demo_${Date.now()}`,
-        username: `@${twitterData.username}`,
-        avatar_url: twitterData.profile_image_url || null,
-        bio: twitterData.description || `Twitter user ${twitterData.name}`,
-        verified: twitterData.verified || false,
-        twitter_id: twitterData.id,
-        twitter_username: twitterData.username,
-        followers_count: twitterData.followers_count || 0,
-        following_count: twitterData.following_count || 0,
-        posts_count: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      console.log('📋 Demo mode: Created user without database');
-      return fallbackUser;
+      throw new Error('Database not available. Please ensure Neon Postgres is properly configured.');
     }
 
     const result = await sql`
@@ -95,7 +79,6 @@ export class NeonSimpleService {
   // 🚀 Get user by Twitter ID
   async getUserByTwitterId(twitterId: string): Promise<Profile | null> {
     if (!sql) {
-      console.log('📋 Demo mode: Database not available');
       return null;
     }
 

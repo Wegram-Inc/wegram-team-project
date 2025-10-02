@@ -27,6 +27,13 @@ export default async function handler(req: any, res: any) {
 
     const sql = neon(DATABASE_URL);
 
+    // Check if this is a demo user ID (starts with 'demo_')
+    if (userId.startsWith('demo_')) {
+      return res.status(400).json({ 
+        error: 'Cannot update demo user. Please log in with X to create a real profile.' 
+      });
+    }
+
     // Update user profile in database
     const result = await sql`
       UPDATE profiles 
@@ -39,7 +46,7 @@ export default async function handler(req: any, res: any) {
     `;
 
     if (result.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found in database' });
     }
 
 
