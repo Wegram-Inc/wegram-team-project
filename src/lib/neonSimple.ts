@@ -2,7 +2,16 @@
 import { neon } from '@neondatabase/serverless';
 
 // Get database connection from environment variable
-const sql = neon(process.env.DATABASE_URL!);
+// Handle both Vite (VITE_) and Node.js environment variables
+const DATABASE_URL = import.meta.env?.DATABASE_URL || 
+                     import.meta.env?.VITE_DATABASE_URL || 
+                     process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  console.warn('⚠️ No DATABASE_URL found. Database features will be disabled.');
+}
+
+const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
 
 export interface Profile {
   id: string;
@@ -40,6 +49,26 @@ export class NeonSimpleService {
   
   // 🚀 Create user from Twitter data
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
+    if (!sql) {
+      // Fallback: create user object without database
+      const fallbackUser: Profile = {
+        id: `demo_${Date.now()}`,
+        username: `@${twitterData.username}`,
+        avatar_url: twitterData.profile_image_url || null,
+        bio: twitterData.description || `Twitter user ${twitterData.name}`,
+        verified: twitterData.verified || false,
+        twitter_id: twitterData.id,
+        twitter_username: twitterData.username,
+        followers_count: twitterData.followers_count || 0,
+        following_count: twitterData.following_count || 0,
+        posts_count: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      console.log('📋 Demo mode: Created user without database');
+      return fallbackUser;
+    }
+
     const result = await sql`
       INSERT INTO profiles (
         username, avatar_url, bio, verified, 
@@ -63,6 +92,11 @@ export class NeonSimpleService {
 
   // 🚀 Get user by Twitter ID
   async getUserByTwitterId(twitterId: string): Promise<Profile | null> {
+    if (!sql) {
+      console.log('📋 Demo mode: Database not available');
+      return null;
+    }
+
     const result = await sql`
       SELECT * FROM profiles WHERE twitter_id = ${twitterId}
     `;

@@ -6,7 +6,7 @@ import { TrendingUp, Compass, Gamepad2, MessageCircle, Coins, Play, ShoppingCart
 import './styles/theme.css';
 
 // Hooks
-import { useAuth } from './hooks/useAuth';
+import { useNeonAuth } from './hooks/useNeonAuth';
 
 // Layout Components
 import { TopBar } from './components/Layout/TopBar';
@@ -59,16 +59,16 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, loading } = useAuth();
+  const { profile, loading } = useNeonAuth();
 
   // Show auth modal if not authenticated and not loading
   useEffect(() => {
     // Only show auth modal if Supabase is configured
     // DISABLED - no auto popup
-    // if (!loading && !user) {
+    // if (!loading && !profile) {
     //   setIsAuthOpen(true);
     // }
-  }, [user, loading]);
+  }, [profile, loading]);
 
   const handleAuth = (method: string) => {
     console.log('Auth method:', method);
