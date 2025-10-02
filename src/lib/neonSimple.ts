@@ -104,6 +104,29 @@ export class NeonSimpleService {
     return result[0] as Profile || null;
   }
 
+  // 🚀 Update user profile
+  async updateProfile(userId: string, updates: { bio?: string; avatar_url?: string }): Promise<Profile> {
+    if (!sql) {
+      throw new Error('Database not available');
+    }
+
+    const result = await sql`
+      UPDATE profiles 
+      SET 
+        bio = COALESCE(${updates.bio}, bio),
+        avatar_url = COALESCE(${updates.avatar_url}, avatar_url),
+        updated_at = NOW()
+      WHERE id = ${userId}
+      RETURNING *
+    `;
+    
+    if (result.length === 0) {
+      throw new Error('User not found');
+    }
+    
+    return result[0] as Profile;
+  }
+
   // 🚀 Get user feed - Single fast query
   async getFeedPosts(userId: string, limit = 20): Promise<Post[]> {
     const result = await sql`

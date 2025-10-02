@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { mockPosts } from '../data/mockData';
-import { useAuth } from '../hooks/useAuth';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 // Mock user data for the logged-in user
 const mockLoggedInUser = {
@@ -105,7 +105,7 @@ export const Profile: React.FC = () => {
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
-  const { profile, twitterUser } = useAuth();
+  const { profile, updateProfile } = useNeonAuth();
 
   // Use real Twitter data if available, otherwise fallback to mock
   const user = profile ? {
@@ -151,31 +151,23 @@ export const Profile: React.FC = () => {
     
     setIsUpdating(true);
     try {
-      // Update profile in database
-      const response = await fetch('/api/update-profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: profile.id,
-          bio: editBio,
-          avatar_url: editAvatar
-        })
+      // Update profile using the auth hook
+      const result = await updateProfile({
+        bio: editBio,
+        avatar_url: editAvatar
       });
 
-      if (response.ok) {
-        // Refresh the page to show updated data
-        window.location.reload();
+      if (result.success) {
+        setShowEditModal(false);
+        // Profile state is automatically updated by the hook
       } else {
-        alert('Failed to update profile. Please try again.');
+        alert(result.error || 'Failed to update profile. Please try again.');
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       alert('Failed to update profile. Please try again.');
     } finally {
       setIsUpdating(false);
-      setShowEditModal(false);
     }
   };
 

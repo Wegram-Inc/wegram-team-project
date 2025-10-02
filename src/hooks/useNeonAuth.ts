@@ -109,9 +109,24 @@ export const useNeonAuth = () => {
   };
 
   // 🚀 Update profile
-  const updateProfile = (updatedProfile: Profile) => {
-    localStorage.setItem('wegram_user', JSON.stringify(updatedProfile));
-    setProfile(updatedProfile);
+  const updateProfile = async (updates: { bio?: string; avatar_url?: string }) => {
+    if (!profile) return { success: false, error: 'No user logged in' };
+
+    try {
+      const updatedProfile = await neonSimple.updateProfile(profile.id, updates);
+      
+      // Update local state and localStorage
+      setProfile(updatedProfile);
+      localStorage.setItem('wegram_user', JSON.stringify(updatedProfile));
+      
+      return { success: true, profile: updatedProfile };
+    } catch (error) {
+      console.error('Profile update error:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update profile' 
+      };
+    }
   };
 
   return {
