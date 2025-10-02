@@ -52,9 +52,9 @@ export class NeonSimpleService {
   // 🚀 Create user from Twitter data
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
     if (!sql) {
-      // Fallback: create user object without database for now
+      // Fallback: create user object with real Twitter data
       const fallbackUser: Profile = {
-        id: `demo_${Date.now()}`,
+        id: `user_${twitterData.id}`,
         username: `@${twitterData.username}`,
         avatar_url: twitterData.profile_image_url || null,
         bio: twitterData.description || `Twitter user ${twitterData.name}`,

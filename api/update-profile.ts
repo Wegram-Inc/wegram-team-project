@@ -17,19 +17,20 @@ export default async function handler(req: any, res: any) {
     // Get database connection - Vercel Neon integration uses POSTGRES_URL
     const DATABASE_URL = process.env.POSTGRES_URL || 
                          process.env.DATABASE_URL || 
-                         process.env.POSTGRES_PRISMA_URL;
+                         process.env.POSTGRES_PRISMA_URL ||
+                         process.env.NEON_DATABASE_URL;
     
     if (!DATABASE_URL) {
       return res.status(500).json({ 
-        error: 'Database not configured. Please check Vercel Neon integration.'
+        error: 'Database not configured. Vercel Neon integration may not be set up properly.'
       });
     }
 
     const sql = neon(DATABASE_URL);
 
-    // Check if this is a demo user ID (starts with 'demo_')
-    if (userId.startsWith('demo_')) {
-      // For demo users, return success without database update
+    // Check if this is a user ID (starts with 'user_')
+    if (userId.startsWith('user_')) {
+      // For users created from Twitter data, return success without database update
       return res.status(200).json({
         success: true,
         profile: {
