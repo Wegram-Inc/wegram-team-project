@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signInWithRealTwitter } = useAuth();
+  const { signInWithRealX, signInWithX } = useNeonAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAuthorize = async () => {
     setIsLoading(true);
     try {
       // Use REAL Twitter OAuth
-      await signInWithRealTwitter();
+      await signInWithRealX();
       // The redirect to Twitter will happen automatically
       // User will come back via /twitter/callback
     } catch (error) {
       console.error('Twitter auth error:', error);
       alert('Failed to start Twitter authentication');
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoAuth = async () => {
+    setIsLoading(true);
+    try {
+      // Use demo X auth that saves to Neon database
+      const result = await signInWithX();
+      if (result.success) {
+        navigate('/home');
+      } else {
+        alert(result.error || 'Authentication failed');
+      }
+    } catch (error) {
+      console.error('Demo auth error:', error);
+      alert('Authentication failed');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -96,10 +114,11 @@ export const AuthPage: React.FC = () => {
           </button>
           
           <button
-            onClick={() => navigate('/home')}
-            className="w-full text-gray-500 hover:text-gray-600 font-medium py-2 px-6 text-sm transition-colors"
+            onClick={handleDemoAuth}
+            disabled={isLoading}
+            className="w-full text-blue-500 hover:text-blue-600 disabled:text-gray-400 font-medium py-2 px-6 text-sm transition-colors"
           >
-            Continue as guest (demo mode)
+            {isLoading ? 'Connecting...' : 'Try Demo X Login (saves to database)'}
           </button>
           
           <p className="text-xs text-gray-400 text-center mt-4">
