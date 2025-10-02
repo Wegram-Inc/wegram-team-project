@@ -22,7 +22,7 @@ class TwitterAuthService {
   private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
   private readonly redirectUri = window.location.hostname === 'localhost' 
     ? `${window.location.origin}/twitter/callback`
-    : 'https://wegram-sept31.vercel.app/twitter/callback';
+    : 'https://wegram-team-project.vercel.app/twitter/callback';
   private readonly scope = 'tweet.read users.read offline.access';
 
   // Generate OAuth URL for Twitter authorization
