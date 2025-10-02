@@ -30,11 +30,10 @@ export default async function handler(req: any, res: any) {
 
     // Check if this is a user ID (starts with 'user_')
     if (userId.startsWith('user_')) {
-      // For users created from Twitter data, return success without database update
+      // For users created from Twitter data, return success with updated fields
       return res.status(200).json({
         success: true,
         profile: {
-          id: userId,
           bio: bio || null,
           avatar_url: avatar_url || null,
           updated_at: new Date().toISOString()

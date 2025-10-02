@@ -129,11 +129,17 @@ export const useNeonAuth = () => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Update local state and localStorage
-        setProfile(result.profile);
-        localStorage.setItem('wegram_user', JSON.stringify(result.profile));
+        // Merge the updated fields with existing profile data
+        const updatedProfile = {
+          ...profile,
+          ...result.profile
+        };
         
-        return { success: true, profile: result.profile };
+        // Update local state and localStorage
+        setProfile(updatedProfile);
+        localStorage.setItem('wegram_user', JSON.stringify(updatedProfile));
+        
+        return { success: true, profile: updatedProfile };
       } else {
         return { 
           success: false, 
