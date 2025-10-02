@@ -113,9 +113,6 @@ export const useNeonAuth = () => {
     if (!profile) return { success: false, error: 'No user logged in' };
 
     try {
-      console.log('🔄 Updating profile for user:', profile.id);
-      console.log('📝 Updates:', updates);
-      
       // Call the API endpoint instead of direct database access
       const response = await fetch('/api/update-profile', {
         method: 'POST',
@@ -129,9 +126,7 @@ export const useNeonAuth = () => {
         })
       });
 
-      console.log('📡 Response status:', response.status);
       const result = await response.json();
-      console.log('📡 Response data:', result);
 
       if (response.ok && result.success) {
         // Update local state and localStorage
@@ -140,12 +135,14 @@ export const useNeonAuth = () => {
         
         return { success: true, profile: result.profile };
       } else {
-        const errorMessage = result.error || result.debug || 'Failed to update profile';
-        console.error('❌ Profile update failed:', errorMessage);
-        throw new Error(errorMessage);
+        console.error('❌ API response error:', result.error || 'Unknown error');
+        return { 
+          success: false, 
+          error: result.error || 'Failed to update profile' 
+        };
       }
     } catch (error) {
-      console.error('❌ Profile update error:', error);
+      console.error('❌ Profile update fetch error:', error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to update profile' 
