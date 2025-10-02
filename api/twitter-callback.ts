@@ -20,7 +20,7 @@ export default async function handler(
   }
 
   try {
-    // Exchange code for access token
+    // Step 1: Exchange code for token
     const tokenResponse = await fetch('https://api.twitter.com/2/oauth2/token', {
       method: 'POST',
       headers: {
@@ -37,11 +37,12 @@ export default async function handler(
     });
 
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.text();
-      console.error('Twitter token exchange failed:', errorData);
+      const errorText = await tokenResponse.text();
+      console.error('Twitter token exchange failed:', errorText);
       return res.status(tokenResponse.status).json({ 
         error: 'Token exchange failed',
-        details: errorData 
+        details: errorText,
+        status: tokenResponse.status
       });
     }
 
