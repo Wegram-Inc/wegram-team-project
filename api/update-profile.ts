@@ -28,19 +28,6 @@ export default async function handler(req: any, res: any) {
 
     const sql = neon(DATABASE_URL);
 
-    // Check if this is a user ID (starts with 'user_')
-    if (userId.startsWith('user_')) {
-      // For users created from Twitter data, return success with updated fields
-      return res.status(200).json({
-        success: true,
-        profile: {
-          bio: bio || null,
-          avatar_url: avatar_url || null,
-          updated_at: new Date().toISOString()
-        }
-      });
-    }
-
     // Update user profile in database
     const result = await sql`
       UPDATE profiles 

@@ -52,22 +52,7 @@ export class NeonSimpleService {
   // 🚀 Create user from Twitter data
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
     if (!sql) {
-      // Fallback: create user object with real Twitter data
-      const fallbackUser: Profile = {
-        id: `user_${twitterData.id}`,
-        username: `@${twitterData.username}`,
-        avatar_url: twitterData.profile_image_url || null,
-        bio: twitterData.description || `Twitter user ${twitterData.name}`,
-        verified: twitterData.verified || false,
-        twitter_id: twitterData.id,
-        twitter_username: twitterData.username,
-        followers_count: twitterData.followers_count || 0,
-        following_count: twitterData.following_count || 0,
-        posts_count: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      return fallbackUser;
+      throw new Error('Database connection required for persistent profiles');
     }
 
     const result = await sql`
