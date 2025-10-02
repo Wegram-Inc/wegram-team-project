@@ -68,15 +68,19 @@ class TwitterAuthService {
       // Clear stored state
       localStorage.removeItem('twitter_oauth_state');
 
-      // Exchange code for access token
+      // Exchange code for access token (now includes user info from backend)
       const tokenResponse = await this.exchangeCodeForToken(code);
       
       if (!tokenResponse.access_token) {
         throw new Error('Failed to get access token');
       }
 
-      // Get user info
-      const userInfo = await this.getUserInfo(tokenResponse.access_token);
+      // User info is already included in tokenResponse from backend
+      const userInfo = tokenResponse.user || await this.getUserInfo(tokenResponse.access_token);
+      
+      if (!userInfo) {
+        throw new Error('Failed to get user information');
+      }
       
       return {
         success: true,

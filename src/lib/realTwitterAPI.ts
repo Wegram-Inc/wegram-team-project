@@ -1,60 +1,55 @@
-// Real Twitter OAuth API Integration
+// Real Twitter OAuth API Integration via Backend
 const TWITTER_API_KEY = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
-const TWITTER_API_SECRET = import.meta.env.VITE_TWITTER_API_SECRET || 'yVLRkNMGNMr0alpbKCSPdKDlwMmZeySkR9wnMIojSc6wPjcztI';
 
 export const realTwitterAPI = {
-  // Exchange authorization code for access token
+  // Exchange authorization code for access token via backend
   async exchangeCodeForToken(code: string, redirectUri: string, codeVerifier: string) {
     try {
-      const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+      // Call our Vercel serverless function instead of Twitter API directly
+      const response = await fetch('/api/twitter-callback', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + btoa(`${TWITTER_API_KEY}:${TWITTER_API_SECRET}`)
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          code: code,
-          grant_type: 'authorization_code',
-          client_id: TWITTER_API_KEY,
-          redirect_uri: redirectUri,
-          code_verifier: codeVerifier
+        body: JSON.stringify({
+          code,
+          codeVerifier,
+          redirectUri
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Twitter API error: ${response.status}`);
+        const errorData = await response.json();
+        console.error('Backend token exchange failed:', errorData);
+        throw new Error(errorData.error || `Token exchange failed: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Token exchange failed');
+      }
+
+      // Return in expected format
+      return {
+        access_token: data.accessToken,
+        user: data.user
+      };
     } catch (error) {
       console.error('Token exchange error:', error);
       throw error;
     }
   },
 
-  // Get user information from Twitter API
+  // Get user information (already fetched by backend, but keeping for compatibility)
   async getUserInfo(accessToken: string) {
-    try {
-      const response = await fetch('https://api.twitter.com/2/users/me?user.fields=id,name,username,profile_image_url,verified,public_metrics', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Twitter API error: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Get user info error:', error);
-      throw error;
-    }
+    // This is now handled by the backend, but we keep this for compatibility
+    return null;
   },
 
   // Check API status
   getAPIStatus() {
-    const hasCredentials = !!TWITTER_API_KEY && !!TWITTER_API_SECRET;
+    const hasCredentials = !!TWITTER_API_KEY;
     return {
       connected: hasCredentials,
       message: hasCredentials ? 'Twitter API ready' : 'Twitter API credentials not configured'
