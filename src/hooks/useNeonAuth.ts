@@ -113,13 +113,30 @@ export const useNeonAuth = () => {
     if (!profile) return { success: false, error: 'No user logged in' };
 
     try {
-      const updatedProfile = await neonSimple.updateProfile(profile.id, updates);
-      
-      // Update local state and localStorage
-      setProfile(updatedProfile);
-      localStorage.setItem('wegram_user', JSON.stringify(updatedProfile));
-      
-      return { success: true, profile: updatedProfile };
+      // Call the API endpoint instead of direct database access
+      const response = await fetch('/api/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: profile.id,
+          bio: updates.bio,
+          avatar_url: updates.avatar_url
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Update local state and localStorage
+        setProfile(result.profile);
+        localStorage.setItem('wegram_user', JSON.stringify(result.profile));
+        
+        return { success: true, profile: result.profile };
+      } else {
+        throw new Error(result.error || 'Failed to update profile');
+      }
     } catch (error) {
       console.error('Profile update error:', error);
       return { 

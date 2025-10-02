@@ -31,7 +31,7 @@ export default async function handler(req: any, res: any) {
         avatar_url = ${avatar_url || null},
         updated_at = NOW()
       WHERE id = ${userId}
-      RETURNING id, username, bio, avatar_url, updated_at
+      RETURNING *
     `;
 
     if (result.length === 0) {

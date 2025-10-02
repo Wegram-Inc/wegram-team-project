@@ -7,11 +7,13 @@ const DATABASE_URL = import.meta.env?.DATABASE_URL ||
                      import.meta.env?.VITE_DATABASE_URL || 
                      process.env.DATABASE_URL;
 
-if (!DATABASE_URL) {
+// For frontend, we'll use API endpoints instead of direct database access
+const isServerSide = typeof window === 'undefined';
+const sql = (DATABASE_URL && isServerSide) ? neon(DATABASE_URL) : null;
+
+if (!DATABASE_URL && isServerSide) {
   console.warn('⚠️ No DATABASE_URL found. Database features will be disabled.');
 }
-
-const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
 
 export interface Profile {
   id: string;
