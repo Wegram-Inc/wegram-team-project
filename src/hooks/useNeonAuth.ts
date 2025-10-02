@@ -135,14 +135,12 @@ export const useNeonAuth = () => {
         
         return { success: true, profile: result.profile };
       } else {
-        console.error('❌ API response error:', result.error || 'Unknown error');
         return { 
           success: false, 
           error: result.error || 'Failed to update profile' 
         };
       }
     } catch (error) {
-      console.error('❌ Profile update fetch error:', error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to update profile' 

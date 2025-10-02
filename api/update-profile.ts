@@ -20,13 +20,10 @@ export default async function handler(req: any, res: any) {
                          process.env.POSTGRES_PRISMA_URL;
     
     if (!DATABASE_URL) {
-      console.error('❌ No database URL found in environment variables');
       return res.status(500).json({ 
         error: 'Database not configured. Please check Vercel Neon integration.'
       });
     }
-    
-    console.log('✅ Database URL found, connecting...');
 
     const sql = neon(DATABASE_URL);
 
@@ -45,7 +42,6 @@ export default async function handler(req: any, res: any) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log('Profile updated successfully:', result[0]);
 
     return res.status(200).json({
       success: true,
@@ -53,7 +49,6 @@ export default async function handler(req: any, res: any) {
     });
 
   } catch (error) {
-    console.error('Profile update error:', error);
     return res.status(500).json({ 
       error: 'Failed to update profile',
       details: error instanceof Error ? error.message : 'Unknown error'
