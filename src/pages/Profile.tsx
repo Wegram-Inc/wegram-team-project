@@ -11,7 +11,8 @@ const mockLoggedInUser = {
   id: '1',
   username: '@demo_user',
   displayName: 'Demo User',
-  avatar: 'DU',
+  avatar: null,
+  avatarInitial: 'D',
   verified: true,
   bio: 'Web3 enthusiast building the future of social media. Love creating content about blockchain, DeFi, and the decentralized web. Always learning, always building! 🚀',
   followers: 1234,
@@ -105,9 +106,10 @@ export const Profile: React.FC = () => {
   // Use real Twitter data if available, otherwise fallback to mock
   const user = profile ? {
     id: profile.id,
-    username: profile.username,
+    username: profile.username.startsWith('@') ? profile.username : `@${profile.username}`,
     displayName: profile.username.replace('@', ''),
-    avatar: profile.avatar_url || profile.username.charAt(1).toUpperCase(),
+    avatar: profile.avatar_url,
+    avatarInitial: profile.username.charAt(0).toUpperCase(),
     verified: profile.verified,
     bio: profile.bio || 'Twitter user on WEGRAM',
     followers: profile.followers_count || 0,
@@ -343,9 +345,17 @@ export const Profile: React.FC = () => {
         <div className="px-4 py-6">
           {/* Avatar and Name */}
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
-              {user.avatar}
-            </div>
+            {user.avatar && user.avatar.startsWith('http') ? (
+              <img 
+                src={user.avatar} 
+                alt={user.displayName}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                {user.avatarInitial || user.avatar}
+              </div>
+            )}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>

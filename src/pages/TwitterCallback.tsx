@@ -33,10 +33,8 @@ export const TwitterCallback: React.FC = () => {
         
         if (result.success) {
           setStatus('success');
-          // Redirect to home after successful authentication
-          setTimeout(() => {
-            navigate('/home');
-          }, 2000);
+          // Redirect to home immediately after successful authentication
+          navigate('/home');
         } else {
           setError(result.error || 'Twitter authentication failed');
           setStatus('error');
