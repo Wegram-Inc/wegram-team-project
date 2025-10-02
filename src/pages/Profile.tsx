@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
@@ -112,13 +112,23 @@ export const Profile: React.FC = () => {
     avatarInitial: profile.username.charAt(0).toUpperCase(),
     verified: profile.verified,
     bio: profile.bio || 'Twitter user on WEGRAM',
-    followers: profile.followers_count || 0,
-    following: profile.following_count || 0,
+    // WEGRAM followers/following (from our database - starts at 0)
+    wegramFollowers: 0, // TODO: Get from database
+    wegramFollowing: 0, // TODO: Get from database
+    // Twitter followers (from Twitter API)
+    twitterFollowers: profile.followers_count || 0,
+    twitterUsername: profile.twitter_username || profile.username.replace('@', ''),
     posts: profile.posts_count || 0,
     isFollowing: false,
     connections: [],
     mutualConnections: 0
-  } : mockLoggedInUser;
+  } : {
+    ...mockLoggedInUser,
+    wegramFollowers: 0,
+    wegramFollowing: 0,
+    twitterFollowers: mockLoggedInUser.followers,
+    twitterUsername: 'demo_user'
+  };
 
   // Memoize posts to avoid re-rendering
   const posts = useMemo(() => mockUserPosts, []);
@@ -389,17 +399,33 @@ export const Profile: React.FC = () => {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
+            {/* WEGRAM Followers */}
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.followers.toLocaleString()}</div>
+              <div className="text-lg font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWERS</div>
             </div>
+            
+            {/* WEGRAM Following */}
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.following.toLocaleString()}</div>
+              <div className="text-lg font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWING</div>
             </div>
+            
+            {/* Twitter Followers - Clickable */}
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.posts}</div>
-              <div className="text-secondary text-xs">POSTS</div>
+              <button
+                onClick={() => window.open(`https://twitter.com/${user.twitterUsername}`, '_blank')}
+                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+              >
+                <div className="flex items-center gap-1">
+                  <div className="text-lg font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
+                  <Twitter className="w-4 h-4 text-blue-500" />
+                </div>
+                <div className="text-secondary text-xs flex items-center gap-1">
+                  X
+                  <ExternalLink className="w-3 h-3" />
+                </div>
+              </button>
             </div>
           </div>
 
