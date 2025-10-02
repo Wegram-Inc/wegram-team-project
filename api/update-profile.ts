@@ -29,8 +29,15 @@ export default async function handler(req: any, res: any) {
 
     // Check if this is a demo user ID (starts with 'demo_')
     if (userId.startsWith('demo_')) {
-      return res.status(400).json({ 
-        error: 'Cannot update demo user. Please log in with X to create a real profile.' 
+      // For demo users, return success without database update
+      return res.status(200).json({
+        success: true,
+        profile: {
+          id: userId,
+          bio: bio || null,
+          avatar_url: avatar_url || null,
+          updated_at: new Date().toISOString()
+        }
       });
     }
 
