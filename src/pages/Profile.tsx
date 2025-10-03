@@ -572,6 +572,20 @@ export const Profile: React.FC = () => {
           {/* Bio */}
           <div className="mb-6">
             <p className="text-primary text-sm leading-relaxed">{user.bio}</p>
+            
+            {/* DEBUG INFO */}
+            <div className="mt-4 bg-yellow-100 dark:bg-yellow-900 p-3 rounded text-xs">
+              <strong>🔍 DEBUG INFO:</strong><br/>
+              ID: {user.id}<br/>
+              Username: {user.username}<br/>
+              Display Name: {user.displayName}<br/>
+              Has Avatar: {user.avatar ? 'YES' : 'NO'}<br/>
+              Avatar URL: {user.avatar || 'None'}<br/>
+              Bio: {user.bio}<br/>
+              Twitter Followers: {user.twitterFollowers}<br/>
+              WEGRAM Followers: {user.wegramFollowers}<br/>
+              Verified: {user.verified ? 'YES' : 'NO'}
+            </div>
           </div>
 
           {/* Connections */}
