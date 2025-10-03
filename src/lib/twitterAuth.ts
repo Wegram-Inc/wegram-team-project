@@ -26,32 +26,23 @@ class TwitterAuthService {
   private readonly scope = 'tweet.read users.read offline.access';
 
   // Generate OAuth URL for Twitter authorization
-  async generateAuthUrl(): Promise<string> {
+  generateAuthUrl(): string {
     const state = this.generateRandomState();
     localStorage.setItem('twitter_oauth_state', state);
     
-    // Generate and store code verifier
+    // Generate and store code verifier for PKCE
     const codeVerifier = this.generateCodeVerifier();
     localStorage.setItem('twitter_code_verifier', codeVerifier);
     
-    // Generate SHA256 hash of code verifier for PKCE S256
-    const encoder = new TextEncoder();
-    const data = encoder.encode(codeVerifier);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const codeChallenge = btoa(String.fromCharCode(...hashArray))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=/g, '');
-    
+    // Use 'plain' code challenge method (simpler and works reliably)
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: this.clientId,
       redirect_uri: this.redirectUri,
       scope: this.scope,
       state: state,
-      code_challenge: codeChallenge,
-      code_challenge_method: 'S256',
+      code_challenge: codeVerifier,
+      code_challenge_method: 'plain',
       prompt: 'consent'
     });
 
@@ -60,7 +51,7 @@ class TwitterAuthService {
 
   // Start real Twitter OAuth flow
   async startRealOAuth(): Promise<void> {
-    const authUrl = await this.generateAuthUrl();
+    const authUrl = this.generateAuthUrl();
     // Redirect to Twitter for real authentication
     window.location.href = authUrl;
   }
