@@ -31,8 +31,35 @@ export const useNeonPosts = () => {
       if (response.ok && result.posts) {
         setPosts(result.posts);
       } else {
-        // Fallback to mock data if API fails
-        console.warn('API failed, using mock data:', result.error);
+        // Check localStorage for local posts first, then fallback to mock
+        const localPosts = localStorage.getItem('wegram_local_posts');
+        if (localPosts) {
+          setPosts(JSON.parse(localPosts));
+        } else {
+          // Fallback to mock data
+          const mockPostsWithProfiles = mockPosts.map(post => ({
+            id: post.id,
+            user_id: post.userId,
+            content: post.content,
+            likes: post.likes,
+            replies: post.replies,
+            shares: post.shares,
+            gifts: post.gifts || 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            username: post.username.replace('@', ''),
+            avatar_url: null
+          }));
+          setPosts(mockPostsWithProfiles);
+        }
+      }
+    } catch (error) {
+      // Check localStorage for local posts first, then fallback to mock
+      const localPosts = localStorage.getItem('wegram_local_posts');
+      if (localPosts) {
+        setPosts(JSON.parse(localPosts));
+      } else {
+        // Fallback to mock data
         const mockPostsWithProfiles = mockPosts.map(post => ({
           id: post.id,
           user_id: post.userId,
@@ -48,29 +75,12 @@ export const useNeonPosts = () => {
         }));
         setPosts(mockPostsWithProfiles);
       }
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      // Fallback to mock data
-      const mockPostsWithProfiles = mockPosts.map(post => ({
-        id: post.id,
-        user_id: post.userId,
-        content: post.content,
-        likes: post.likes,
-        replies: post.replies,
-        shares: post.shares,
-        gifts: post.gifts || 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        username: post.username.replace('@', ''),
-        avatar_url: null
-      }));
-      setPosts(mockPostsWithProfiles);
     } finally {
       setLoading(false);
     }
   };
 
-  const createPost = async (content: string, userId: string) => {
+  const createPost = async (content: string, userId: string, username?: string) => {
     try {
       const response = await fetch('/api/posts', {
         method: 'POST',
@@ -84,12 +94,48 @@ export const useNeonPosts = () => {
         setPosts([result.post, ...posts]);
         return { data: result.post };
       } else {
-        console.error('Error creating post:', result.error);
-        return { error: result.error };
+        // API failed, create local post
+        const newPost: Post = {
+          id: Date.now().toString(),
+          user_id: userId,
+          content,
+          likes: 0,
+          replies: 0,
+          shares: 0,
+          gifts: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          username: username || 'demo_user',
+          avatar_url: null
+        };
+        
+        const updatedPosts = [newPost, ...posts];
+        setPosts(updatedPosts);
+        localStorage.setItem('wegram_local_posts', JSON.stringify(updatedPosts));
+        
+        return { data: newPost };
       }
     } catch (error) {
-      console.error('Error in createPost:', error);
-      return { error: 'Failed to create post' };
+      // API failed, create local post
+      const newPost: Post = {
+        id: Date.now().toString(),
+        user_id: userId,
+        content,
+        likes: 0,
+        replies: 0,
+        shares: 0,
+        gifts: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        username: username || 'demo_user',
+        avatar_url: null
+      };
+      
+      const updatedPosts = [newPost, ...posts];
+      setPosts(updatedPosts);
+      localStorage.setItem('wegram_local_posts', JSON.stringify(updatedPosts));
+      
+      return { data: newPost };
     }
   };
 

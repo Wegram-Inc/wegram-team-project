@@ -31,7 +31,8 @@ export const Home: React.FC = () => {
 
   const handlePost = async (content: string) => {
     if (!profile) return;
-    await createPost(content, profile.id);
+    const username = profile.username?.replace('@', '') || 'demo_user';
+    await createPost(content, profile.id, username);
   };
 
   // Listen for quick composer posts from BottomNav modal
