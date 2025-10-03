@@ -13,8 +13,6 @@ export const EmailAuthPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
-  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
-  const [signupEmail, setSignupEmail] = useState('');
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,17 +33,7 @@ export const EmailAuthPage: React.FC = () => {
       }
 
       if (result.success) {
-        if (mode === 'signup') {
-          // Show verification message for signup
-          setSignupEmail(email);
-          setShowVerificationMessage(true);
-          setEmail('');
-          setPassword('');
-          setUsername('');
-        } else {
-          // Login success - go to home
-          navigate('/home');
-        }
+        navigate('/home');
       } else {
         setError(result.error || 'Authentication failed');
       }
@@ -80,43 +68,6 @@ export const EmailAuthPage: React.FC = () => {
         {error && (
           <div className="mb-6 p-3 bg-red-900/50 border border-red-500 rounded-lg">
             <p className="text-sm text-red-300">{error}</p>
-          </div>
-        )}
-
-        {/* Verification Message */}
-        {showVerificationMessage && (
-          <div className="mb-6 p-4 bg-green-900/50 border border-green-500 rounded-lg">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-6 h-6 text-green-400">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-green-300">Account Created!</h3>
-            </div>
-            <p className="text-sm text-green-200 mb-3">
-              We've sent a verification email to <strong>{signupEmail}</strong>
-            </p>
-            <p className="text-sm text-green-200 mb-4">
-              Please check your email and click the verification link to activate your account.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setShowVerificationMessage(false);
-                  setMode('login');
-                }}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                I've Verified My Email
-              </button>
-              <button
-                onClick={() => setShowVerificationMessage(false)}
-                className="px-4 py-2 border border-green-500 hover:border-green-400 text-green-300 rounded-lg text-sm font-medium transition-colors"
-              >
-                Sign Up Again
-              </button>
-            </div>
           </div>
         )}
 

@@ -11,17 +11,6 @@ function hashPassword(password: string): string {
   return `${salt}:${hash}`;
 }
 
-function generateVerificationToken(): string {
-  return randomBytes(32).toString('hex');
-}
-
-function getVerificationUrl(token: string): string {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : 'http://localhost:5007';
-  return `${baseUrl}/verify-email?token=${token}`;
-}
-
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
@@ -75,12 +64,15 @@ export default async function handler(
       return res.status(400).json({ error: 'Username already taken' });
     }
 
-    // Create user (without email verification for now)
+    // Hash password
+    const passwordHash = hashPassword(password);
+
+    // Create user
     const result = await sql`
       INSERT INTO profiles (
         username, email, password_hash,
         followers_count, following_count, posts_count,
-        bio, verified, email_verified
+        bio, verified
       ) VALUES (
         ${username.toLowerCase()},
         ${email.toLowerCase()},
@@ -89,10 +81,9 @@ export default async function handler(
         ${0},
         ${0},
         ${'Welcome to WEGRAM! 🚀'},
-        ${false},
-        ${true}
+        ${false}
       )
-      RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at, email_verified
+      RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at
     `;
 
     const user = result[0];
@@ -109,10 +100,8 @@ export default async function handler(
         followers_count: user.followers_count,
         following_count: user.following_count,
         posts_count: user.posts_count,
-        created_at: user.created_at,
-        email_verified: user.email_verified
-      },
-      message: 'Account created successfully!'
+        created_at: user.created_at
+      }
     });
 
   } catch (error) {
