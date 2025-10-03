@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { PostComposer } from '../components/Post/PostComposer';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 import { useNeonAuth } from '../hooks/useNeonAuth';
@@ -156,12 +155,6 @@ export const Home: React.FC = () => {
         ))}
       </div>
 
-      {profile && (
-        <PostComposer 
-          onPost={handlePost}
-          onCancel={() => {}}
-        />
-      )}
       
       <div>
         {displayPosts.map(post => (
