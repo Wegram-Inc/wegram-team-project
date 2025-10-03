@@ -171,7 +171,7 @@ export class NeonSimpleService {
   // 🚀 Get trending posts
   async getTrendingPosts(limit = 20): Promise<Post[]> {
     const result = await sql`
-      SELECT 
+      SELECT
         p.*,
         pr.username,
         pr.avatar_url,
@@ -182,8 +182,92 @@ export class NeonSimpleService {
       ORDER BY p.likes_count DESC, p.created_at DESC
       LIMIT ${limit}
     `;
-    
+
     return result as Post[];
+  }
+
+  // 🚀 Bookmark post
+  async bookmarkPost(userId: string, postId: string): Promise<boolean> {
+    if (!sql) {
+      return false;
+    }
+
+    try {
+      await sql`
+        INSERT INTO bookmarks (user_id, post_id)
+        VALUES (${userId}, ${postId})
+        ON CONFLICT (user_id, post_id) DO NOTHING
+      `;
+      return true;
+    } catch (error) {
+      console.error('Bookmark error:', error);
+      return false;
+    }
+  }
+
+  // 🚀 Remove bookmark
+  async removeBookmark(userId: string, postId: string): Promise<boolean> {
+    if (!sql) {
+      return false;
+    }
+
+    try {
+      await sql`
+        DELETE FROM bookmarks
+        WHERE user_id = ${userId} AND post_id = ${postId}
+      `;
+      return true;
+    } catch (error) {
+      console.error('Remove bookmark error:', error);
+      return false;
+    }
+  }
+
+  // 🚀 Get user bookmarks
+  async getUserBookmarks(userId: string, limit = 20): Promise<Post[]> {
+    if (!sql) {
+      return [];
+    }
+
+    try {
+      const result = await sql`
+        SELECT
+          p.*,
+          pr.username,
+          pr.avatar_url,
+          pr.verified,
+          b.created_at as bookmarked_at
+        FROM bookmarks b
+        JOIN posts p ON b.post_id = p.id
+        JOIN profiles pr ON p.user_id = pr.id
+        WHERE b.user_id = ${userId}
+        ORDER BY b.created_at DESC
+        LIMIT ${limit}
+      `;
+
+      return result as Post[];
+    } catch (error) {
+      console.error('Get bookmarks error:', error);
+      return [];
+    }
+  }
+
+  // 🚀 Check if post is bookmarked
+  async isPostBookmarked(userId: string, postId: string): Promise<boolean> {
+    if (!sql) {
+      return false;
+    }
+
+    try {
+      const result = await sql`
+        SELECT id FROM bookmarks
+        WHERE user_id = ${userId} AND post_id = ${postId}
+      `;
+      return result.length > 0;
+    } catch (error) {
+      console.error('Check bookmark error:', error);
+      return false;
+    }
   }
 }
 
