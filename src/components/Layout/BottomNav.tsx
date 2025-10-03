@@ -173,8 +173,6 @@ export const BottomNav: React.FC = () => {
               onClick={() => {
                 const content = textContent.trim() || (selectedFiles.length > 0 ? 'Shared media' : '');
                 if (!content) return; 
-                
-                console.log('🚀 Dispatching post event:', { content, profile: profile?.username });
                 window.dispatchEvent(new CustomEvent('wegram:new-post', { detail: { content } }));
                 setShowCreateModal(false);
                 setTextContent('');
