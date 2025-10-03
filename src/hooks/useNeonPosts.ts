@@ -19,9 +19,10 @@ export const useNeonPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPosts('trenches');
-  }, []);
+  // Remove automatic fetchPosts call - let components control when to fetch
+  // useEffect(() => {
+  //   fetchPosts('trenches');
+  // }, []);
 
   const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
     setLoading(true);

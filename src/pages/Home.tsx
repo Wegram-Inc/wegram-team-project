@@ -39,6 +39,15 @@ export const Home: React.FC = () => {
     }
   };
 
+  // Load initial feed when component mounts or profile changes
+  useEffect(() => {
+    if (profile?.id) {
+      fetchPosts(activeTab, profile.id);
+    } else {
+      fetchPosts(activeTab);
+    }
+  }, [profile?.id, activeTab]);
+
   const handlePost = async (content: string) => {
     if (!profile) return;
     await createPost(content, profile.id, profile.username);
