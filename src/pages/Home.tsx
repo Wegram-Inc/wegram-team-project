@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 import { useNeonAuth } from '../hooks/useNeonAuth';
-import { mockPosts } from '../data/mockData';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Users, Zap } from 'lucide-react';
@@ -14,20 +13,8 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('following');
   
-  // Use real posts from database, fallback to mock if none exist
-  const displayPosts = posts.length > 0 ? posts : mockPosts.map(post => ({
-    id: post.id,
-    user_id: post.userId,
-    content: post.content,
-    likes: post.likes,
-    replies: post.replies,
-    shares: post.shares,
-    gifts: post.gifts || 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    username: post.username.replace('@', ''),
-    avatar_url: null
-  }));
+  // Use real posts from database only - NO MOCK FALLBACKS
+  const displayPosts = posts;
 
   // Handle tab changes
   const handleTabChange = (tab: 'following' | 'trenches' | 'trending') => {

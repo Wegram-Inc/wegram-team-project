@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { mockPosts } from '../data/mockData';
 
 export interface Post {
   id: string;
@@ -41,38 +40,12 @@ export const useNeonPosts = () => {
       if (response.ok && result.posts) {
         setPosts(result.posts);
       } else {
-        // Fallback to mock data if API fails
-        const mockPostsWithProfiles = mockPosts.map(post => ({
-          id: post.id,
-          user_id: post.userId,
-          content: post.content,
-          likes: post.likes,
-          replies: post.replies,
-          shares: post.shares,
-          gifts: post.gifts || 0,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          username: post.username.replace('@', ''),
-          avatar_url: null
-        }));
-        setPosts(mockPostsWithProfiles);
+        console.error('Failed to fetch posts:', result.error || 'Unknown error');
+        setPosts([]);
       }
     } catch (error) {
-      // Fallback to mock data
-      const mockPostsWithProfiles = mockPosts.map(post => ({
-        id: post.id,
-        user_id: post.userId,
-        content: post.content,
-        likes: post.likes,
-        replies: post.replies,
-        shares: post.shares,
-        gifts: post.gifts || 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        username: post.username.replace('@', ''),
-        avatar_url: null
-      }));
-      setPosts(mockPostsWithProfiles);
+      console.error('Error fetching posts:', error);
+      setPosts([]);
     } finally {
       setLoading(false);
     }
