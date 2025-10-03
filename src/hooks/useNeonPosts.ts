@@ -80,8 +80,6 @@ export const useNeonPosts = () => {
 
       if (response.ok && result.post) {
         setPosts([result.post, ...posts]);
-        // Refresh posts to ensure we have the latest data
-        fetchPosts();
         return { data: result.post };
       } else {
         return { error: result.error };

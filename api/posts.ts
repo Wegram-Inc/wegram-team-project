@@ -20,7 +20,15 @@ export default async function handler(
         // Fetch all posts with user profiles
         const posts = await sql`
           SELECT 
-            p.*,
+            p.id,
+            p.user_id,
+            p.content,
+            p.image_url,
+            p.likes_count as likes,
+            p.comments_count as replies,
+            p.shares_count as shares,
+            p.created_at,
+            p.updated_at,
             pr.username,
             pr.avatar_url
           FROM posts p
@@ -44,15 +52,23 @@ export default async function handler(
         }
 
         const newPost = await sql`
-          INSERT INTO posts (content, user_id, likes, replies, shares, gifts)
-          VALUES (${content}, ${user_id}, 0, 0, 0, 0)
+          INSERT INTO posts (content, user_id, likes_count, comments_count, shares_count)
+          VALUES (${content}, ${user_id}, 0, 0, 0)
           RETURNING *
         `;
 
         // Get the post with user profile
         const postWithProfile = await sql`
           SELECT 
-            p.*,
+            p.id,
+            p.user_id,
+            p.content,
+            p.image_url,
+            p.likes_count as likes,
+            p.comments_count as replies,
+            p.shares_count as shares,
+            p.created_at,
+            p.updated_at,
             pr.username,
             pr.avatar_url
           FROM posts p
@@ -73,13 +89,13 @@ export default async function handler(
         let updateQuery;
         switch (action) {
           case 'like':
-            updateQuery = sql`UPDATE posts SET likes = likes + 1 WHERE id = ${post_id} RETURNING *`;
+            updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
             break;
           case 'gift':
-            updateQuery = sql`UPDATE posts SET gifts = gifts + 1 WHERE id = ${post_id} RETURNING *`;
+            updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
             break;
           case 'share':
-            updateQuery = sql`UPDATE posts SET shares = shares + 1 WHERE id = ${post_id} RETURNING *`;
+            updateQuery = sql`UPDATE posts SET shares_count = shares_count + 1 WHERE id = ${post_id} RETURNING *`;
             break;
           default:
             return res.status(400).json({ error: 'Invalid action' });
