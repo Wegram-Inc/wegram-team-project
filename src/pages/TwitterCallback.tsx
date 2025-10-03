@@ -121,12 +121,28 @@ export const TwitterCallback: React.FC = () => {
               <div className="space-y-2">
                 <button
                   onClick={() => {
+                    // Clear all auth data
                     localStorage.clear();
+                    sessionStorage.clear();
+                    // Clear all cookies
+                    document.cookie.split(";").forEach((c) => {
+                      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                    });
+                    // Redirect to auth page
                     window.location.href = '/auth';
                   }}
                   className="btn-primary px-6 py-2 w-full bg-blue-500 hover:bg-blue-600 text-white rounded"
                 >
-                  Try Again (Fresh Start)
+                  Try Different Twitter Account
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = '/auth';
+                  }}
+                  className="btn-secondary px-6 py-2 w-full bg-gray-500 hover:bg-gray-600 text-white rounded"
+                >
+                  Try Again (Same Account)
                 </button>
                 <button
                   onClick={() => navigate('/')}

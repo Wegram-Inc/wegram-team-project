@@ -10,6 +10,11 @@ export const AuthPage: React.FC = () => {
   const handleAuthorize = async () => {
     setIsLoading(true);
     try {
+      // Clear any previous Twitter session data to ensure account picker shows
+      // This allows users to choose which Twitter account to log in with
+      localStorage.removeItem('wegram_user');
+      sessionStorage.clear();
+      
       // Use REAL Twitter OAuth
       await signInWithRealX();
       // The redirect to Twitter will happen automatically

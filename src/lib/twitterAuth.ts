@@ -26,7 +26,7 @@ class TwitterAuthService {
   private readonly scope = 'tweet.read users.read offline.access';
 
   // Generate OAuth URL for Twitter authorization
-  generateAuthUrl(): string {
+  generateAuthUrl(forceAccountPicker: boolean = true): string {
     const state = this.generateRandomState();
     localStorage.setItem('twitter_oauth_state', state);
     
@@ -46,7 +46,8 @@ class TwitterAuthService {
       state: state,
       code_challenge: codeVerifier,
       code_challenge_method: 'plain',
-      prompt: 'consent'
+      // IMPORTANT: Force Twitter to always show account picker so users can choose which account to use
+      prompt: forceAccountPicker ? 'consent' : 'none'
     });
 
     return `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
