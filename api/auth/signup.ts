@@ -109,19 +109,12 @@ export default async function handler(
     const user = result[0];
 
     // Send verification email
-    const emailResult = process.env.RESEND_API_KEY 
-      ? await sendVerificationEmail({
-          email: user.email,
-          username: user.username,
-          verificationToken,
-          verificationUrl
-        })
-      : await sendVerificationEmailFallback({
-          email: user.email,
-          username: user.username,
-          verificationToken,
-          verificationUrl
-        });
+    const emailResult = await sendVerificationEmail({
+      email: user.email,
+      username: user.username,
+      verificationToken,
+      verificationUrl
+    });
 
     if (!emailResult.success) {
       console.error('Failed to send verification email:', emailResult.error);
