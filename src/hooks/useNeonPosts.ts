@@ -26,6 +26,7 @@ export const useNeonPosts = () => {
 
   const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
     setLoading(true);
+    setPosts([]); // Clear posts immediately to show loading state
     try {
       const params = new URLSearchParams();
       params.append('feed_type', feedType);

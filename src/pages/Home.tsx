@@ -194,7 +194,7 @@ export const Home: React.FC = () => {
         {displayPosts.length > 0 ? (
           displayPosts.map(post => (
             <PostCard
-              key={post.id}
+              key={`${activeTab}-${post.id}`}
               post={{
                 id: post.id,
                 userId: post.user_id,
