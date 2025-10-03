@@ -60,9 +60,9 @@ export default async function handler(
 
     const tokenData = await tokenResponse.json();
 
-    // Get user information
+    // Get user information (request only minimal fields to avoid permission/rate issues)
     const userResponse = await fetch(
-      'https://api.twitter.com/2/users/me?user.fields=id,name,username,profile_image_url,description,verified,public_metrics',
+      'https://api.twitter.com/2/users/me?user.fields=id,name,username,profile_image_url',
       {
         headers: {
           'Authorization': `Bearer ${tokenData.access_token}`
@@ -91,19 +91,14 @@ export default async function handler(
 
     const userData = await userResponse.json();
 
-    // Return user data and tokens
+    // Return user data and tokens (follower metrics are optional and may update later)
     return res.status(200).json({
       success: true,
       user: {
         id: userData.data.id,
         username: userData.data.username,
         name: userData.data.name,
-        profile_image_url: userData.data.profile_image_url,
-        description: userData.data.description,
-        verified: userData.data.verified,
-        followers_count: userData.data.public_metrics?.followers_count || 0,
-        following_count: userData.data.public_metrics?.following_count || 0,
-        tweet_count: userData.data.public_metrics?.tweet_count || 0
+        profile_image_url: userData.data.profile_image_url
       },
       accessToken: tokenData.access_token
     });

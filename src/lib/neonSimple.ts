@@ -69,7 +69,7 @@ export class NeonSimpleService {
         ${twitterData.id},
         ${twitterData.username},
         ${twitterData.followers_count || 0},
-        ${twitterData.following_count || 0}
+        ${0}
       )
       ON CONFLICT (twitter_id) 
       DO UPDATE SET
