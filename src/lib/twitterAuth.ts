@@ -34,6 +34,9 @@ class TwitterAuthService {
     const codeVerifier = this.generateCodeVerifier();
     localStorage.setItem('twitter_code_verifier', codeVerifier);
     
+    // Store redirect_uri to ensure it matches exactly during token exchange
+    localStorage.setItem('twitter_redirect_uri', this.redirectUri);
+    
     // Use 'plain' code challenge method (simpler and works reliably)
     const params = new URLSearchParams({
       response_type: 'code',
@@ -99,21 +102,29 @@ class TwitterAuthService {
 
   // Exchange authorization code for access token
   private async exchangeCodeForToken(code: string): Promise<any> {
-    // Get the stored code verifier
+    // Get the stored code verifier and redirect_uri
     const codeVerifier = localStorage.getItem('twitter_code_verifier');
+    const storedRedirectUri = localStorage.getItem('twitter_redirect_uri');
     
     if (!codeVerifier) {
       throw new Error('Code verifier not found in storage');
     }
     
-    console.log('Exchanging code for token with verifier:', codeVerifier.substring(0, 10) + '...');
+    // Use the EXACT redirect_uri that was sent to Twitter initially
+    const redirectUri = storedRedirectUri || this.redirectUri;
+    
+    console.log('Exchanging code for token:', {
+      verifier: codeVerifier.substring(0, 10) + '...',
+      redirectUri
+    });
     
     try {
-      // Use real Twitter API
-      const result = await realTwitterAPI.exchangeCodeForToken(code, this.redirectUri, codeVerifier);
+      // Use real Twitter API with the stored redirect_uri
+      const result = await realTwitterAPI.exchangeCodeForToken(code, redirectUri, codeVerifier);
       
-      // Clear the code verifier
+      // Clear the stored OAuth data
       localStorage.removeItem('twitter_code_verifier');
+      localStorage.removeItem('twitter_redirect_uri');
       
       return result;
     } catch (error) {
