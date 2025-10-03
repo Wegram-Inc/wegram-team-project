@@ -92,9 +92,33 @@ export const Home: React.FC = () => {
   };
 
   const handleBookmark = async (postId: string) => {
-    // Bookmark functionality - in real app this would save to user's bookmarks
-    console.log('Bookmarking post:', postId);
-    alert('Post bookmarked! 📖');
+    if (!profile?.id) {
+      alert('Please sign in to bookmark posts');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/bookmarks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: profile.id,
+          postId: postId
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Post bookmarked! 📖');
+      } else {
+        console.error('Bookmark failed:', data.error);
+        alert('Failed to bookmark post');
+      }
+    } catch (error) {
+      console.error('Bookmark error:', error);
+      alert('Failed to bookmark post');
+    }
   };
 
   if (loading) {
