@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, MoreHorizontal, Gift, CheckCircle, XCircle, Flag, Share, Mail } from 'lucide-react';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 interface UserProfileData {
   username: string;
@@ -639,9 +640,12 @@ export const UserProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile: currentUser } = useNeonAuth();
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'nft' | 'stats'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Memoize the feed posts to prevent regeneration on every render
   const feedPosts = useMemo(() => {
@@ -690,9 +694,38 @@ export const UserProfile: React.FC = () => {
 
   const user = getUserData(`@${username}`);
 
-  const handleFollow = () => {
-    // Follow/unfollow logic would go here
-    console.log('Follow/unfollow user:', username);
+  const handleFollow = async () => {
+    if (!currentUser) {
+      alert('Please log in to follow users');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const method = isFollowing ? 'DELETE' : 'POST';
+      const response = await fetch('/api/follow', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          follower_id: currentUser.id,
+          following_id: user.id // We'll need to get the actual user ID from the database
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setIsFollowing(!isFollowing);
+        // Update the user object to reflect the change
+        user.isFollowing = !isFollowing;
+      } else {
+        alert(result.error || 'Failed to update follow status');
+      }
+    } catch (error) {
+      alert('Failed to update follow status');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleMessage = () => {
@@ -939,9 +972,10 @@ export const UserProfile: React.FC = () => {
               </button>
               <button
                 onClick={handleFollow}
-                className={`btn-primary px-6 py-2 rounded-full font-medium transition-colors`}
+                disabled={isLoading}
+                className={`btn-primary px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {user.isFollowing ? 'Unfollow' : 'Follow'}
+                {isLoading ? '...' : (isFollowing ? 'Unfollow' : 'Follow')}
               </button>
             </div>
           </div>
