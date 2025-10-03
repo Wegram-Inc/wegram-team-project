@@ -604,7 +604,11 @@ export const Profile: React.FC = () => {
                   } else {
                     const newUrl = prompt('Enter your X (Twitter) URL:', 'https://x.com/');
                     if (newUrl && newUrl.trim()) {
-                      updateProfile({ twitter_url: newUrl.trim() });
+                      updateProfile({ 
+                        bio: profile?.bio, 
+                        avatar_url: profile?.avatar_url,
+                        twitter_url: newUrl.trim() 
+                      });
                     }
                   }
                 }}
@@ -627,7 +631,11 @@ export const Profile: React.FC = () => {
                   } else {
                     const newUrl = prompt('Enter your Discord URL:', 'https://discord.gg/');
                     if (newUrl && newUrl.trim()) {
-                      updateProfile({ discord_url: newUrl.trim() });
+                      updateProfile({ 
+                        bio: profile?.bio, 
+                        avatar_url: profile?.avatar_url,
+                        discord_url: newUrl.trim() 
+                      });
                     }
                   }
                 }}
@@ -650,7 +658,11 @@ export const Profile: React.FC = () => {
                   } else {
                     const newUrl = prompt('Enter your Telegram URL:', 'https://t.me/');
                     if (newUrl && newUrl.trim()) {
-                      updateProfile({ telegram_url: newUrl.trim() });
+                      updateProfile({ 
+                        bio: profile?.bio, 
+                        avatar_url: profile?.avatar_url,
+                        telegram_url: newUrl.trim() 
+                      });
                     }
                   }
                 }}
