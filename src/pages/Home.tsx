@@ -30,15 +30,25 @@ export const Home: React.FC = () => {
   }));
 
   const handlePost = async (content: string) => {
-    if (!profile) return;
-    await createPost(content, profile.id);
+    console.log('🔄 handlePost called:', { content, profile: profile?.username, profileId: profile?.id });
+    if (!profile) {
+      console.log('❌ No profile found, cannot create post');
+      return;
+    }
+    console.log('📤 Creating post via API...');
+    const result = await createPost(content, profile.id);
+    console.log('📥 Post creation result:', result);
   };
 
   // Listen for quick composer posts from BottomNav modal
   useEffect(() => {
     const handler = (e: any) => {
       const content = e.detail?.content as string;
-      if (content) handlePost(content);
+      console.log('📥 Received post event:', { content, profile: profile?.username });
+      if (content) {
+        console.log('📤 Calling handlePost with:', content);
+        handlePost(content);
+      }
     };
     window.addEventListener('wegram:new-post', handler as any);
     return () => window.removeEventListener('wegram:new-post', handler as any);

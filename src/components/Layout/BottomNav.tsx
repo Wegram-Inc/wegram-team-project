@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { BarChart3, Plus, Wallet, HelpCircle, Play, Type, Image, Video, X, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { mockUser } from '../../data/mockData';
+import { useNeonAuth } from '../../hooks/useNeonAuth';
 
 export const BottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile } = useNeonAuth();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [textContent, setTextContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -102,13 +104,24 @@ export const BottomNav: React.FC = () => {
                   // Close modal first, then navigate to avoid popup issues
                   setShowCreateModal(false);
                   setTimeout(() => {
-                    navigate(`/user/${mockUser.username.replace('@', '')}`);
+                    const username = profile?.username?.replace('@', '') || 'demo_user';
+                    navigate(`/user/${username}`);
                   }, 100);
                 }}
-                className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+                className="w-10 h-10 rounded-full overflow-hidden hover:scale-105 transition-transform cursor-pointer"
                 aria-label="Open profile"
               >
-                <User className="w-5 h-5 text-white" />
+                {profile?.avatar_url ? (
+                  <img 
+                    src={profile.avatar_url} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full gradient-bg flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                )}
               </button>
               <textarea
                 value={textContent}
@@ -160,6 +173,8 @@ export const BottomNav: React.FC = () => {
               onClick={() => {
                 const content = textContent.trim() || (selectedFiles.length > 0 ? 'Shared media' : '');
                 if (!content) return; 
+                
+                console.log('🚀 Dispatching post event:', { content, profile: profile?.username });
                 window.dispatchEvent(new CustomEvent('wegram:new-post', { detail: { content } }));
                 setShowCreateModal(false);
                 setTextContent('');
