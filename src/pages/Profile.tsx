@@ -456,7 +456,7 @@ export const Profile: React.FC = () => {
 
       {/* Edit Profile Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black bg-opacity-50"
@@ -465,7 +465,7 @@ export const Profile: React.FC = () => {
 
           {/* Modal */}
           <div
-            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden w-full max-w-md mx-4"
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 my-8 max-h-[90vh] overflow-y-auto"
             style={{ backgroundColor: 'var(--card)' }}
           >
             {/* Header */}
@@ -696,51 +696,80 @@ export const Profile: React.FC = () => {
           </div>
 
           {/* Social Media Links */}
-          {(user.twitterLink || user.discordLink || user.telegramLink) && (
-            <div className="mb-6">
-              <h3 className="text-primary font-semibold mb-3">Social Links</h3>
-              <div className="flex flex-wrap gap-3">
-                {user.twitterLink && (
-                  <a
-                    href={user.twitterLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    <span>X</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-                {user.discordLink && (
-                  <a
-                    href={user.discordLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>Discord</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-                {user.telegramLink && (
-                  <a
-                    href={user.telegramLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>Telegram</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-              </div>
+          <div className="mb-6">
+            <h3 className="text-primary font-semibold mb-3">Social Links</h3>
+            <div className="flex flex-wrap gap-3">
+              {/* X (Twitter) Link */}
+              {user.twitterLink ? (
+                <a
+                  href={user.twitterLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  <span>X</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : (
+                <button
+                  onClick={handleEditProfile}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-dashed border-gray-300 dark:border-gray-600 text-secondary text-sm hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                >
+                  <svg className="w-4 h-4 opacity-50" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  <span className="opacity-50">Add X</span>
+                </button>
+              )}
+
+              {/* Discord Link */}
+              {user.discordLink ? (
+                <a
+                  href={user.discordLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Discord</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : (
+                <button
+                  onClick={handleEditProfile}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-dashed border-gray-300 dark:border-gray-600 text-secondary text-sm hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4 opacity-50" />
+                  <span className="opacity-50">Add Discord</span>
+                </button>
+              )}
+
+              {/* Telegram Link */}
+              {user.telegramLink ? (
+                <a
+                  href={user.telegramLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Telegram</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : (
+                <button
+                  onClick={handleEditProfile}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-dashed border-gray-300 dark:border-gray-600 text-secondary text-sm hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4 opacity-50" />
+                  <span className="opacity-50">Add Telegram</span>
+                </button>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Mutual Connections */}
           {user.mutualConnections > 0 && (
