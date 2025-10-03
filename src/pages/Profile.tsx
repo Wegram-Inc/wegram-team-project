@@ -157,7 +157,8 @@ export const Profile: React.FC = () => {
       likes: post.likes,
       replies: post.replies,
       shares: post.shares,
-      gifts: post.gifts || 0
+      gifts: post.gifts || 0,
+      avatar_url: post.avatar_url
     }));
 
     return formattedPosts.length > 0 ? formattedPosts : [];
