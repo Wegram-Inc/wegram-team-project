@@ -164,9 +164,9 @@ export const Profile: React.FC = () => {
       if (result.success) {
         setShowEditModal(false);
         // Profile state is automatically updated by the hook
-        alert('Profile updated successfully!');
+        alert('✅ Profile updated successfully!');
       } else {
-        alert(result.error || 'Failed to update profile. Please try again.');
+        alert(`❌ Failed to update profile:\n${result.error || 'Unknown error'}\n\nCheck browser console for details.`);
       }
     } catch (error) {
       console.error('❌ Error updating profile:', error);
