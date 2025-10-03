@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { PostComposer } from '../components/Post/PostComposer';
 import { PostCard } from '../components/Post/PostCard';
-import { usePosts } from '../hooks/usePosts';
-import { useAuth } from '../hooks/useAuth';
+import { useNeonPosts } from '../hooks/useNeonPosts';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 import { mockPosts } from '../data/mockData';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
@@ -10,12 +10,12 @@ import { TrendingUp, Users, Zap } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isDark } = useTheme();
-  const { posts, loading, createPost, likePost, giftPost } = usePosts();
-  const { user, profile } = useAuth();
+  const { posts, loading, createPost, likePost, giftPost } = useNeonPosts();
+  const { profile } = useNeonAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('following');
   
-  // For MVP demo - show mock posts if no real posts exist
+  // Use real posts from database, fallback to mock if none exist
   const displayPosts = posts.length > 0 ? posts : mockPosts.map(post => ({
     id: post.id,
     user_id: post.userId,
@@ -26,15 +26,13 @@ export const Home: React.FC = () => {
     gifts: post.gifts || 0,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    profiles: {
-      username: post.username.replace('@', ''),
-      avatar_url: null
-    }
+    username: post.username.replace('@', ''),
+    avatar_url: null
   }));
 
   const handlePost = async (content: string) => {
-    if (!user || !profile) return;
-    await createPost(content, user.id);
+    if (!profile) return;
+    await createPost(content, profile.id);
   };
 
   // Listen for quick composer posts from BottomNav modal
@@ -45,7 +43,7 @@ export const Home: React.FC = () => {
     };
     window.addEventListener('wegram:new-post', handler as any);
     return () => window.removeEventListener('wegram:new-post', handler as any);
-  }, [user, profile]);
+  }, [profile]);
 
   const handleLike = async (postId: string) => {
     await likePost(postId);

@@ -2,10 +2,26 @@ import React from 'react';
 import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
-import { Post } from '../../data/mockData';
+import { Post as MockPost } from '../../data/mockData';
+
+// Unified post interface that works with both mock and database posts
+interface UnifiedPost {
+  id: string;
+  user_id?: string;
+  userId?: string;
+  username: string;
+  content: string;
+  created_at?: string;
+  timestamp?: string;
+  likes: number;
+  replies: number;
+  shares: number;
+  gifts?: number;
+  avatar_url?: string | null;
+}
 
 interface PostCardProps {
-  post: Post;
+  post: UnifiedPost;
   onLike?: (postId: string) => void;
   onReply?: (postId: string) => void;
   onShare?: (postId: string) => void;
@@ -89,7 +105,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
             >
               {post.username}
             </button>
-            <div className="text-secondary text-sm">{post.timestamp}</div>
+            <div className="text-secondary text-sm">
+              {post.timestamp || (post.created_at ? new Date(post.created_at).toLocaleDateString() : '')}
+            </div>
           </div>
         </div>
         <div className="relative">
