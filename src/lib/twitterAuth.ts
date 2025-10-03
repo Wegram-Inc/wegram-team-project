@@ -26,7 +26,7 @@ class TwitterAuthService {
   private readonly scope = 'tweet.read users.read offline.access';
 
   // Generate OAuth URL for Twitter authorization
-  generateAuthUrl(): string {
+  async generateAuthUrl(): Promise<string> {
     const state = this.generateRandomState();
     localStorage.setItem('twitter_oauth_state', state);
     
@@ -37,7 +37,7 @@ class TwitterAuthService {
     // Generate SHA256 hash of code verifier for PKCE S256
     const encoder = new TextEncoder();
     const data = encoder.encode(codeVerifier);
-    const hashBuffer = crypto.subtle.digestSync('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const codeChallenge = btoa(String.fromCharCode(...hashArray))
       .replace(/\+/g, '-')
@@ -51,7 +51,8 @@ class TwitterAuthService {
       scope: this.scope,
       state: state,
       code_challenge: codeChallenge,
-      code_challenge_method: 'S256'
+      code_challenge_method: 'S256',
+      prompt: 'consent'
     });
 
     return `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
@@ -59,7 +60,7 @@ class TwitterAuthService {
 
   // Start real Twitter OAuth flow
   async startRealOAuth(): Promise<void> {
-    const authUrl = this.generateAuthUrl();
+    const authUrl = await this.generateAuthUrl();
     // Redirect to Twitter for real authentication
     window.location.href = authUrl;
   }
