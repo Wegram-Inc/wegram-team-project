@@ -96,7 +96,7 @@ export default async function handler(
         } else {
           // Trenches feed (default) - newest posts from all users
           posts = await sql`
-            SELECT 
+            SELECT
               p.id,
               p.user_id,
               p.content,
@@ -104,6 +104,7 @@ export default async function handler(
               p.likes_count as likes,
               p.comments_count as replies,
               p.shares_count as shares,
+              0 as gifts,
               p.created_at,
               p.updated_at,
               pr.username,

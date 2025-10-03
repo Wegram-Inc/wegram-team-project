@@ -11,7 +11,7 @@ export const Home: React.FC = () => {
   const { posts, loading, createPost, likePost, giftPost, fetchPosts } = useNeonPosts();
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('following');
+  const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('trenches');
   
   // Use real posts from database only - NO MOCK FALLBACKS
   const displayPosts = posts;
