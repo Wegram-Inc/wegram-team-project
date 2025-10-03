@@ -74,15 +74,18 @@ export const useNeonAuth = () => {
       const result = await twitterAuth.handleCallback(code, state);
       
       if (result.success && result.user) {
+        console.log('🔍 Twitter user data received:', result.user);
+        
         // Check if user exists in database
         let user = await neonSimple.getUserByTwitterId(result.user.id);
         
         if (!user) {
           // Create new user from Twitter data
+          console.log('🔍 Creating new user from Twitter data:', result.user);
           user = await neonSimple.createUserFromTwitter(result.user);
-          console.log('✅ New user created from real X auth');
+          console.log('✅ New user created from real X auth:', user);
         } else {
-          console.log('✅ Existing user authenticated with real X');
+          console.log('✅ Existing user authenticated with real X:', user);
         }
         
         // Store in localStorage
