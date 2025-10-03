@@ -54,11 +54,11 @@ export const Home: React.FC = () => {
     if (!post) return;
 
     const giftOptions = ['🎁 1 WGM', '💎 5 WGM', '🚀 10 WGM', '👑 25 WGM'];
-    const selectedGift = prompt(`Send a gift to @${post.profiles.username}:\n\n${giftOptions.join('\n')}\n\nEnter gift (1, 5, 10, or 25):`);
+    const selectedGift = prompt(`Send a gift to @${post.username}:\n\n${giftOptions.join('\n')}\n\nEnter gift (1, 5, 10, or 25):`);
     
     if (selectedGift && ['1', '5', '10', '25'].includes(selectedGift)) {
       await giftPost(postId);
-      alert(`🎁 Sent ${selectedGift} WGM to @${post.profiles.username}!`);
+      alert(`🎁 Sent ${selectedGift} WGM to @${post.username}!`);
     }
   };
 
@@ -67,6 +67,9 @@ export const Home: React.FC = () => {
     console.log('Bookmarking post:', postId);
     alert('Post bookmarked! 📖');
   };
+  // Debug logging
+  console.log('Home page render:', { loading, postsCount: posts.length, displayPostsCount: displayPosts.length, profile });
+
   if (loading) {
     return (
       <div className="max-w-md mx-auto px-4 pt-20 pb-24 text-center">
@@ -153,7 +156,7 @@ export const Home: React.FC = () => {
         ))}
       </div>
 
-      {user && profile && (
+      {profile && (
         <PostComposer 
           onPost={handlePost}
           onCancel={() => {}}
@@ -167,9 +170,9 @@ export const Home: React.FC = () => {
             post={{
               id: post.id,
               userId: post.user_id,
-              username: `@${post.profiles.username}`,
+              username: `@${post.username}`,
               content: post.content,
-              timestamp: posts.length > 0 ? new Date(post.created_at).toLocaleDateString() : (post as any).timestamp || '2h',
+              timestamp: post.created_at ? new Date(post.created_at).toLocaleDateString() : (post as any).timestamp || '2h',
               likes: post.likes,
               replies: post.replies,
               shares: post.shares,
