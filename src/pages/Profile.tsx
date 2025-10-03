@@ -225,6 +225,8 @@ export const Profile: React.FC = () => {
     setEditAvatar(user.avatar || '');
     setShowEditModal(true);
   };
+
+  const handleSaveProfile = async () => {
     if (!profile) return;
     
     setIsUpdating(true);
