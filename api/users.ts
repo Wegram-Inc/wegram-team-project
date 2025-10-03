@@ -1,5 +1,5 @@
 // API endpoint to save users to MongoDB
-import { connectToDatabase, Collections } from '../lib/mongodb';
+import { connectToDatabase, Collections } from '../lib/mongodb.ts';
 
 export async function POST(request: Request) {
   try {
