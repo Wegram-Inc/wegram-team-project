@@ -151,20 +151,25 @@ export const Profile: React.FC = () => {
     
     setIsUpdating(true);
     try {
+      console.log('🔄 Updating profile with:', { bio: editBio, avatar_url: editAvatar });
+      
       // Update profile using the auth hook
       const result = await updateProfile({
         bio: editBio,
         avatar_url: editAvatar
       });
 
+      console.log('✅ Update result:', result);
+
       if (result.success) {
         setShowEditModal(false);
         // Profile state is automatically updated by the hook
+        alert('Profile updated successfully!');
       } else {
         alert(result.error || 'Failed to update profile. Please try again.');
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('❌ Error updating profile:', error);
       alert('Failed to update profile. Please try again.');
     } finally {
       setIsUpdating(false);
