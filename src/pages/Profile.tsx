@@ -112,7 +112,7 @@ export const Profile: React.FC = () => {
   const { profile, updateProfile } = useNeonAuth();
   const { posts: userPosts, loading: postsLoading, fetchUserPosts } = useNeonPosts();
 
-  // Use real Twitter data if available, otherwise fallback to mock
+  // Use real user data only - NO MOCK FALLBACKS
   const user = profile ? {
     id: profile.id,
     username: profile.username.startsWith('@') ? profile.username : `@${profile.username}`,
@@ -121,10 +121,10 @@ export const Profile: React.FC = () => {
     avatarInitial: profile.username.charAt(0).toUpperCase(),
     verified: profile.verified,
     bio: profile.bio || 'Twitter user on WEGRAM',
-    // Social media links
-    twitterLink: profile.twitter_link,
-    discordLink: profile.discord_link,
-    telegramLink: profile.telegram_link,
+    // Social media links (with fallbacks for when columns don't exist yet)
+    twitterLink: profile.twitter_link || null,
+    discordLink: profile.discord_link || null,
+    telegramLink: profile.telegram_link || null,
     // WEGRAM followers/following (from our database - starts at 0)
     wegramFollowers: 0, // TODO: Get from database
     wegramFollowing: 0, // TODO: Get from database
@@ -135,13 +135,7 @@ export const Profile: React.FC = () => {
     isFollowing: false,
     connections: [],
     mutualConnections: 0
-  } : {
-    ...mockLoggedInUser,
-    wegramFollowers: 0,
-    wegramFollowing: 0,
-    twitterFollowers: mockLoggedInUser.followers,
-    twitterUsername: 'demo_user'
-  };
+  } : null;
 
   // Load user posts when profile is available
   React.useEffect(() => {
@@ -150,9 +144,9 @@ export const Profile: React.FC = () => {
     }
   }, [profile?.id]);
 
-  // Use real posts or fallback to mock if no real posts exist
+  // Use real posts only - NO FALLBACKS TO MOCK DATA
   const posts = useMemo(() => {
-    if (!profile?.id) return mockUserPosts;
+    if (!profile?.id) return [];
 
     // Convert real posts to the format expected by PostCard
     const formattedPosts = userPosts.map(post => ({
@@ -168,7 +162,7 @@ export const Profile: React.FC = () => {
       avatar_url: post.avatar_url
     }));
 
-    return formattedPosts.length > 0 ? formattedPosts : [];
+    return formattedPosts;
   }, [userPosts, profile?.id]);
 
   const handleEditProfile = (e: React.MouseEvent) => {
@@ -196,13 +190,10 @@ export const Profile: React.FC = () => {
         telegram_link: editTelegramLink
       });
 
-      // Update profile using the auth hook
+      // Update profile using the auth hook (only bio and avatar for now)
       const result = await updateProfile({
         bio: editBio,
-        avatar_url: editAvatar,
-        twitter_link: editTwitterLink,
-        discord_link: editDiscordLink,
-        telegram_link: editTelegramLink
+        avatar_url: editAvatar
       });
 
       console.log('✅ Update result:', result);
@@ -405,6 +396,18 @@ export const Profile: React.FC = () => {
     }
   };
 
+  // Show loading or redirect if no user
+  if (!user) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="text-center">
+          <div className="text-primary text-lg mb-2">Loading profile...</div>
+          <div className="text-secondary text-sm">Please sign in to view your profile</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Action Menu Popup */}
@@ -523,57 +526,59 @@ export const Profile: React.FC = () => {
                 <p className="text-secondary text-xs mt-1">{editBio.length}/160 characters</p>
               </div>
 
-              {/* Social Media Links */}
-              <div className="space-y-4">
-                <h3 className="text-primary font-medium">Social Media Links</h3>
+              {/* Social Media Links - Temporarily disabled until database migration */}
+              {false && (
+                <div className="space-y-4">
+                  <h3 className="text-primary font-medium">Social Media Links</h3>
 
-                {/* Twitter/X Link */}
-                <div>
-                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    X (Twitter)
-                  </label>
-                  <input
-                    type="url"
-                    value={editTwitterLink}
-                    onChange={(e) => setEditTwitterLink(e.target.value)}
-                    placeholder="https://x.com/username"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
-                  />
-                </div>
+                  {/* Twitter/X Link */}
+                  <div>
+                    <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                      X (Twitter)
+                    </label>
+                    <input
+                      type="url"
+                      value={editTwitterLink}
+                      onChange={(e) => setEditTwitterLink(e.target.value)}
+                      placeholder="https://x.com/username"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                    />
+                  </div>
 
-                {/* Discord Link */}
-                <div>
-                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    Discord
-                  </label>
-                  <input
-                    type="url"
-                    value={editDiscordLink}
-                    onChange={(e) => setEditDiscordLink(e.target.value)}
-                    placeholder="https://discord.gg/username"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
-                  />
-                </div>
+                  {/* Discord Link */}
+                  <div>
+                    <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4" />
+                      Discord
+                    </label>
+                    <input
+                      type="url"
+                      value={editDiscordLink}
+                      onChange={(e) => setEditDiscordLink(e.target.value)}
+                      placeholder="https://discord.gg/username"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                    />
+                  </div>
 
-                {/* Telegram Link */}
-                <div>
-                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    Telegram
-                  </label>
-                  <input
-                    type="url"
-                    value={editTelegramLink}
-                    onChange={(e) => setEditTelegramLink(e.target.value)}
-                    placeholder="https://t.me/username"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
-                  />
+                  {/* Telegram Link */}
+                  <div>
+                    <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4" />
+                      Telegram
+                    </label>
+                    <input
+                      type="url"
+                      value={editTelegramLink}
+                      onChange={(e) => setEditTelegramLink(e.target.value)}
+                      placeholder="https://t.me/username"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex gap-3">
