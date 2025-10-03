@@ -18,17 +18,39 @@ export default async function handler(
     switch (req.method) {
       case 'GET':
         // Fetch posts with different feed types
-        const { feed_type = 'all', user_id: current_user_id } = req.query;
+        const { feed_type = 'all', user_id: current_user_id, user_posts } = req.query;
         
         console.log('🔍 Feed API Debug:', {
           feed_type,
           current_user_id,
+          user_posts,
           query: req.query
         });
-        
+
         let posts;
-        
-        if (feed_type === 'following' && current_user_id) {
+
+        if (user_posts) {
+          // Fetch posts by specific user
+          posts = await sql`
+            SELECT
+              p.id,
+              p.user_id,
+              p.content,
+              p.image_url,
+              p.likes_count as likes,
+              p.comments_count as replies,
+              p.shares_count as shares,
+              p.created_at,
+              p.updated_at,
+              pr.username,
+              pr.avatar_url
+            FROM posts p
+            JOIN profiles pr ON p.user_id = pr.id
+            WHERE p.user_id = ${user_posts}
+            ORDER BY p.created_at DESC
+            LIMIT 50
+          `;
+        } else if (feed_type === 'following' && current_user_id) {
           // Following feed - posts from users the current user follows
           posts = await sql`
             SELECT 

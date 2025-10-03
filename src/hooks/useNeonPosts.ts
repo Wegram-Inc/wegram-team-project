@@ -158,8 +158,8 @@ export const useNeonPosts = () => {
       const result = await response.json();
 
       if (response.ok && result.post) {
-        setPosts(posts.map(p => 
-          p.id === postId 
+        setPosts(posts.map(p =>
+          p.id === postId
             ? { ...p, shares: result.post.shares }
             : p
         ));
@@ -171,10 +171,31 @@ export const useNeonPosts = () => {
     }
   };
 
+  const fetchUserPosts = async (userId: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/posts?user_posts=${userId}`);
+      const result = await response.json();
+
+      if (response.ok && result.posts) {
+        setPosts(result.posts);
+      } else {
+        console.error('Failed to fetch user posts:', result.error);
+        setPosts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     posts,
     loading,
     fetchPosts,
+    fetchUserPosts,
     createPost,
     likePost,
     giftPost,

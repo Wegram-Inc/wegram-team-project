@@ -107,7 +107,7 @@ export const Profile: React.FC = () => {
   const [editAvatar, setEditAvatar] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
-  const { posts: allPosts } = useNeonPosts();
+  const { posts: userPosts, loading: postsLoading, fetchUserPosts } = useNeonPosts();
 
   // Use real Twitter data if available, otherwise fallback to mock
   const user = profile ? {
@@ -136,11 +136,32 @@ export const Profile: React.FC = () => {
     twitterUsername: 'demo_user'
   };
 
-  // Filter posts to show only current user's posts
+  // Load user posts when profile is available
+  React.useEffect(() => {
+    if (profile?.id) {
+      fetchUserPosts(profile.id);
+    }
+  }, [profile?.id, fetchUserPosts]);
+
+  // Use real posts or fallback to mock if no real posts exist
   const posts = useMemo(() => {
     if (!profile?.id) return mockUserPosts;
-    return allPosts.filter(post => post.user_id === profile.id);
-  }, [allPosts, profile?.id]);
+
+    // Convert real posts to the format expected by PostCard
+    const formattedPosts = userPosts.map(post => ({
+      id: post.id,
+      userId: post.user_id,
+      username: `@${post.username}`,
+      content: post.content,
+      timestamp: new Date(post.created_at).toLocaleDateString(),
+      likes: post.likes,
+      replies: post.replies,
+      shares: post.shares,
+      gifts: 0 // gifts not implemented yet
+    }));
+
+    return formattedPosts.length > 0 ? formattedPosts : mockUserPosts;
+  }, [userPosts, profile?.id]);
 
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -248,6 +269,23 @@ export const Profile: React.FC = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'posts':
+        if (postsLoading) {
+          return (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
+              <p className="text-secondary text-sm mt-2">Loading posts...</p>
+            </div>
+          );
+        }
+
+        if (posts.length === 0 && !postsLoading) {
+          return (
+            <div className="text-center py-8">
+              <p className="text-secondary text-sm">No posts yet</p>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-4">
             {posts.map(post => (
