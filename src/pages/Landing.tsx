@@ -48,13 +48,37 @@ export const Landing: React.FC = () => {
           <div className="text-5xl font-bold text-white">Monetize.</div>
         </div>
 
-        {/* CTA Button */}
-        <div className="w-full max-w-sm mb-8">
+        {/* Main CTA Button - X Login */}
+        <div className="w-full max-w-sm mb-6">
           <button
             onClick={() => navigate('/auth')}
-            className="w-full bg-gradient-to-r from-cyan-400 to-purple-500 hover:from-cyan-500 hover:to-purple-600 text-white font-semibold py-4 px-6 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg"
+            className="w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-full text-lg transition-all transform hover:scale-105 shadow-lg border border-gray-600 flex items-center justify-center gap-3"
           >
-            Enter WEGRAM With 𝕏
+            <span className="text-2xl">𝕏</span>
+            Continue with X
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center w-full max-w-sm mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-gray-600"></span>
+          </div>
+          <div className="relative bg-black px-4 text-sm text-gray-400">
+            OR
+          </div>
+        </div>
+
+        {/* Email/Password Option */}
+        <div className="w-full max-w-sm mb-6">
+          <button
+            onClick={() => navigate('/auth')}
+            className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-full text-sm transition-all shadow-md flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+            </svg>
+            Sign up with Email
           </button>
         </div>
 
