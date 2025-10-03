@@ -422,6 +422,18 @@ export const Profile: React.FC = () => {
     }
   };
 
+  // Show loading if profile is not loaded yet
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-secondary">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Action Menu Popup */}
