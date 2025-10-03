@@ -315,9 +315,9 @@ export const Games: React.FC = () => {
   const handlePlayGame = (gameId: string) => {
     const game = games.find(g => g.id === gameId);
     if (game) {
-      // Navigate to WeRunner if it's the WeRunner game
+      // Open WeRunner in new tab if it's the WeRunner game
       if (game.title === 'WeRunner') {
-        navigate('/werunner');
+        window.open('https://centricj20.github.io/We-Runner/', '_blank');
       } else {
         setSelectedGame(game);
       }
@@ -749,7 +749,7 @@ export const Games: React.FC = () => {
                 onClick={() => {
                   if (selectedGame.title === 'WeRunner') {
                     // Open WeRunner game in new tab
-                    window.open('/werunner', '_blank');
+                    window.open('https://centricj20.github.io/We-Runner/', '_blank');
                   } else {
                     // Game integration coming soon
                     console.log('Launching game:', selectedGame.title);

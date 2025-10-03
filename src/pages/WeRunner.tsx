@@ -48,28 +48,16 @@ export const WeRunner: React.FC = () => {
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
           <div className="text-6xl mb-6">⚡</div>
-          <h2 className="text-2xl font-bold text-purple-400 mb-4">WeRunner Game Status</h2>
+          <h2 className="text-2xl font-bold text-purple-400 mb-4">WeRunner</h2>
           <p className="text-gray-400 mb-6">
-            The game works on mobile devices but has display issues on desktop. The Unity WebGL build needs optimization for desktop browsers.
+            Epic anime-style battle runner with stunning visuals
           </p>
-          <div className="space-y-4">
-            <div className="bg-gray-800 rounded-lg p-4 text-left">
-              <h3 className="font-semibold text-purple-400 mb-2">For Developer:</h3>
-              <ul className="text-sm text-gray-300 space-y-1">
-                <li>• Game works on mobile but skewed on desktop</li>
-                <li>• Unity WebGL build needs desktop optimization</li>
-                <li>• Check Unity build settings for desktop compatibility</li>
-                <li>• Test on both mobile and desktop browsers</li>
-                <li>• URL: centricj20.github.io/We-Runner/</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => window.open('https://centricj20.github.io/We-Runner/', '_blank')}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-colors"
-            >
-              Try Opening Game in New Tab
-            </button>
-          </div>
+          <button
+            onClick={() => window.open('https://centricj20.github.io/We-Runner/', '_blank')}
+            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold text-lg rounded-lg transition-colors shadow-lg"
+          >
+            🚀 Play WeRunner
+          </button>
         </div>
       </div>
     </div>
