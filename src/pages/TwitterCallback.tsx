@@ -9,8 +9,13 @@ export const TwitterCallback: React.FC = () => {
   const { handleXCallback } = useNeonAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [error, setError] = useState<string>('');
+  const [hasRun, setHasRun] = useState(false);
 
   useEffect(() => {
+    // Prevent double execution (React StrictMode causes double renders)
+    if (hasRun) return;
+    setHasRun(true);
+    
     const handleCallback = async () => {
       try {
         const code = searchParams.get('code');

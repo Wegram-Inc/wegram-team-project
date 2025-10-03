@@ -8,9 +8,7 @@ import { ThemeProvider } from './hooks/useTheme.tsx';
 globalThis.Buffer = Buffer;
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
-  </StrictMode>
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>
 );
