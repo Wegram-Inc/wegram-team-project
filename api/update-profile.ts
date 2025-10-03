@@ -7,37 +7,43 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { userId, bio, avatar_url } = req.body;
+      try {
+        const { userId, bio, avatar_url, twitter_url, discord_url, telegram_url, instagram_url, tiktok_url, youtube_url } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'User ID is required' });
-    }
+        if (!userId) {
+          return res.status(400).json({ error: 'User ID is required' });
+        }
 
-    // Get database connection - Vercel Neon integration uses POSTGRES_URL
-    const DATABASE_URL = process.env.POSTGRES_URL || 
-                         process.env.DATABASE_URL || 
-                         process.env.POSTGRES_PRISMA_URL ||
-                         process.env.NEON_DATABASE_URL;
-    
-    if (!DATABASE_URL) {
-      return res.status(500).json({ 
-        error: 'Database not configured. Vercel Neon integration may not be set up properly.'
-      });
-    }
+        // Get database connection - Vercel Neon integration uses POSTGRES_URL
+        const DATABASE_URL = process.env.POSTGRES_URL || 
+                             process.env.DATABASE_URL || 
+                             process.env.POSTGRES_PRISMA_URL ||
+                             process.env.NEON_DATABASE_URL;
+        
+        if (!DATABASE_URL) {
+          return res.status(500).json({ 
+            error: 'Database not configured. Vercel Neon integration may not be set up properly.'
+          });
+        }
 
-    const sql = neon(DATABASE_URL);
+        const sql = neon(DATABASE_URL);
 
-    // Update user profile in database - NO FALLBACKS, this is a live site
-    const result = await sql`
-      UPDATE profiles 
-      SET 
-        bio = ${bio || null},
-        avatar_url = ${avatar_url || null},
-        updated_at = NOW()
-      WHERE id = ${userId}
-      RETURNING *
-    `;
+        // Update user profile in database - NO FALLBACKS, this is a live site
+        const result = await sql`
+          UPDATE profiles 
+          SET 
+            bio = ${bio || null},
+            avatar_url = ${avatar_url || null},
+            twitter_url = ${twitter_url || null},
+            discord_url = ${discord_url || null},
+            telegram_url = ${telegram_url || null},
+            instagram_url = ${instagram_url || null},
+            tiktok_url = ${tiktok_url || null},
+            youtube_url = ${youtube_url || null},
+            updated_at = NOW()
+          WHERE id = ${userId}
+          RETURNING *
+        `;
 
     if (result.length === 0) {
       return res.status(404).json({ error: 'User not found in database' });

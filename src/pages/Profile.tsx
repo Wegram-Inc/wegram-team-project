@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X, Youtube } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
@@ -105,6 +105,12 @@ export const Profile: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
+  const [editTwitterUrl, setEditTwitterUrl] = useState('');
+  const [editDiscordUrl, setEditDiscordUrl] = useState('');
+  const [editTelegramUrl, setEditTelegramUrl] = useState('');
+  const [editInstagramUrl, setEditInstagramUrl] = useState('');
+  const [editTiktokUrl, setEditTiktokUrl] = useState('');
+  const [editYoutubeUrl, setEditYoutubeUrl] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
   const { posts: allPosts } = useNeonPosts();
@@ -126,7 +132,14 @@ export const Profile: React.FC = () => {
     twitterUsername: profile.twitter_username || profile.username.replace('@', ''),
     posts: profile.posts_count || 0,
     isFollowing: false,
-    connections: [],
+    connections: [
+      ...(profile.twitter_url ? [{ platform: 'Twitter', url: profile.twitter_url }] : []),
+      ...(profile.discord_url ? [{ platform: 'Discord', url: profile.discord_url }] : []),
+      ...(profile.telegram_url ? [{ platform: 'Telegram', url: profile.telegram_url }] : []),
+      ...(profile.instagram_url ? [{ platform: 'Instagram', url: profile.instagram_url }] : []),
+      ...(profile.tiktok_url ? [{ platform: 'TikTok', url: profile.tiktok_url }] : []),
+      ...(profile.youtube_url ? [{ platform: 'YouTube', url: profile.youtube_url }] : [])
+    ],
     mutualConnections: 0
   } : {
     ...mockLoggedInUser,
@@ -148,6 +161,12 @@ export const Profile: React.FC = () => {
     // Initialize edit form with current data
     setEditBio(user.bio || '');
     setEditAvatar(user.avatar || '');
+    setEditTwitterUrl(profile?.twitter_url || '');
+    setEditDiscordUrl(profile?.discord_url || '');
+    setEditTelegramUrl(profile?.telegram_url || '');
+    setEditInstagramUrl(profile?.instagram_url || '');
+    setEditTiktokUrl(profile?.tiktok_url || '');
+    setEditYoutubeUrl(profile?.youtube_url || '');
     setShowEditModal(true);
   };
 
@@ -161,7 +180,13 @@ export const Profile: React.FC = () => {
       // Update profile using the auth hook
       const result = await updateProfile({
         bio: editBio,
-        avatar_url: editAvatar
+        avatar_url: editAvatar,
+        twitter_url: editTwitterUrl,
+        discord_url: editDiscordUrl,
+        telegram_url: editTelegramUrl,
+        instagram_url: editInstagramUrl,
+        tiktok_url: editTiktokUrl,
+        youtube_url: editYoutubeUrl
       });
 
       console.log('✅ Update result:', result);
@@ -465,6 +490,84 @@ export const Profile: React.FC = () => {
                 <p className="text-secondary text-xs mt-1">{editBio.length}/160 characters</p>
               </div>
 
+              {/* Social Media Links */}
+              <div>
+                <label className="block text-primary font-medium mb-3">Social Media Links</label>
+                <div className="space-y-3">
+                  {/* Twitter */}
+                  <div className="flex items-center gap-3">
+                    <Twitter className="w-5 h-5 text-blue-400" />
+                    <input
+                      type="url"
+                      value={editTwitterUrl}
+                      onChange={(e) => setEditTwitterUrl(e.target.value)}
+                      placeholder="https://twitter.com/username"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                  
+                  {/* Discord */}
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-indigo-400" />
+                    <input
+                      type="url"
+                      value={editDiscordUrl}
+                      onChange={(e) => setEditDiscordUrl(e.target.value)}
+                      placeholder="https://discord.gg/server"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                  
+                  {/* Telegram */}
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-blue-500" />
+                    <input
+                      type="url"
+                      value={editTelegramUrl}
+                      onChange={(e) => setEditTelegramUrl(e.target.value)}
+                      placeholder="https://t.me/username"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                  
+                  {/* Instagram */}
+                  <div className="flex items-center gap-3">
+                    <Instagram className="w-5 h-5 text-pink-400" />
+                    <input
+                      type="url"
+                      value={editInstagramUrl}
+                      onChange={(e) => setEditInstagramUrl(e.target.value)}
+                      placeholder="https://instagram.com/username"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                  
+                  {/* TikTok */}
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-black dark:text-white" />
+                    <input
+                      type="url"
+                      value={editTiktokUrl}
+                      onChange={(e) => setEditTiktokUrl(e.target.value)}
+                      placeholder="https://tiktok.com/@username"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                  
+                  {/* YouTube */}
+                  <div className="flex items-center gap-3">
+                    <Youtube className="w-5 h-5 text-red-500" />
+                    <input
+                      type="url"
+                      value={editYoutubeUrl}
+                      onChange={(e) => setEditYoutubeUrl(e.target.value)}
+                      placeholder="https://youtube.com/@username"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <button
@@ -602,6 +705,9 @@ export const Profile: React.FC = () => {
                     {connection.platform === 'Instagram' && <Instagram className="w-4 h-4" />}
                     {connection.platform === 'LinkedIn' && <Linkedin className="w-4 h-4" />}
                     {connection.platform === 'Discord' && <MessageCircle className="w-4 h-4" />}
+                    {connection.platform === 'Telegram' && <MessageCircle className="w-4 h-4" />}
+                    {connection.platform === 'TikTok' && <MessageCircle className="w-4 h-4" />}
+                    {connection.platform === 'YouTube' && <Youtube className="w-4 h-4" />}
                     <span>{connection.platform}</span>
                   </a>
                 ))}
