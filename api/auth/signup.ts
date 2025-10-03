@@ -1,6 +1,7 @@
 // Email/Password Signup API
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
+import { sendVerificationEmail, sendVerificationEmailFallback } from '../../src/lib/emailService';
 
 // Simple server-side password hashing using Node's crypto
 import { createHash, randomBytes, pbkdf2Sync } from 'crypto';
@@ -9,6 +10,17 @@ function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex');
   const hash = pbkdf2Sync(password, salt, 100000, 64, 'sha256').toString('hex');
   return `${salt}:${hash}`;
+}
+
+function generateVerificationToken(): string {
+  return randomBytes(32).toString('hex');
+}
+
+function getVerificationUrl(token: string): string {
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : 'http://localhost:5007';
+  return `${baseUrl}/verify-email?token=${token}`;
 }
 
 export default async function handler(
@@ -66,13 +78,18 @@ export default async function handler(
 
     // Hash password
     const passwordHash = hashPassword(password);
+    
+    // Generate verification token
+    const verificationToken = generateVerificationToken();
+    const verificationUrl = getVerificationUrl(verificationToken);
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Create user
     const result = await sql`
       INSERT INTO profiles (
         username, email, password_hash,
         followers_count, following_count, posts_count,
-        bio, verified
+        bio, verified, email_verified, verification_token, verification_token_expires
       ) VALUES (
         ${username.toLowerCase()},
         ${email.toLowerCase()},
@@ -81,12 +98,35 @@ export default async function handler(
         ${0},
         ${0},
         ${'Welcome to WEGRAM! 🚀'},
-        ${false}
+        ${false},
+        ${false},
+        ${verificationToken},
+        ${tokenExpires}
       )
-      RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at
+      RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at, email_verified
     `;
 
     const user = result[0];
+
+    // Send verification email
+    const emailResult = process.env.RESEND_API_KEY 
+      ? await sendVerificationEmail({
+          email: user.email,
+          username: user.username,
+          verificationToken,
+          verificationUrl
+        })
+      : await sendVerificationEmailFallback({
+          email: user.email,
+          username: user.username,
+          verificationToken,
+          verificationUrl
+        });
+
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error);
+      // Don't fail signup if email fails, but log it
+    }
 
     return res.status(201).json({
       success: true,
@@ -100,8 +140,11 @@ export default async function handler(
         followers_count: user.followers_count,
         following_count: user.following_count,
         posts_count: user.posts_count,
-        created_at: user.created_at
-      }
+        created_at: user.created_at,
+        email_verified: user.email_verified
+      },
+      message: 'Account created! Please check your email to verify your account.',
+      emailSent: emailResult.success
     });
 
   } catch (error) {

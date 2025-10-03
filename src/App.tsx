@@ -21,6 +21,7 @@ import { Landing } from './pages/Landing';
 import { AuthPage } from './pages/AuthPage';
 import { XAuthPage } from './pages/XAuthPage';
 import { EmailAuthPage } from './pages/EmailAuthPage';
+import { VerifyEmailPage } from './pages/VerifyEmailPage';
 import { Profile } from './pages/Profile';
 import { Analytics } from './pages/Analytics';
 import { Compose } from './pages/Compose';
@@ -98,7 +99,8 @@ function AppContent() {
   const hideNavigation = location.pathname === '/' || 
     location.pathname === '/auth' || 
     location.pathname === '/x-auth' || 
-    location.pathname === '/email-auth';
+    location.pathname === '/email-auth' ||
+    location.pathname.startsWith('/verify-email');
 
   // Hide top navigation (TopBar) on chat-style pages (custom headers)
   const hideTopNav = hideNavigation ||
@@ -130,6 +132,7 @@ function AppContent() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/x-auth" element={<XAuthPage />} />
           <Route path="/email-auth" element={<EmailAuthPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/twitter/callback" element={<TwitterCallback />} />
           <Route path="/home" element={<Home />} />
