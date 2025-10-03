@@ -107,50 +107,21 @@ export const TwitterCallback: React.FC = () => {
                   </svg>
                 </div>
               </div>
-              <h2 className="text-xl font-semibold text-red-500 mb-2">
+              <h2 className="text-xl font-semibold text-red-500 mb-4">
                 Authentication Failed
               </h2>
-              <p className="text-secondary mb-4 text-sm">
+              <p className="text-secondary mb-8 text-sm">
                 {error}
               </p>
-              <div className="mb-4">
-                <p className="text-xs text-gray-500 mb-2">
-                  Check browser console for detailed error logs
-                </p>
-              </div>
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    // Clear all auth data
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    // Clear all cookies
-                    document.cookie.split(";").forEach((c) => {
-                      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                    });
-                    // Redirect to auth page
-                    window.location.href = '/auth';
-                  }}
-                  className="btn-primary px-6 py-2 w-full bg-blue-500 hover:bg-blue-600 text-white rounded"
-                >
-                  Try Different Twitter Account
-                </button>
-                <button
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = '/auth';
-                  }}
-                  className="btn-secondary px-6 py-2 w-full bg-gray-500 hover:bg-gray-600 text-white rounded"
-                >
-                  Try Again (Same Account)
-                </button>
-                <button
-                  onClick={() => navigate('/')}
-                  className="btn-secondary px-6 py-2 w-full border border-gray-300 rounded"
-                >
-                  Return to Home
-                </button>
-              </div>
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '/auth';
+                }}
+                className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Try Again
+              </button>
             </>
           )}
         </div>
