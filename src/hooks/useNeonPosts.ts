@@ -32,7 +32,15 @@ export const useNeonPosts = () => {
         params.append('user_id', userId);
       }
       
-      const response = await fetch(`/api/posts?${params.toString()}`);
+      const url = `/api/posts?${params.toString()}`;
+      console.log('🔍 Frontend Debug:', {
+        feedType,
+        userId,
+        url,
+        params: params.toString()
+      });
+      
+      const response = await fetch(url);
       const result = await response.json();
 
       if (response.ok && result.posts) {

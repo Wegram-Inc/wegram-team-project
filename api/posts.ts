@@ -20,6 +20,12 @@ export default async function handler(
         // Fetch posts with different feed types
         const { feed_type = 'all', user_id: current_user_id } = req.query;
         
+        console.log('🔍 Feed API Debug:', {
+          feed_type,
+          current_user_id,
+          query: req.query
+        });
+        
         let posts;
         
         if (feed_type === 'following' && current_user_id) {
