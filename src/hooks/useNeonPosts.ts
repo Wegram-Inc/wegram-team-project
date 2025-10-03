@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { mockPosts } from '../data/mockData';
 
 export interface Post {
@@ -24,7 +24,7 @@ export const useNeonPosts = () => {
   //   fetchPosts('trenches');
   // }, []);
 
-  const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
+  const fetchPosts = useCallback(async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -76,7 +76,7 @@ export const useNeonPosts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array since we don't depend on any external values
 
   const createPost = async (content: string, userId: string, username?: string) => {
     try {

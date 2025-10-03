@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 import { useNeonAuth } from '../hooks/useNeonAuth';
@@ -33,12 +33,12 @@ export const Home: React.FC = () => {
     } else {
       fetchPosts(activeTab);
     }
-  }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
+  }, [profile?.id, activeTab, fetchPosts]); // Include all dependencies
 
-  const handlePost = async (content: string) => {
+  const handlePost = useCallback(async (content: string) => {
     if (!profile) return;
     await createPost(content, profile.id, profile.username);
-  };
+  }, [profile, createPost]);
 
   // Listen for quick composer posts from BottomNav modal
   useEffect(() => {
@@ -50,11 +50,11 @@ export const Home: React.FC = () => {
     return () => window.removeEventListener('wegram:new-post', handler as any);
   }, [profile]);
 
-  const handleLike = async (postId: string) => {
+  const handleLike = useCallback(async (postId: string) => {
     await likePost(postId);
-  };
+  }, [likePost]);
 
-  const handleGift = async (postId: string) => {
+  const handleGift = useCallback(async (postId: string) => {
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
@@ -65,9 +65,9 @@ export const Home: React.FC = () => {
       await giftPost(postId);
       alert(`🎁 Sent ${selectedGift} WGM to @${post.username}!`);
     }
-  };
+  }, [posts, giftPost]);
 
-  const handleShare = async (postId: string) => {
+  const handleShare = useCallback(async (postId: string) => {
     // Share functionality - copy link to clipboard
     const postUrl = `${window.location.origin}/post/${postId}`;
     try {
@@ -76,13 +76,13 @@ export const Home: React.FC = () => {
     } catch (error) {
       alert('Failed to copy link');
     }
-  };
+  }, []);
 
-  const handleBookmark = async (postId: string) => {
+  const handleBookmark = useCallback(async (postId: string) => {
     // Bookmark functionality - in real app this would save to user's bookmarks
     console.log('Bookmarking post:', postId);
     alert('Post bookmarked! 📖');
-  };
+  }, []);
 
   if (loading) {
     return (
