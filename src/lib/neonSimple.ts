@@ -49,12 +49,13 @@ export interface Post {
 
 export class NeonSimpleService {
   
-  // 🚀 Create user from Twitter data
+  // 🚀 Create or update user from Twitter data (UPSERT)
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
     if (!sql) {
       throw new Error('Database connection not available. Cannot create user.');
     }
 
+    // Use UPSERT to handle both new and existing users
     const result = await sql`
       INSERT INTO profiles (
         username, avatar_url, bio, verified, 
@@ -70,6 +71,13 @@ export class NeonSimpleService {
         ${twitterData.followers_count || 0},
         ${twitterData.following_count || 0}
       )
+      ON CONFLICT (twitter_id) 
+      DO UPDATE SET
+        username = EXCLUDED.username,
+        avatar_url = EXCLUDED.avatar_url,
+        followers_count = EXCLUDED.followers_count,
+        following_count = EXCLUDED.following_count,
+        updated_at = NOW()
       RETURNING *
     `;
     
