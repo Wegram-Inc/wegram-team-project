@@ -87,11 +87,21 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
               console.log('PostCard Avatar button clicked!');
               handleAvatarClick();
             }} 
-            className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl"
+            className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl"
           >
-            <span className="text-white text-sm font-semibold">
-              {post.username.charAt(1).toUpperCase()}
-            </span>
+            {post.avatar_url ? (
+              <img 
+                src={post.avatar_url} 
+                alt={post.username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full gradient-bg flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">
+                  {post.username.charAt(1).toUpperCase()}
+                </span>
+              </div>
+            )}
           </button>
           <div>
             <button 

@@ -5,6 +5,7 @@ import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { mockPosts } from '../data/mockData';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { useNeonPosts } from '../hooks/useNeonPosts';
 
 // Mock user data for the logged-in user
 const mockLoggedInUser = {
@@ -106,6 +107,7 @@ export const Profile: React.FC = () => {
   const [editAvatar, setEditAvatar] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
+  const { posts: allPosts } = useNeonPosts();
 
   // Use real Twitter data if available, otherwise fallback to mock
   const user = profile ? {
@@ -134,8 +136,11 @@ export const Profile: React.FC = () => {
     twitterUsername: 'demo_user'
   };
 
-  // Memoize posts to avoid re-rendering
-  const posts = useMemo(() => mockUserPosts, []);
+  // Filter posts to show only current user's posts
+  const posts = useMemo(() => {
+    if (!profile?.id) return mockUserPosts;
+    return allPosts.filter(post => post.user_id === profile.id);
+  }, [allPosts, profile?.id]);
 
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
