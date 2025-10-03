@@ -41,7 +41,12 @@ export const TwitterCallback: React.FC = () => {
           // Redirect to home immediately after successful authentication
           navigate('/home');
         } else {
-          setError(result.error || 'Twitter authentication failed');
+          // Check if it's a rate limit error
+          if (result.error?.includes('429') || result.error?.includes('Too Many Requests')) {
+            setError('Twitter API rate limit reached. Please try again in 15 minutes or use a different Twitter account.');
+          } else {
+            setError(result.error || 'Twitter authentication failed');
+          }
           setStatus('error');
         }
       } catch (err) {
