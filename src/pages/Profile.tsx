@@ -498,7 +498,7 @@ export const Profile: React.FC = () => {
         <div className="px-4 py-6">
           {/* Avatar and Name */}
           <div className="flex items-start gap-4 mb-6">
-            {user.avatar && user.avatar.startsWith('http') ? (
+            {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
               <img 
                 src={user.avatar} 
                 alt={user.displayName}
