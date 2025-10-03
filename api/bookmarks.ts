@@ -1,4 +1,67 @@
-import { neonSimple } from '../src/lib/neonSimple';
+import { neon } from '@neondatabase/serverless';
+
+// Database connection
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
+
+// Simplified bookmark functions for API
+const bookmarkService = {
+  async getUserBookmarks(userId: string, limit = 20) {
+    if (!sql) return [];
+
+    try {
+      const result = await sql`
+        SELECT
+          p.*,
+          pr.username,
+          pr.avatar_url,
+          pr.verified,
+          b.created_at as bookmarked_at
+        FROM bookmarks b
+        JOIN posts p ON b.post_id = p.id
+        JOIN profiles pr ON p.user_id = pr.id
+        WHERE b.user_id = ${userId}
+        ORDER BY b.created_at DESC
+        LIMIT ${limit}
+      `;
+      return result;
+    } catch (error) {
+      console.error('Get bookmarks error:', error);
+      return [];
+    }
+  },
+
+  async bookmarkPost(userId: string, postId: string) {
+    if (!sql) return false;
+
+    try {
+      await sql`
+        INSERT INTO bookmarks (user_id, post_id)
+        VALUES (${userId}, ${postId})
+        ON CONFLICT (user_id, post_id) DO NOTHING
+      `;
+      return true;
+    } catch (error) {
+      console.error('Bookmark error:', error);
+      return false;
+    }
+  },
+
+  async removeBookmark(userId: string, postId: string) {
+    if (!sql) return false;
+
+    try {
+      await sql`
+        DELETE FROM bookmarks
+        WHERE user_id = ${userId} AND post_id = ${postId}
+      `;
+      return true;
+    } catch (error) {
+      console.error('Remove bookmark error:', error);
+      return false;
+    }
+  }
+};
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -25,7 +88,7 @@ export default async function handler(req: any, res: any) {
           });
         }
 
-        const bookmarks = await neonSimple.getUserBookmarks(userId);
+        const bookmarks = await bookmarkService.getUserBookmarks(userId);
         return res.status(200).json({
           success: true,
           bookmarks
@@ -42,7 +105,7 @@ export default async function handler(req: any, res: any) {
           });
         }
 
-        const bookmarkSuccess = await neonSimple.bookmarkPost(bookmarkUserId, postId);
+        const bookmarkSuccess = await bookmarkService.bookmarkPost(bookmarkUserId, postId);
 
         if (bookmarkSuccess) {
           return res.status(200).json({
@@ -67,7 +130,7 @@ export default async function handler(req: any, res: any) {
           });
         }
 
-        const removeSuccess = await neonSimple.removeBookmark(removeUserId, removePostId);
+        const removeSuccess = await bookmarkService.removeBookmark(removeUserId, removePostId);
 
         if (removeSuccess) {
           return res.status(200).json({
