@@ -26,7 +26,6 @@ export const useNeonPosts = () => {
 
   const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
     setLoading(true);
-    setPosts([]); // Clear posts immediately to show loading state
     try {
       const params = new URLSearchParams();
       params.append('feed_type', feedType);
@@ -35,18 +34,11 @@ export const useNeonPosts = () => {
       }
       
       const url = `/api/posts?${params.toString()}`;
-      console.log('🔍 Frontend Debug:', {
-        feedType,
-        userId,
-        url,
-        params: params.toString()
-      });
       
       const response = await fetch(url);
       const result = await response.json();
 
       if (response.ok && result.posts) {
-        console.log('🔍 Setting posts for feedType:', feedType, 'Posts:', result.posts.length);
         setPosts(result.posts);
       } else {
         // Fallback to mock data if API fails

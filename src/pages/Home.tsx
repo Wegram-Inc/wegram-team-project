@@ -31,7 +31,6 @@ export const Home: React.FC = () => {
 
   // Handle tab changes
   const handleTabChange = (tab: 'following' | 'trenches' | 'trending') => {
-    console.log('🔍 Tab changed to:', tab, 'Profile ID:', profile?.id);
     setActiveTab(tab);
     if (profile?.id) {
       fetchPosts(tab, profile.id);
@@ -47,7 +46,7 @@ export const Home: React.FC = () => {
     } else {
       fetchPosts(activeTab);
     }
-  }, [profile?.id, activeTab]);
+  }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
 
   const handlePost = async (content: string) => {
     if (!profile) return;
