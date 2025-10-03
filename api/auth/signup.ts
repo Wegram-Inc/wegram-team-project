@@ -1,10 +1,20 @@
 // Email/Password Signup API
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import { sendVerificationEmail } from '../../src/lib/emailService';
 
 // Simple server-side password hashing using Node's crypto
 import { createHash, randomBytes, pbkdf2Sync } from 'crypto';
+
+// Email service - dynamic import to avoid build issues
+async function sendVerificationEmail(data: any) {
+  try {
+    const { sendVerificationEmail: emailService } = await import('../../src/lib/emailService');
+    return await emailService(data);
+  } catch (error) {
+    console.error('Email service import failed:', error);
+    throw error;
+  }
+}
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex');
