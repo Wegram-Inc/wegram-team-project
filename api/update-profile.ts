@@ -8,7 +8,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { userId, bio, avatar_url } = req.body;
+    const { userId, bio, avatar_url, twitter_link, discord_link, telegram_link } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -30,10 +30,13 @@ export default async function handler(req: any, res: any) {
 
     // Update user profile in database - NO FALLBACKS, this is a live site
     const result = await sql`
-      UPDATE profiles 
-      SET 
+      UPDATE profiles
+      SET
         bio = ${bio || null},
         avatar_url = ${avatar_url || null},
+        twitter_link = ${twitter_link || null},
+        discord_link = ${discord_link || null},
+        telegram_link = ${telegram_link || null},
         updated_at = NOW()
       WHERE id = ${userId}
       RETURNING *

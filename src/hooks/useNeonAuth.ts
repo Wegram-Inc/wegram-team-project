@@ -112,12 +112,18 @@ export const useNeonAuth = () => {
   };
 
   // 🚀 Update profile
-  const updateProfile = async (updates: { bio?: string; avatar_url?: string }) => {
+  const updateProfile = async (updates: {
+    bio?: string;
+    avatar_url?: string;
+    twitter_link?: string;
+    discord_link?: string;
+    telegram_link?: string;
+  }) => {
     if (!profile) return { success: false, error: 'No user logged in' };
 
     try {
       console.log('📤 Sending update request:', { userId: profile.id, updates });
-      
+
       // Call the API endpoint instead of direct database access
       const response = await fetch('/api/update-profile', {
         method: 'POST',
@@ -127,7 +133,10 @@ export const useNeonAuth = () => {
         body: JSON.stringify({
           userId: profile.id,
           bio: updates.bio,
-          avatar_url: updates.avatar_url
+          avatar_url: updates.avatar_url,
+          twitter_link: updates.twitter_link,
+          discord_link: updates.discord_link,
+          telegram_link: updates.telegram_link
         })
       });
 

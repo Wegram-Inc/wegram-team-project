@@ -105,6 +105,9 @@ export const Profile: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
+  const [editTwitterLink, setEditTwitterLink] = useState('');
+  const [editDiscordLink, setEditDiscordLink] = useState('');
+  const [editTelegramLink, setEditTelegramLink] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
   const { posts: userPosts, loading: postsLoading, fetchUserPosts } = useNeonPosts();
@@ -118,6 +121,10 @@ export const Profile: React.FC = () => {
     avatarInitial: profile.username.charAt(0).toUpperCase(),
     verified: profile.verified,
     bio: profile.bio || 'Twitter user on WEGRAM',
+    // Social media links
+    twitterLink: profile.twitter_link,
+    discordLink: profile.discord_link,
+    telegramLink: profile.telegram_link,
     // WEGRAM followers/following (from our database - starts at 0)
     wegramFollowers: 0, // TODO: Get from database
     wegramFollowing: 0, // TODO: Get from database
@@ -170,6 +177,9 @@ export const Profile: React.FC = () => {
     // Initialize edit form with current data
     setEditBio(user.bio || '');
     setEditAvatar(user.avatar || '');
+    setEditTwitterLink(user.twitterLink || '');
+    setEditDiscordLink(user.discordLink || '');
+    setEditTelegramLink(user.telegramLink || '');
     setShowEditModal(true);
   };
 
@@ -178,12 +188,21 @@ export const Profile: React.FC = () => {
     
     setIsUpdating(true);
     try {
-      console.log('🔄 Updating profile with:', { bio: editBio, avatar_url: editAvatar });
-      
+      console.log('🔄 Updating profile with:', {
+        bio: editBio,
+        avatar_url: editAvatar,
+        twitter_link: editTwitterLink,
+        discord_link: editDiscordLink,
+        telegram_link: editTelegramLink
+      });
+
       // Update profile using the auth hook
       const result = await updateProfile({
         bio: editBio,
-        avatar_url: editAvatar
+        avatar_url: editAvatar,
+        twitter_link: editTwitterLink,
+        discord_link: editDiscordLink,
+        telegram_link: editTelegramLink
       });
 
       console.log('✅ Update result:', result);
@@ -504,6 +523,58 @@ export const Profile: React.FC = () => {
                 <p className="text-secondary text-xs mt-1">{editBio.length}/160 characters</p>
               </div>
 
+              {/* Social Media Links */}
+              <div className="space-y-4">
+                <h3 className="text-primary font-medium">Social Media Links</h3>
+
+                {/* Twitter/X Link */}
+                <div>
+                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    X (Twitter)
+                  </label>
+                  <input
+                    type="url"
+                    value={editTwitterLink}
+                    onChange={(e) => setEditTwitterLink(e.target.value)}
+                    placeholder="https://x.com/username"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                  />
+                </div>
+
+                {/* Discord Link */}
+                <div>
+                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    Discord
+                  </label>
+                  <input
+                    type="url"
+                    value={editDiscordLink}
+                    onChange={(e) => setEditDiscordLink(e.target.value)}
+                    placeholder="https://discord.gg/username"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                  />
+                </div>
+
+                {/* Telegram Link */}
+                <div>
+                  <label className="block text-primary text-sm mb-1 flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    Telegram
+                  </label>
+                  <input
+                    type="url"
+                    value={editTelegramLink}
+                    onChange={(e) => setEditTelegramLink(e.target.value)}
+                    placeholder="https://t.me/username"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                  />
+                </div>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <button
@@ -624,26 +695,49 @@ export const Profile: React.FC = () => {
             <p className="text-primary text-sm leading-relaxed">{user.bio}</p>
           </div>
 
-          {/* Connections */}
-          {user.connections && user.connections.length > 0 && (
+          {/* Social Media Links */}
+          {(user.twitterLink || user.discordLink || user.telegramLink) && (
             <div className="mb-6">
-              <h3 className="text-primary font-semibold mb-3">Connections</h3>
+              <h3 className="text-primary font-semibold mb-3">Social Links</h3>
               <div className="flex flex-wrap gap-3">
-                {user.connections.map((connection, index) => (
+                {user.twitterLink && (
                   <a
-                    key={index}
-                    href={connection.url}
+                    href={user.twitterLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
                   >
-                    {connection.platform === 'Twitter' && <Twitter className="w-4 h-4" />}
-                    {connection.platform === 'Instagram' && <Instagram className="w-4 h-4" />}
-                    {connection.platform === 'LinkedIn' && <Linkedin className="w-4 h-4" />}
-                    {connection.platform === 'Discord' && <MessageCircle className="w-4 h-4" />}
-                    <span>{connection.platform}</span>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>X</span>
+                    <ExternalLink className="w-3 h-3" />
                   </a>
-                ))}
+                )}
+                {user.discordLink && (
+                  <a
+                    href={user.discordLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Discord</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+                {user.telegramLink && (
+                  <a
+                    href={user.telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-overlay-light text-secondary text-sm hover:bg-overlay-medium transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Telegram</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
             </div>
           )}
