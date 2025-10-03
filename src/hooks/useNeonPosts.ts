@@ -172,21 +172,33 @@ export const useNeonPosts = () => {
   };
 
   const fetchUserPosts = async (userId: string) => {
+    console.log('🚀 fetchUserPosts called with userId:', userId);
     setLoading(true);
     try {
-      const response = await fetch(`/api/posts?user_posts=${userId}`);
+      const url = `/api/posts?user_posts=${userId}`;
+      console.log('📡 Making request to:', url);
+
+      const response = await fetch(url);
       const result = await response.json();
 
+      console.log('📥 API Response:', {
+        status: response.status,
+        ok: response.ok,
+        result
+      });
+
       if (response.ok && result.posts) {
+        console.log('✅ Setting posts:', result.posts);
         setPosts(result.posts);
       } else {
-        console.error('Failed to fetch user posts:', result.error);
+        console.error('❌ Failed to fetch user posts:', result.error);
         setPosts([]);
       }
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      console.error('💥 Error fetching user posts:', error);
       setPosts([]);
     } finally {
+      console.log('🏁 Setting loading to false');
       setLoading(false);
     }
   };

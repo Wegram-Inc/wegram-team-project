@@ -141,7 +141,7 @@ export const Profile: React.FC = () => {
     if (profile?.id) {
       fetchUserPosts(profile.id);
     }
-  }, [profile?.id, fetchUserPosts]);
+  }, [profile?.id]);
 
   // Use real posts or fallback to mock if no real posts exist
   const posts = useMemo(() => {
@@ -157,10 +157,10 @@ export const Profile: React.FC = () => {
       likes: post.likes,
       replies: post.replies,
       shares: post.shares,
-      gifts: 0 // gifts not implemented yet
+      gifts: post.gifts || 0
     }));
 
-    return formattedPosts.length > 0 ? formattedPosts : mockUserPosts;
+    return formattedPosts.length > 0 ? formattedPosts : [];
   }, [userPosts, profile?.id]);
 
   const handleEditProfile = (e: React.MouseEvent) => {
