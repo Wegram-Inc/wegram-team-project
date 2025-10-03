@@ -171,6 +171,33 @@ export const useNeonPosts = () => {
     }
   };
 
+  const bookmarkPost = async (postId: string, userId: string) => {
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId, action: 'bookmark', user_id: userId })
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.bookmarked !== undefined) {
+        // Update the post's bookmark status in the local state
+        setPosts(posts.map(p => 
+          p.id === postId 
+            ? { ...p, bookmarked: result.bookmarked }
+            : p
+        ));
+        return { success: true, bookmarked: result.bookmarked };
+      } else {
+        return { success: false, error: result.error || 'Failed to bookmark post' };
+      }
+    } catch (error) {
+      console.error('Error bookmarking post:', error);
+      return { success: false, error: 'Failed to bookmark post' };
+    }
+  };
+
   return {
     posts,
     loading,
@@ -178,6 +205,7 @@ export const useNeonPosts = () => {
     createPost,
     likePost,
     giftPost,
-    sharePost
+    sharePost,
+    bookmarkPost
   };
 };
