@@ -469,6 +469,7 @@ export const Profile: React.FC = () => {
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleSaveProfile}
                   disabled={isUpdating}
                   className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
