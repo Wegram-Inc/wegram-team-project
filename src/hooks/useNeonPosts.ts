@@ -20,12 +20,19 @@ export const useNeonPosts = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts('trenches');
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/posts');
+      const params = new URLSearchParams();
+      params.append('feed_type', feedType);
+      if (userId) {
+        params.append('user_id', userId);
+      }
+      
+      const response = await fetch(`/api/posts?${params.toString()}`);
       const result = await response.json();
 
       if (response.ok && result.posts) {

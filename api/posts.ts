@@ -17,25 +17,74 @@ export default async function handler(
   try {
     switch (req.method) {
       case 'GET':
-        // Fetch all posts with user profiles
-        const posts = await sql`
-          SELECT 
-            p.id,
-            p.user_id,
-            p.content,
-            p.image_url,
-            p.likes_count as likes,
-            p.comments_count as replies,
-            p.shares_count as shares,
-            p.created_at,
-            p.updated_at,
-            pr.username,
-            pr.avatar_url
-          FROM posts p
-          JOIN profiles pr ON p.user_id = pr.id
-          ORDER BY p.created_at DESC
-          LIMIT 50
-        `;
+        // Fetch posts with different feed types
+        const { feed_type = 'all', user_id: current_user_id } = req.query;
+        
+        let posts;
+        
+        if (feed_type === 'following' && current_user_id) {
+          // Following feed - posts from users the current user follows
+          posts = await sql`
+            SELECT 
+              p.id,
+              p.user_id,
+              p.content,
+              p.image_url,
+              p.likes_count as likes,
+              p.comments_count as replies,
+              p.shares_count as shares,
+              p.created_at,
+              p.updated_at,
+              pr.username,
+              pr.avatar_url
+            FROM posts p
+            JOIN profiles pr ON p.user_id = pr.id
+            JOIN follows f ON f.following_id = p.user_id
+            WHERE f.follower_id = ${current_user_id}
+            ORDER BY p.created_at DESC
+            LIMIT 50
+          `;
+        } else if (feed_type === 'trending') {
+          // Trending feed - most liked posts
+          posts = await sql`
+            SELECT 
+              p.id,
+              p.user_id,
+              p.content,
+              p.image_url,
+              p.likes_count as likes,
+              p.comments_count as replies,
+              p.shares_count as shares,
+              p.created_at,
+              p.updated_at,
+              pr.username,
+              pr.avatar_url
+            FROM posts p
+            JOIN profiles pr ON p.user_id = pr.id
+            ORDER BY p.likes_count DESC, p.created_at DESC
+            LIMIT 50
+          `;
+        } else {
+          // Trenches feed (default) - newest posts from all users
+          posts = await sql`
+            SELECT 
+              p.id,
+              p.user_id,
+              p.content,
+              p.image_url,
+              p.likes_count as likes,
+              p.comments_count as replies,
+              p.shares_count as shares,
+              p.created_at,
+              p.updated_at,
+              pr.username,
+              pr.avatar_url
+            FROM posts p
+            JOIN profiles pr ON p.user_id = pr.id
+            ORDER BY p.created_at DESC
+            LIMIT 50
+          `;
+        }
         
         return res.status(200).json({ posts });
 

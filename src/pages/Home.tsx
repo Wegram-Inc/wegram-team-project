@@ -9,7 +9,7 @@ import { TrendingUp, Users, Zap } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isDark } = useTheme();
-  const { posts, loading, createPost, likePost, giftPost } = useNeonPosts();
+  const { posts, loading, createPost, likePost, giftPost, fetchPosts } = useNeonPosts();
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('following');
@@ -28,6 +28,16 @@ export const Home: React.FC = () => {
     username: post.username.replace('@', ''),
     avatar_url: null
   }));
+
+  // Handle tab changes
+  const handleTabChange = (tab: 'following' | 'trenches' | 'trending') => {
+    setActiveTab(tab);
+    if (profile?.id) {
+      fetchPosts(tab, profile.id);
+    } else {
+      fetchPosts(tab);
+    }
+  };
 
   const handlePost = async (content: string) => {
     if (!profile) return;
@@ -147,46 +157,79 @@ export const Home: React.FC = () => {
       <div className={`flex gap-1 mb-6 rounded-lg p-1 ${
         isDark ? 'bg-gray-800 bg-opacity-50' : 'bg-gray-200 bg-opacity-70'
       }`}>
-        {(['following', 'trenches', 'trending'] as const).map((tab) => (
+        {([
+          { key: 'following', label: 'Following', icon: Users },
+          { key: 'trenches', label: 'Trenches', icon: Zap },
+          { key: 'trending', label: 'Trending', icon: TrendingUp }
+        ] as const).map(({ key, label, icon: Icon }) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab
+            key={key}
+            onClick={() => handleTabChange(key)}
+            className={`flex items-center justify-center gap-2 flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === key
                 ? 'bg-purple-600 text-white'
                 : isDark 
                   ? 'text-gray-400 hover:text-white hover:bg-gray-700'
                   : 'text-gray-600 hover:text-gray-800 hover:bg-gray-300'
             }`}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            <Icon className="w-4 h-4" />
+            {label}
           </button>
         ))}
       </div>
 
       
       <div>
-        {displayPosts.map(post => (
-          <PostCard
-            key={post.id}
-            post={{
-              id: post.id,
-              userId: post.user_id,
-              username: `@${post.username}`,
-              content: post.content,
-              timestamp: post.created_at ? new Date(post.created_at).toLocaleDateString() : (post as any).timestamp || '2h',
-              likes: post.likes,
-              replies: post.replies,
-              shares: post.shares,
-              gifts: post.gifts,
-              avatar_url: post.avatar_url
-            }}
-            onLike={handleLike}
-            onShare={handleShare}
-            onGift={handleGift}
-            onBookmark={handleBookmark}
-          />
-        ))}
+        {displayPosts.length > 0 ? (
+          displayPosts.map(post => (
+            <PostCard
+              key={post.id}
+              post={{
+                id: post.id,
+                userId: post.user_id,
+                username: `@${post.username}`,
+                content: post.content,
+                timestamp: post.created_at ? new Date(post.created_at).toLocaleDateString() : (post as any).timestamp || '2h',
+                likes: post.likes,
+                replies: post.replies,
+                shares: post.shares,
+                gifts: post.gifts,
+                avatar_url: post.avatar_url
+              }}
+              onLike={handleLike}
+              onShare={handleShare}
+              onGift={handleGift}
+              onBookmark={handleBookmark}
+            />
+          ))
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">
+              {activeTab === 'following' && '👥'}
+              {activeTab === 'trenches' && '⚡'}
+              {activeTab === 'trending' && '🔥'}
+            </div>
+            <h3 className="text-xl font-semibold text-primary mb-2">
+              {activeTab === 'following' && 'No posts from people you follow'}
+              {activeTab === 'trenches' && 'No recent posts'}
+              {activeTab === 'trending' && 'No trending posts yet'}
+            </h3>
+            <p className="text-secondary text-sm mb-4">
+              {activeTab === 'following' && 'Follow some users to see their posts here'}
+              {activeTab === 'trenches' && 'Be the first to post something new!'}
+              {activeTab === 'trending' && 'Posts need more likes to appear in trending'}
+            </p>
+            {activeTab === 'following' && (
+              <button
+                onClick={() => navigate('/explore')}
+                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Discover Users
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
