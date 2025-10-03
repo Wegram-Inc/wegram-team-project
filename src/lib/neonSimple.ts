@@ -73,10 +73,7 @@ export class NeonSimpleService {
       )
       ON CONFLICT (twitter_id) 
       DO UPDATE SET
-        username = EXCLUDED.username,
-        avatar_url = EXCLUDED.avatar_url,
         followers_count = EXCLUDED.followers_count,
-        following_count = EXCLUDED.following_count,
         updated_at = NOW()
       RETURNING *
     `;
