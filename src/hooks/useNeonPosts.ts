@@ -174,10 +174,10 @@ export const useNeonPosts = () => {
   return {
     posts,
     loading,
+    fetchPosts,
     createPost,
     likePost,
     giftPost,
-    sharePost,
-    refetch: fetchPosts,
+    sharePost
   };
 };
