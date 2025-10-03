@@ -31,6 +31,7 @@ export const Home: React.FC = () => {
 
   // Handle tab changes
   const handleTabChange = (tab: 'following' | 'trenches' | 'trending') => {
+    console.log('🔍 Tab changed to:', tab, 'Profile ID:', profile?.id);
     setActiveTab(tab);
     if (profile?.id) {
       fetchPosts(tab, profile.id);

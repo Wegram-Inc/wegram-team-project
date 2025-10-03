@@ -45,6 +45,7 @@ export const useNeonPosts = () => {
       const result = await response.json();
 
       if (response.ok && result.posts) {
+        console.log('🔍 Setting posts for feedType:', feedType, 'Posts:', result.posts.length);
         setPosts(result.posts);
       } else {
         // Fallback to mock data if API fails
