@@ -70,26 +70,23 @@ export const useNeonPosts = () => {
 
   const createPost = async (content: string, userId: string, username?: string) => {
     try {
-      console.log('📤 Sending post to API:', { content: content.substring(0, 50) + '...', user_id: userId });
-      
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, user_id: userId })
       });
 
-      console.log('📥 API response status:', response.status);
       const result = await response.json();
-      console.log('📥 API response data:', result);
 
       if (response.ok && result.post) {
         setPosts([result.post, ...posts]);
+        // Refresh posts to ensure we have the latest data
+        fetchPosts();
         return { data: result.post };
       } else {
         return { error: result.error };
       }
     } catch (error) {
-      console.error('❌ Post creation error:', error);
       return { error: 'Failed to create post' };
     }
   };

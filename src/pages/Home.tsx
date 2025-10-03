@@ -30,25 +30,8 @@ export const Home: React.FC = () => {
   }));
 
   const handlePost = async (content: string) => {
-    if (!profile) {
-      console.error('❌ No profile found for post creation');
-      return;
-    }
-    
-    console.log('🚀 Creating post with:', {
-      content: content.substring(0, 50) + '...',
-      userId: profile.id,
-      username: profile.username
-    });
-    
-    const result = await createPost(content, profile.id, profile.username);
-    
-    if (result.error) {
-      console.error('❌ Post creation failed:', result.error);
-      alert(`Failed to create post: ${result.error}`);
-    } else {
-      console.log('✅ Post created successfully:', result.data);
-    }
+    if (!profile) return;
+    await createPost(content, profile.id, profile.username);
   };
 
   // Listen for quick composer posts from BottomNav modal
