@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Phone, Video, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Send, Phone, Video, CheckCircle, MoreHorizontal } from 'lucide-react';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 interface UserProfileData {
   username: string;
@@ -43,13 +44,90 @@ const mockUsers: { [key: string]: UserProfileData } = {
   },
 };
 
+interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  created_at: string;
+  sender_username: string;
+  sender_avatar: string;
+  receiver_username: string;
+  receiver_avatar: string;
+}
+
 export const DirectMessage: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
+  const { profile: currentUser } = useNeonAuth();
   const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [otherUser, setOtherUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user data and messages
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!username || !currentUser) return;
+      
+      setLoading(true);
+      try {
+        // Fetch other user's profile
+        const userResponse = await fetch(`/api/user-profile?username=${encodeURIComponent(username)}`);
+        const userResult = await userResponse.json();
+        
+        if (userResponse.ok && userResult.user) {
+          setOtherUser(userResult.user);
+          
+          // Fetch messages between current user and other user
+          const messagesResponse = await fetch(`/api/messages?user1_id=${currentUser.id}&user2_id=${userResult.user.id}`);
+          const messagesResult = await messagesResponse.json();
+          
+          if (messagesResponse.ok && messagesResult.messages) {
+            setMessages(messagesResult.messages);
+          }
+        } else {
+          // Fallback to mock data
+          const mockUser = mockUsers[username] || {
+            username: `@${username}`,
+            displayName: username?.toUpperCase() || 'USER',
+            bio: 'Web3 enthusiast',
+            joinDate: '2024',
+            followers: 0,
+            avatar: username?.charAt(0)?.toUpperCase() || 'U',
+            verified: false,
+          };
+          setOtherUser(mockUser);
+        }
+      } catch (error) {
+        // Fallback to mock data on error
+        const mockUser = mockUsers[username] || {
+          username: `@${username}`,
+          displayName: username?.toUpperCase() || 'USER',
+          bio: 'Web3 enthusiast',
+          joinDate: '2024',
+          followers: 0,
+          avatar: username?.charAt(0)?.toUpperCase() || 'U',
+          verified: false,
+        };
+        setOtherUser(mockUser);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [username, currentUser]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // Mock user data - use the mockUsers data or fallback
-  const user = mockUsers[username || 'cryptorap'] || {
+  const user = otherUser || mockUsers[username || 'cryptorap'] || {
     username: `@${username}`,
     displayName: username?.toUpperCase() || 'USER',
     bio: 'Web3 enthusiast and content creator.',
@@ -59,11 +137,55 @@ export const DirectMessage: React.FC = () => {
     verified: false,
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-    // Handle message sending here
-    setMessage('');
+    if (!message.trim() || !currentUser || !otherUser || sending) return;
+    
+    setSending(true);
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender_id: currentUser.id,
+          receiver_id: otherUser.id,
+          content: message.trim()
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Add the new message to the messages list
+        const newMessage: Message = {
+          id: result.message.id,
+          sender_id: currentUser.id,
+          receiver_id: otherUser.id,
+          content: message.trim(),
+          created_at: result.message.created_at,
+          sender_username: currentUser.username,
+          sender_avatar: currentUser.avatar_url || '',
+          receiver_username: otherUser.username,
+          receiver_avatar: otherUser.avatar_url || ''
+        };
+        
+        setMessages(prev => [...prev, newMessage]);
+        setMessage('');
+      } else {
+        alert(result.error || 'Failed to send message');
+      }
+    } catch (error) {
+      alert('Failed to send message');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e as any);
+    }
   };
 
   return (
@@ -84,77 +206,100 @@ export const DirectMessage: React.FC = () => {
         <div className="px-4 py-6">
           {/* Centered Avatar and Name */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl mb-4">
-              {user.avatar}
+            <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+              {user.avatar_url ? (
+                <img 
+                  src={user.avatar_url} 
+                  alt={user.username}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
+                  {user.username?.charAt(1)?.toUpperCase() || user.avatar || 'U'}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-2xl font-bold gradient-text">{user.displayName}</h2>
+              <h2 className="text-2xl font-bold gradient-text">{user.username?.replace('@', '') || user.displayName}</h2>
               {user.verified && (
                 <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
                   <CheckCircle className="w-4 h-4 text-white" />
                 </div>
               )}
             </div>
-            <p className="text-primary text-sm leading-relaxed text-center mb-2">Visionary | Former Operations Analyst | Human<br />Terrain-Mapping and Behavior Pattern<br />Recognition Specialist</p>
-            <p className="text-xs text-secondary">Joined {user.joinDate} • {user.followers.toLocaleString()} Followers</p>
+            <p className="text-primary text-sm leading-relaxed text-center mb-2">{user.bio || 'Web3 enthusiast'}</p>
+            <p className="text-xs text-secondary">Joined {user.created_at ? new Date(user.created_at).toLocaleDateString() : user.joinDate} • {(user.followers_count || user.followers || 0).toLocaleString()} Followers</p>
           </div>
         </div>
 
         {/* Messages Area */}
         <div className="px-4 py-4">
-          <div className="space-y-2">
-            {/* Message from other user */}
-            <div className="flex justify-start">
-              <div className="max-w-xs px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700">
-                <p className="text-xs">Hey! How are you doing today?</p>
-                <div className="text-xs mt-0.5 text-secondary opacity-70">08:15</div>
-              </div>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
-            
-            {/* Your message */}
-            <div className="flex justify-end">
-              <div className="max-w-xs px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                <p className="text-xs">I'm doing great, thanks for asking!</p>
-                <div className="text-xs mt-0.5 text-blue-100 opacity-70">08:20</div>
-              </div>
+          ) : (
+            <div className="space-y-3 min-h-[300px] max-h-[400px] overflow-y-auto">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-secondary text-sm">No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const isFromCurrentUser = msg.sender_id === currentUser?.id;
+                  const messageTime = new Date(msg.created_at).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  });
+                  
+                  return (
+                    <div key={msg.id} className={`flex ${isFromCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-xs px-4 py-2 rounded-xl ${
+                        isFromCurrentUser 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                          : 'bg-gray-100 dark:bg-gray-700'
+                      }`}>
+                        <p className="text-sm">{msg.content}</p>
+                        <div className={`text-xs mt-1 ${
+                          isFromCurrentUser ? 'text-blue-100 opacity-70' : 'text-secondary opacity-70'
+                        }`}>
+                          {messageTime}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
             </div>
-            
-            {/* Message from other user */}
-            <div className="flex justify-start">
-              <div className="max-w-xs px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700">
-                <p className="text-xs">That's awesome! What are you working on?</p>
-                <div className="text-xs mt-0.5 text-secondary opacity-70">08:22</div>
-              </div>
-            </div>
-            
-            {/* Your message */}
-            <div className="flex justify-end">
-              <div className="max-w-xs px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                <p className="text-xs">Just some new features for the app. How about you?</p>
-                <div className="text-xs mt-0.5 text-blue-100 opacity-70">08:25</div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Message Input - Card Container */}
         <div className="p-4">
           <div className="card p-4">
             <form onSubmit={handleSendMessage} className="flex items-center gap-3">
-              <button
-                type="button"
-                className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
-                style={{ backgroundColor: 'var(--accent)' }}
-              >
-                <Plus className="w-5 h-5 text-white" />
-              </button>
-              <input
-                type="text"
+              <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Start a message"
-                className="input flex-1"
+                onKeyPress={handleKeyPress}
+                placeholder="Type a message..."
+                className="input flex-1 resize-none min-h-[40px] max-h-[120px] py-2"
+                rows={1}
+                disabled={sending}
               />
+              <button
+                type="submit"
+                disabled={!message.trim() || sending}
+                className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--accent)' }}
+              >
+                {sending ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Send className="w-5 h-5 text-white" />
+                )}
+              </button>
             </form>
           </div>
         </div>
