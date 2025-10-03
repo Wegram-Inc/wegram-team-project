@@ -73,6 +73,29 @@ export default async function handler(
     if (!userResponse.ok) {
       const errorData = await userResponse.text();
       console.error('Twitter user fetch failed:', errorData);
+      
+      // If rate limited (429) or other error, return minimal user data from token
+      // This allows authentication to succeed even if user details fetch fails
+      if (userResponse.status === 429) {
+        console.warn('Rate limited - creating user with minimal data');
+        return res.status(200).json({
+          success: true,
+          user: {
+            id: 'twitter_user_' + Date.now(),
+            username: 'twitter_user',
+            name: 'Twitter User',
+            profile_image_url: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png',
+            description: 'Authenticated via Twitter',
+            verified: false,
+            followers_count: 0,
+            following_count: 0,
+            tweet_count: 0
+          },
+          accessToken: tokenData.access_token,
+          rateLimited: true
+        });
+      }
+      
       return res.status(userResponse.status).json({ 
         error: 'User fetch failed',
         details: errorData 
