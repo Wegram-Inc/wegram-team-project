@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X, Edit3, Trash2, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
@@ -106,6 +106,8 @@ export const Profile: React.FC = () => {
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [socialModalOpen, setSocialModalOpen] = useState(false);
+  const [editingSocial, setEditingSocial] = useState<{platform: string, url: string} | null>(null);
   const { profile, updateProfile } = useNeonAuth();
   const { posts: allPosts } = useNeonPosts();
 
@@ -146,6 +148,75 @@ export const Profile: React.FC = () => {
     return allPosts.filter(post => post.user_id === profile.id);
   }, [allPosts, profile?.id]);
 
+  // Social Link Management Functions
+  const openSocialModal = (platform: string, existingUrl?: string) => {
+    setEditingSocial({ platform, url: existingUrl || '' });
+    setSocialModalOpen(true);
+  };
+
+  const saveSocialLink = async (url: string) => {
+    if (!profile || !editingSocial) return;
+    
+    setIsUpdating(true);
+    try {
+      const updateData: any = {
+        bio: profile?.bio,
+        avatar_url: profile?.avatar_url
+      };
+      
+      // Update the specific social platform URL
+      if (editingSocial.platform === 'X') {
+        updateData.twitter_url = url;
+      } else if (editingSocial.platform === 'Discord') {
+        updateData.discord_url = url;
+      } else if (editingSocial.platform === 'Telegram') {
+        updateData.telegram_url = url;
+      }
+
+      const result = await updateProfile(updateData);
+      if (result.success) {
+        setSocialModalOpen(false);
+        setEditingSocial(null);
+      }
+    } catch (error) {
+      console.error('Error saving social link:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const deleteSocialLink = async (platform: string) => {
+    if (!profile) return;
+    
+    setIsUpdating(true);
+    try {
+      const updateData: any = {
+        bio: profile?.bio,
+        avatar_url: profile?.avatar_url
+      };
+      
+      // Clear the specific social platform URL
+      if (platform === 'X') {
+        updateData.twitter_url = '';
+      } else if (platform === 'Discord') {
+        updateData.discord_url = '';
+      } else if (platform === 'Telegram') {
+        updateData.telegram_url = '';
+      }
+
+      await updateProfile(updateData);
+    } catch (error) {
+      console.error('Error deleting social link:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+    e.preventDefault();
+    e.stopPropagation();
+    // Initialize edit form with current data
+    setEditBio(user.bio || '');
+    setEditAvatar(user.avatar || '');
+    setShowEditModal(true);
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -154,8 +225,6 @@ export const Profile: React.FC = () => {
     setEditAvatar(user.avatar || '');
     setShowEditModal(true);
   };
-
-  const handleSaveProfile = async () => {
     if (!profile) return;
     
     setIsUpdating(true);
@@ -591,90 +660,172 @@ export const Profile: React.FC = () => {
 
           {/* Social Links */}
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-primary text-sm font-medium">🔗 Social Links</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-primary text-sm font-semibold">🔗 Social Links</span>
+                <span className="text-secondary text-xs">({[profile?.twitter_url, profile?.discord_url, profile?.telegram_url].filter(Boolean).length}/3)</span>
+              </div>
             </div>
-            <div className="flex gap-3">
-              {/* X */}
-              <button
-                onClick={() => {
-                  const url = profile?.twitter_url || '';
-                  if (url) {
-                    window.open(url, '_blank');
-                  } else {
-                    const newUrl = prompt('Enter your X (Twitter) URL:', 'https://x.com/');
-                    if (newUrl && newUrl.trim()) {
-                      updateProfile({ 
-                        bio: profile?.bio, 
-                        avatar_url: profile?.avatar_url,
-                        twitter_url: newUrl.trim() 
-                      });
-                    }
-                  }
-                }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  profile?.twitter_url 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30' 
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <X className="w-4 h-4" />
-                <span className="text-sm font-medium">X</span>
-              </button>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {/* X (Twitter) */}
+              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                    <X className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-primary">X (Twitter)</div>
+                    <div className="text-xs text-secondary">
+                      {profile?.twitter_url ? 
+                        (profile.twitter_url.length > 30 ? `${profile.twitter_url.substring(0, 30)}...` : profile.twitter_url) 
+                        : 'Not added yet'
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {profile?.twitter_url ? (
+                    <>
+                      <button
+                        onClick={() => window.open(profile.twitter_url, '_blank')}
+                        className="p-1.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                        title="Open link"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openSocialModal('X', profile.twitter_url)}
+                        className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                        title="Edit link"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSocialLink('X')}
+                        className="p-1.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        title="Delete link"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => openSocialModal('X')}
+                      className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      title="Add X link"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
 
               {/* Discord */}
-              <button
-                onClick={() => {
-                  const url = profile?.discord_url || '';
-                  if (url) {
-                    window.open(url, '_blank');
-                  } else {
-                    const newUrl = prompt('Enter your Discord URL:', 'https://discord.gg/');
-                    if (newUrl && newUrl.trim()) {
-                      updateProfile({ 
-                        bio: profile?.bio, 
-                        avatar_url: profile?.avatar_url,
-                        discord_url: newUrl.trim() 
-                      });
-                    }
-                  }
-                }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  profile?.discord_url 
-                    ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30' 
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Discord</span>
-              </button>
+              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-primary">Discord</div>
+                    <div className="text-xs text-secondary">
+                      {profile?.discord_url ? 
+                        (profile.discord_url.length > 30 ? `${profile.discord_url.substring(0, 30)}...` : profile.discord_url) 
+                        : 'Not added yet'
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {profile?.discord_url ? (
+                    <>
+                      <button
+                        onClick={() => window.open(profile.discord_url, '_blank')}
+                        className="p-1.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                        title="Open link"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openSocialModal('Discord', profile.discord_url)}
+                        className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                        title="Edit link"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSocialLink('Discord')}
+                        className="p-1.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        title="Delete link"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => openSocialModal('Discord')}
+                      className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      title="Add Discord link"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
 
               {/* Telegram */}
-              <button
-                onClick={() => {
-                  const url = profile?.telegram_url || '';
-                  if (url) {
-                    window.open(url, '_blank');
-                  } else {
-                    const newUrl = prompt('Enter your Telegram URL:', 'https://t.me/');
-                    if (newUrl && newUrl.trim()) {
-                      updateProfile({ 
-                        bio: profile?.bio, 
-                        avatar_url: profile?.avatar_url,
-                        telegram_url: newUrl.trim() 
-                      });
-                    }
-                  }
-                }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  profile?.telegram_url 
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30' 
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Telegram</span>
-              </button>
+              <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-secondary">Telegram</div>
+                    <div className="text-xs text-secondary">
+                      {profile?.telegram_url ? 
+                        (profile.telegram_url.length > 30 ? `${profile.telegram_url.substring(0, 30)}...` : profile.telegram_url) 
+                        : 'Not added yet'
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {profile?.telegram_url ? (
+                    <>
+                      <button
+                        onClick={() => window.open(profile.telegram_url, '_blank')}
+                        className="p-1.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                        title="Open link"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openSocialModal('Telegram', profile.telegram_url)}
+                        className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                        title="Edit link"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSocialLink('Telegram')}
+                        className="p-1.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                        title="Delete link"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => openSocialModal('Telegram')}
+                      className="p-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      title="Add Telegram link"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -742,6 +893,71 @@ export const Profile: React.FC = () => {
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
       />
+
+      {/* Social Link Edit Modal */}
+      {socialModalOpen && editingSocial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setSocialModalOpen(false)}
+          />
+          
+          {/* Modal */}
+          <div
+            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden w-full max-w-md mx-4"
+            style={{ backgroundColor: 'var(--card)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-primary">
+                {editingSocial.url ? 'Edit' : 'Add'} {editingSocial.platform} Link
+              </h2>
+              <button
+                onClick={() => setSocialModalOpen(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-secondary" />
+              </button>
+            </div>
+            
+            {/* Content */}
+            <div className="p-6">
+              <div className="mb-4">
+                <label className="block text-primary font-medium mb-2">URL</label>
+                <input
+                  type="url"
+                  value={editingSocial.url}
+                  onChange={(e) => setEditingSocial({...editingSocial, url: e.target.value})}
+                  placeholder={
+                    editingSocial.platform === 'X' ? 'https://x.com/username' :
+                    editingSocial.platform === 'Discord' ? 'https://discord.gg/server' :
+                    'https://t.me/username'
+                  }
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary"
+                />
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setSocialModalOpen(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => saveSocialLink(editingSocial.url)}
+                  disabled={isUpdating || !editingSocial.url.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white rounded-lg transition-colors font-medium"
+                >
+                  {isUpdating ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
