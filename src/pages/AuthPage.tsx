@@ -4,132 +4,190 @@ import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signInWithRealX, signInWithX } = useNeonAuth();
+  const { signInWithRealX, signInWithEmail, signUpWithEmail } = useNeonAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  
+  // Form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
 
-  const handleAuthorize = async () => {
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     setIsLoading(true);
-    try {
-      // Clear any previous Twitter session data to ensure account picker shows
-      // This allows users to choose which Twitter account to log in with
-      localStorage.removeItem('wegram_user');
-      sessionStorage.clear();
-      
-      // Use REAL Twitter OAuth
-      await signInWithRealX();
-      // The redirect to Twitter will happen automatically
-      // User will come back via /twitter/callback
-    } catch (error) {
-      console.error('Twitter auth error:', error);
-      alert('Failed to start Twitter authentication');
-      setIsLoading(false);
-    }
-  };
 
-  const handleDemoAuth = async () => {
-    setIsLoading(true);
     try {
-      // Use demo X auth that saves to Neon database
-      const result = await signInWithX();
+      let result;
+      if (mode === 'signup') {
+        if (!username || username.length < 3) {
+          setError('Username must be at least 3 characters');
+          setIsLoading(false);
+          return;
+        }
+        result = await signUpWithEmail(email, password, username);
+      } else {
+        result = await signInWithEmail(email, password);
+      }
+
       if (result.success) {
         navigate('/home');
       } else {
-        alert(result.error || 'Authentication failed');
+        setError(result.error || 'Authentication failed');
       }
-    } catch (error) {
-      console.error('Demo auth error:', error);
-      alert('Authentication failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    navigate('/landing');
+  const handleXAuth = async () => {
+    setIsLoading(true);
+    try {
+      localStorage.removeItem('wegram_user');
+      sessionStorage.clear();
+      await signInWithRealX();
+    } catch (error) {
+      console.error('X auth error:', error);
+      setError('Failed to start X authentication');
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
-          <div className="w-4 h-4 bg-gray-400 rounded"></div>
-        </div>
-        <div className="text-gray-600 text-sm font-medium">wegram.com</div>
-        <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
-          <div className="w-4 h-4 bg-gray-400 rounded"></div>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="w-full h-1 bg-gray-200">
-        <div className="w-3/4 h-full bg-blue-500"></div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* X Logo */}
-        <div className="mb-8">
-          <div className="w-12 h-12 flex items-center justify-center">
-            <div className="text-4xl font-bold">𝕏</div>
-          </div>
-        </div>
-
-        {/* WEGRAM Logo */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-cyan-400 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
           <img 
             src="https://i.ibb.co/TxdWc0kL/IMG-9101.jpg"
             alt="WEGRAM Logo" 
-            className="w-24 h-24 rounded-lg object-cover shadow-lg"
+            className="w-20 h-20 rounded-lg object-cover shadow-lg"
           />
         </div>
 
-        {/* Main Text */}
-        <div className="text-center mb-12">
-          <h1 className="text-2xl font-bold text-black mb-4">
-            Sign in to WEGRAM with X
-          </h1>
-          <p className="text-gray-600">
-            Connect your X account to get started
-          </p>
-        </div>
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
+          {mode === 'login' ? 'Welcome back' : 'Create account'}
+        </h1>
+        <p className="text-center text-gray-600 mb-8">
+          {mode === 'login' ? 'Sign in to your WEGRAM account' : 'Join WEGRAM today'}
+        </p>
 
-        {/* Authorization Info */}
-        <div className="text-center mb-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 flex items-center justify-center">
-            <span className="text-white font-bold text-xl">𝕏</span>
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
           </div>
-          <p className="text-gray-600 text-sm">
-            Connect your X account to get started with WEGRAM
-          </p>
-        </div>
+        )}
 
-        {/* Action Buttons */}
-        <div className="w-full max-w-sm space-y-4">
+        {/* Email/Password Form */}
+        <form onSubmit={handleEmailAuth} className="space-y-4 mb-6">
+          {mode === 'signup' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Choose a username"
+                required
+              />
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="your@email.com"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="••••••••"
+              required
+              minLength={8}
+            />
+            {mode === 'signup' && (
+              <p className="text-xs text-gray-500 mt-1">
+                At least 8 characters
+              </p>
+            )}
+          </div>
+
           <button
-            onClick={handleAuthorize}
+            type="submit"
             disabled={isLoading}
-            className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-full text-lg transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
           >
-            {isLoading ? 'Connecting to X...' : '𝕏 Continue with X'}
+            {isLoading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
           </button>
-          
-          <button
-            onClick={handleCancel}
-            className="w-full text-gray-500 hover:text-gray-600 font-medium py-2 px-6 text-sm transition-colors"
-          >
-            Cancel
-          </button>
-          
-          <p className="text-xs text-gray-400 text-center mt-4">
-            Secure OAuth 2.0 authentication with X
-          </p>
-        </div>
-      </div>
+        </form>
 
-      {/* Bottom Navigation Bar */}
-      <div className="flex items-center justify-center py-4">
-        <div className="w-32 h-1 bg-black rounded-full"></div>
+        {/* Toggle Mode */}
+        <div className="text-center mb-6">
+          <button
+            type="button"
+            onClick={() => {
+              setMode(mode === 'login' ? 'signup' : 'login');
+              setError('');
+            }}
+            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+          >
+            {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+          </div>
+        </div>
+
+        {/* X Auth Button */}
+        <button
+          type="button"
+          onClick={handleXAuth}
+          disabled={isLoading}
+          className="w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          <span className="text-xl">𝕏</span>
+          Continue with X
+        </button>
+
+        {/* Back Button */}
+        <button
+          type="button"
+          onClick={() => navigate('/landing')}
+          className="w-full mt-4 text-gray-500 hover:text-gray-600 font-medium py-2 text-sm transition-colors"
+        >
+          Back to Home
+        </button>
       </div>
     </div>
   );

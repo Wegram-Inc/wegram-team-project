@@ -156,11 +156,65 @@ export const useNeonAuth = () => {
     }
   };
 
+  // 🚀 Sign up with email/password
+  const signUpWithEmail = async (email: string, password: string, username: string) => {
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, username })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        localStorage.setItem('wegram_user', JSON.stringify(result.user));
+        setProfile(result.user);
+        return { success: true, user: result.user };
+      } else {
+        return { success: false, error: result.error || 'Signup failed' };
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Signup failed' 
+      };
+    }
+  };
+
+  // 🚀 Sign in with email/password
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        localStorage.setItem('wegram_user', JSON.stringify(result.user));
+        setProfile(result.user);
+        return { success: true, user: result.user };
+      } else {
+        return { success: false, error: result.error || 'Login failed' };
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Login failed' 
+      };
+    }
+  };
+
   return {
     profile,
     loading,
     signInWithX,
     signInWithRealX,
+    signInWithEmail,
+    signUpWithEmail,
     handleXCallback,
     signOut,
     updateProfile,
