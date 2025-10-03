@@ -35,6 +35,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const { isDark } = useTheme();
   const { profile } = useNeonAuth();
   const [showMenu, setShowMenu] = React.useState(false);
+  const [isLiked, setIsLiked] = React.useState(false);
+  const [isShared, setIsShared] = React.useState(false);
+  const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [isGifted, setIsGifted] = React.useState(false);
+  const [likesCount, setLikesCount] = React.useState(post.likes);
+  const [sharesCount, setSharesCount] = React.useState(post.shares);
+  const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
@@ -57,11 +64,36 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
     }
   };
 
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
+    onLike?.(post.id);
+  };
+
+  const handleShare = () => {
+    setIsShared(true);
+    setSharesCount(prev => prev + 1);
+    onShare?.(post.id);
+    
+    // Copy post link to clipboard
+    const postUrl = `${window.location.origin}/post/${post.id}`;
+    navigator.clipboard?.writeText(postUrl);
+    
+    // Reset share state after animation
+    setTimeout(() => setIsShared(false), 1000);
+  };
+
   const handleGift = () => {
+    setIsGifted(true);
+    setGiftsCount(prev => prev + 1);
     onGift?.(post.id);
+    
+    // Reset gift state after animation
+    setTimeout(() => setIsGifted(false), 1000);
   };
 
   const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
     onBookmark?.(post.id);
   };
 
@@ -209,38 +241,66 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
 
       <div className="flex items-center justify-between text-secondary">
         <button
-          onClick={() => onLike?.(post.id)}
-          className="flex items-center gap-2 hover:text-red-400 transition-colors"
+          onClick={handleLike}
+          className={`flex items-center gap-2 transition-all duration-200 ${
+            isLiked 
+              ? 'text-red-500 scale-110' 
+              : 'hover:text-red-400 hover:scale-105'
+          }`}
         >
-          <Heart className="w-4 h-4" />
-          <span className="text-sm">{post.likes}</span>
+          <Heart className={`w-4 h-4 transition-all duration-200 ${
+            isLiked ? 'fill-current' : ''
+          }`} />
+          <span className="text-sm font-medium">{likesCount}</span>
         </button>
+        
         <button
           onClick={() => onReply?.(post.id)}
-          className="flex items-center gap-2 hover:text-blue-400 transition-colors"
+          className="flex items-center gap-2 hover:text-blue-400 hover:scale-105 transition-all duration-200"
         >
           <MessageCircle className="w-4 h-4" />
           <span className="text-sm">{post.replies}</span>
         </button>
+        
         <button
-          onClick={() => onShare?.(post.id)}
-          className="flex items-center gap-2 hover:text-green-400 transition-colors"
+          onClick={handleShare}
+          className={`flex items-center gap-2 transition-all duration-200 ${
+            isShared 
+              ? 'text-green-500 scale-110' 
+              : 'hover:text-green-400 hover:scale-105'
+          }`}
         >
-          <Share className="w-4 h-4" />
-          <span className="text-sm">{post.shares}</span>
+          <Share className={`w-4 h-4 transition-all duration-200 ${
+            isShared ? 'rotate-12' : ''
+          }`} />
+          <span className="text-sm font-medium">{sharesCount}</span>
         </button>
+        
         <button
           onClick={handleGift}
-          className="flex items-center gap-2 hover:text-yellow-400 transition-colors"
+          className={`flex items-center gap-2 transition-all duration-200 ${
+            isGifted 
+              ? 'text-yellow-500 scale-110' 
+              : 'hover:text-yellow-400 hover:scale-105'
+          }`}
         >
-          <Gift className="w-4 h-4" />
-          <span className="text-sm">{post.gifts || 0}</span>
+          <Gift className={`w-4 h-4 transition-all duration-200 ${
+            isGifted ? 'animate-bounce' : ''
+          }`} />
+          <span className="text-sm font-medium">{giftsCount}</span>
         </button>
+        
         <button
           onClick={handleBookmark}
-          className="flex items-center gap-2 hover:text-purple-400 transition-colors"
+          className={`flex items-center gap-2 transition-all duration-200 ${
+            isBookmarked 
+              ? 'text-purple-500 scale-110' 
+              : 'hover:text-purple-400 hover:scale-105'
+          }`}
         >
-          <Bookmark className="w-4 h-4" />
+          <Bookmark className={`w-4 h-4 transition-all duration-200 ${
+            isBookmarked ? 'fill-current' : ''
+          }`} />
         </button>
       </div>
     </div>

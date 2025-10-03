@@ -61,6 +61,17 @@ export const Home: React.FC = () => {
     }
   };
 
+  const handleShare = async (postId: string) => {
+    // Share functionality - copy link to clipboard
+    const postUrl = `${window.location.origin}/post/${postId}`;
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      alert('Post link copied to clipboard! 🔗');
+    } catch (error) {
+      alert('Failed to copy link');
+    }
+  };
+
   const handleBookmark = async (postId: string) => {
     // Bookmark functionality - in real app this would save to user's bookmarks
     console.log('Bookmarking post:', postId);
@@ -171,6 +182,7 @@ export const Home: React.FC = () => {
               avatar_url: post.avatar_url
             }}
             onLike={handleLike}
+            onShare={handleShare}
             onGift={handleGift}
             onBookmark={handleBookmark}
           />
