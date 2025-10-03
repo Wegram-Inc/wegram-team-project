@@ -21,7 +21,7 @@ export interface TwitterAuthResponse {
 class TwitterAuthService {
   private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
   private readonly redirectUri = window.location.hostname === 'localhost' 
-    ? `${window.location.origin}/twitter/callback`
+    ? `http://localhost:${window.location.port}/twitter/callback`
     : 'https://wegram-team-project.vercel.app/twitter/callback';
   private readonly scope = 'tweet.read users.read offline.access';
 
@@ -34,14 +34,24 @@ class TwitterAuthService {
     const codeVerifier = this.generateCodeVerifier();
     localStorage.setItem('twitter_code_verifier', codeVerifier);
     
+    // Generate SHA256 hash of code verifier for PKCE S256
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+    const hashBuffer = crypto.subtle.digestSync('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const codeChallenge = btoa(String.fromCharCode(...hashArray))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '');
+    
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: this.clientId,
       redirect_uri: this.redirectUri,
       scope: this.scope,
       state: state,
-      code_challenge: codeVerifier, // Use plain method for now
-      code_challenge_method: 'plain'
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256'
     });
 
     return `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
@@ -76,7 +86,7 @@ class TwitterAuthService {
       }
 
       // User info is already included in tokenResponse from backend
-      const userInfo = tokenResponse.user || await this.getUserInfo(tokenResponse.access_token);
+      const userInfo = tokenResponse.user;
       
       if (!userInfo) {
         throw new Error('Failed to get user information');
@@ -118,22 +128,6 @@ class TwitterAuthService {
       console.error('Token exchange failed:', error);
       throw error;
     }
-  }
-
-  // Get user information from Twitter API
-  private async getUserInfo(accessToken: string): Promise<TwitterUser> {
-    // Use real Twitter API
-    const data = await realTwitterAPI.getUserInfo(accessToken);
-    return {
-      id: data.data.id,
-      username: data.data.username,
-      name: data.data.name,
-      profile_image_url: data.data.profile_image_url,
-      verified: data.data.verified,
-      followers_count: data.data.public_metrics?.followers_count,
-      following_count: data.data.public_metrics?.following_count,
-      tweet_count: data.data.public_metrics?.tweet_count
-    };
   }
 
   // Generate random state parameter for security
