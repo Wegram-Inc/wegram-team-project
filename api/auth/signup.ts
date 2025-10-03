@@ -1,7 +1,6 @@
 // Email/Password Signup API
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import { sendVerificationEmail } from '../../src/lib/emailService';
 
 // Simple server-side password hashing using Node's crypto
 import { createHash, randomBytes, pbkdf2Sync } from 'crypto';
@@ -76,20 +75,12 @@ export default async function handler(
       return res.status(400).json({ error: 'Username already taken' });
     }
 
-    // Hash password
-    const passwordHash = hashPassword(password);
-    
-    // Generate verification token
-    const verificationToken = generateVerificationToken();
-    const verificationUrl = getVerificationUrl(verificationToken);
-    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    // Create user
+    // Create user (without email verification for now)
     const result = await sql`
       INSERT INTO profiles (
         username, email, password_hash,
         followers_count, following_count, posts_count,
-        bio, verified, email_verified, verification_token, verification_token_expires
+        bio, verified, email_verified
       ) VALUES (
         ${username.toLowerCase()},
         ${email.toLowerCase()},
@@ -99,22 +90,12 @@ export default async function handler(
         ${0},
         ${'Welcome to WEGRAM! 🚀'},
         ${false},
-        ${false},
-        ${verificationToken},
-        ${tokenExpires}
+        ${true}
       )
       RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at, email_verified
     `;
 
     const user = result[0];
-
-    // Send verification email
-    await sendVerificationEmail({
-      email: user.email,
-      username: user.username,
-      verificationToken,
-      verificationUrl
-    });
 
     return res.status(201).json({
       success: true,
@@ -131,7 +112,7 @@ export default async function handler(
         created_at: user.created_at,
         email_verified: user.email_verified
       },
-      message: 'Account created! Please check your email to verify your account.'
+      message: 'Account created successfully!'
     });
 
   } catch (error) {
