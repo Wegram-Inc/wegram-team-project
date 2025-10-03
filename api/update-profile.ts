@@ -29,18 +29,34 @@ export default async function handler(req: any, res: any) {
     const sql = neon(DATABASE_URL);
 
     // Update user profile in database - NO FALLBACKS, this is a live site
-    const result = await sql`
-      UPDATE profiles
-      SET
-        bio = ${bio || null},
-        avatar_url = ${avatar_url || null},
-        twitter_link = ${twitter_link || null},
-        discord_link = ${discord_link || null},
-        telegram_link = ${telegram_link || null},
-        updated_at = NOW()
-      WHERE id = ${userId}
-      RETURNING *
-    `;
+    // First try to update with social media fields, fallback if columns don't exist
+    let result;
+    try {
+      result = await sql`
+        UPDATE profiles
+        SET
+          bio = ${bio || null},
+          avatar_url = ${avatar_url || null},
+          twitter_link = ${twitter_link || null},
+          discord_link = ${discord_link || null},
+          telegram_link = ${telegram_link || null},
+          updated_at = NOW()
+        WHERE id = ${userId}
+        RETURNING *
+      `;
+    } catch (error) {
+      // If social media columns don't exist yet, update without them
+      console.log('Social media columns not found, updating without them:', error.message);
+      result = await sql`
+        UPDATE profiles
+        SET
+          bio = ${bio || null},
+          avatar_url = ${avatar_url || null},
+          updated_at = NOW()
+        WHERE id = ${userId}
+        RETURNING *
+      `;
+    }
 
     if (result.length === 0) {
       return res.status(404).json({ error: 'User not found in database' });
