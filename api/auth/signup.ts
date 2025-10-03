@@ -1,7 +1,7 @@
 // Email/Password Signup API
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import { sendVerificationEmail, sendVerificationEmailFallback } from '../../src/lib/emailService';
+import { sendVerificationEmail } from '../../src/lib/emailService';
 
 // Simple server-side password hashing using Node's crypto
 import { createHash, randomBytes, pbkdf2Sync } from 'crypto';
@@ -109,16 +109,19 @@ export default async function handler(
     const user = result[0];
 
     // Send verification email
-    const emailResult = await sendVerificationEmail({
-      email: user.email,
-      username: user.username,
-      verificationToken,
-      verificationUrl
-    });
-
-    if (!emailResult.success) {
-      console.error('Failed to send verification email:', emailResult.error);
-      // Don't fail signup if email fails, but log it
+    try {
+      await sendVerificationEmail({
+        email: user.email,
+        username: user.username,
+        verificationToken,
+        verificationUrl
+      });
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      return res.status(500).json({ 
+        error: 'Account created but email verification failed. Please contact support.',
+        details: emailError instanceof Error ? emailError.message : 'Unknown error'
+      });
     }
 
     return res.status(201).json({
@@ -136,8 +139,7 @@ export default async function handler(
         created_at: user.created_at,
         email_verified: user.email_verified
       },
-      message: 'Account created! Please check your email to verify your account.',
-      emailSent: emailResult.success
+      message: 'Account created! Please check your email to verify your account.'
     });
 
   } catch (error) {
