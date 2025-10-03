@@ -646,6 +646,48 @@ export const UserProfile: React.FC = () => {
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real user data from API
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      if (!username) return;
+      
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/user-profile?username=${encodeURIComponent(username)}`);
+        const result = await response.json();
+        
+        if (response.ok && result.user) {
+          setUser(result.user);
+          setUserPosts(result.posts || []);
+          
+          // Check if current user is following this user
+          if (currentUser && result.user.id !== currentUser.id) {
+            const followResponse = await fetch(`/api/follow?follower_id=${currentUser.id}&following_id=${result.user.id}`);
+            const followResult = await followResponse.json();
+            setIsFollowing(followResult.isFollowing || false);
+          }
+        } else {
+          // Fallback to mock data if user not found in database
+          const mockUser = getUserData(`@${username}`);
+          setUser(mockUser);
+          setUserPosts([]);
+        }
+      } catch (error) {
+        // Fallback to mock data on error
+        const mockUser = getUserData(`@${username}`);
+        setUser(mockUser);
+        setUserPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [username, currentUser]);
 
   // Memoize the feed posts to prevent regeneration on every render
   const feedPosts = useMemo(() => {
@@ -692,11 +734,35 @@ export const UserProfile: React.FC = () => {
     return null;
   }
 
-  const user = getUserData(`@${username}`);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-secondary">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-secondary">User not found</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleFollow = async () => {
     if (!currentUser) {
       alert('Please log in to follow users');
+      return;
+    }
+
+    if (!user.id) {
+      alert('Cannot follow this user');
       return;
     }
 
@@ -708,7 +774,7 @@ export const UserProfile: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           follower_id: currentUser.id,
-          following_id: user.id // We'll need to get the actual user ID from the database
+          following_id: user.id
         })
       });
 
@@ -716,8 +782,13 @@ export const UserProfile: React.FC = () => {
 
       if (response.ok && result.success) {
         setIsFollowing(!isFollowing);
-        // Update the user object to reflect the change
-        user.isFollowing = !isFollowing;
+        // Update follower count in the user object
+        setUser(prev => ({
+          ...prev,
+          followers_count: isFollowing 
+            ? prev.followers_count - 1 
+            : prev.followers_count + 1
+        }));
       } else {
         alert(result.error || 'Failed to update follow status');
       }
@@ -930,12 +1001,22 @@ export const UserProfile: React.FC = () => {
         <div className="px-4 py-6">
           {/* Avatar and Name */}
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
-              {user.avatar}
+            <div className="w-16 h-16 rounded-full overflow-hidden">
+              {user.avatar_url ? (
+                <img 
+                  src={user.avatar_url} 
+                  alt={user.username}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                  {user.username?.charAt(1)?.toUpperCase() || '👤'}
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>
+                <h2 className="text-xl font-bold gradient-text">{user.username?.replace('@', '') || 'User'}</h2>
                 {user.verified && (
                   <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <CheckCircle className="w-3 h-3 text-white" />
@@ -983,15 +1064,15 @@ export const UserProfile: React.FC = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.followers.toLocaleString()}</div>
+              <div className="text-lg font-bold text-primary">{(user.followers_count || 0).toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWERS</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.following.toLocaleString()}</div>
+              <div className="text-lg font-bold text-primary">{(user.following_count || 0).toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWING</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-primary">{user.posts}</div>
+              <div className="text-lg font-bold text-primary">{user.posts_count || 0}</div>
               <div className="text-secondary text-xs">POSTS</div>
             </div>
           </div>

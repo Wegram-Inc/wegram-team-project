@@ -1,0 +1,105 @@
+// User Profile API for Neon Postgres
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { neon } from '@neondatabase/serverless';
+
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
+  const DATABASE_URL = process.env.POSTGRES_URL;
+  
+  if (!DATABASE_URL) {
+    return res.status(500).json({ error: 'Database not configured' });
+  }
+
+  const sql = neon(DATABASE_URL);
+
+  try {
+    switch (req.method) {
+      case 'GET':
+        // Get user profile by username
+        const { username } = req.query;
+
+        if (!username) {
+          return res.status(400).json({ error: 'Username is required' });
+        }
+
+        // Clean username (remove @ if present)
+        const cleanUsername = username.toString().replace('@', '');
+
+        const users = await sql`
+          SELECT 
+            id,
+            username,
+            email,
+            avatar_url,
+            bio,
+            verified,
+            followers_count,
+            following_count,
+            posts_count,
+            twitter_id,
+            twitter_username,
+            created_at,
+            updated_at
+          FROM profiles 
+          WHERE username = ${`@${cleanUsername}`} OR username = ${cleanUsername}
+        `;
+
+        if (users.length === 0) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = users[0];
+
+        // Get user's posts
+        const posts = await sql`
+          SELECT 
+            p.id,
+            p.user_id,
+            p.content,
+            p.image_url,
+            p.likes_count as likes,
+            p.comments_count as replies,
+            p.shares_count as shares,
+            p.created_at,
+            p.updated_at,
+            pr.username,
+            pr.avatar_url
+          FROM posts p
+          JOIN profiles pr ON p.user_id = pr.id
+          WHERE p.user_id = ${user.id}
+          ORDER BY p.created_at DESC
+          LIMIT 20
+        `;
+
+        return res.status(200).json({ 
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            avatar_url: user.avatar_url,
+            bio: user.bio,
+            verified: user.verified,
+            followers_count: user.followers_count,
+            following_count: user.following_count,
+            posts_count: user.posts_count,
+            twitter_id: user.twitter_id,
+            twitter_username: user.twitter_username,
+            created_at: user.created_at,
+            updated_at: user.updated_at
+          },
+          posts
+        });
+
+      default:
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+  } catch (error) {
+    console.error('User Profile API error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+}
