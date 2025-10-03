@@ -167,7 +167,8 @@ export const Home: React.FC = () => {
               likes: post.likes,
               replies: post.replies,
               shares: post.shares,
-              gifts: post.gifts
+              gifts: post.gifts,
+              avatar_url: post.avatar_url
             }}
             onLike={handleLike}
             onGift={handleGift}

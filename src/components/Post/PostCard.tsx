@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
+import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
 
 // Unified post interface that works with both mock and database posts
@@ -32,17 +33,28 @@ interface PostCardProps {
 export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onShare, onGift, onBookmark }) => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
+  const { profile } = useNeonAuth();
   const [showMenu, setShowMenu] = React.useState(false);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
     const cleanUsername = post.username.replace('@', '');
-    console.log('Navigating to:', `/user/${cleanUsername}`);
     
-    // Navigate from home page, so this becomes the original profile
-    navigate(`/user/${cleanUsername}`, { 
-      state: { originalProfile: cleanUsername } 
-    });
+    // Check if this is the current user's own post
+    const isOwnPost = profile && (
+      post.user_id === profile.id || 
+      cleanUsername === profile.username.replace('@', '')
+    );
+    
+    if (isOwnPost) {
+      // Navigate to own profile page
+      navigate('/profile');
+    } else {
+      // Navigate to other user's profile page
+      navigate(`/user/${cleanUsername}`, { 
+        state: { originalProfile: cleanUsername } 
+      });
+    }
   };
 
   const handleGift = () => {
