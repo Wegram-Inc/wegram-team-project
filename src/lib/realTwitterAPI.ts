@@ -20,8 +20,20 @@ export const realTwitterAPI = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Backend token exchange failed:', errorData);
-        throw new Error(errorData.error || `Token exchange failed: ${response.status}`);
+        console.error('🔴 Backend token exchange failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+          requestParams: {
+            code: code.substring(0, 20) + '...',
+            codeVerifier: codeVerifier.substring(0, 20) + '...',
+            redirectUri
+          }
+        });
+        
+        // Create detailed error message
+        const detailedError = `Token exchange failed: ${errorData.error || response.status}${errorData.details ? '\nDetails: ' + errorData.details : ''}${errorData.hint ? '\n' + errorData.hint : ''}`;
+        throw new Error(detailedError);
       }
 
       const data = await response.json();

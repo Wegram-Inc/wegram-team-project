@@ -100,15 +100,31 @@ export const TwitterCallback: React.FC = () => {
               <h2 className="text-xl font-semibold text-red-500 mb-2">
                 Authentication Failed
               </h2>
-              <p className="text-secondary mb-4">
+              <p className="text-secondary mb-4 text-sm">
                 {error}
               </p>
-              <button
-                onClick={() => navigate('/')}
-                className="btn-primary px-6 py-2"
-              >
-                Return to Home
-              </button>
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 mb-2">
+                  Check browser console for detailed error logs
+                </p>
+              </div>
+              <div className="space-y-2">
+                <button
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = '/auth';
+                  }}
+                  className="btn-primary px-6 py-2 w-full bg-blue-500 hover:bg-blue-600 text-white rounded"
+                >
+                  Try Again (Fresh Start)
+                </button>
+                <button
+                  onClick={() => navigate('/')}
+                  className="btn-secondary px-6 py-2 w-full border border-gray-300 rounded"
+                >
+                  Return to Home
+                </button>
+              </div>
             </>
           )}
         </div>

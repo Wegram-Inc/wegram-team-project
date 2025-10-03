@@ -38,11 +38,23 @@ export default async function handler(
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error('Twitter token exchange failed:', errorText);
+      console.error('Twitter token exchange failed:', {
+        status: tokenResponse.status,
+        statusText: tokenResponse.statusText,
+        errorText,
+        requestBody: {
+          code: code.substring(0, 20) + '...',
+          grant_type: 'authorization_code',
+          client_id: TWITTER_API_KEY,
+          redirect_uri: redirectUri,
+          code_verifier: codeVerifier.substring(0, 20) + '...'
+        }
+      });
       return res.status(tokenResponse.status).json({ 
         error: 'Token exchange failed',
         details: errorText,
-        status: tokenResponse.status
+        status: tokenResponse.status,
+        hint: 'Check Vercel function logs for details'
       });
     }
 
