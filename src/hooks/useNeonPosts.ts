@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { mockPosts } from '../data/mockData';
 
 export interface Post {
@@ -24,7 +24,7 @@ export const useNeonPosts = () => {
   //   fetchPosts('trenches');
   // }, []);
 
-  const fetchPosts = useCallback(async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
+  const fetchPosts = async (feedType: 'following' | 'trenches' | 'trending' = 'trenches', userId?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -76,7 +76,7 @@ export const useNeonPosts = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // Empty dependency array since we don't depend on any external values
+  };
 
   const createPost = async (content: string, userId: string, username?: string) => {
     try {
@@ -171,33 +171,6 @@ export const useNeonPosts = () => {
     }
   };
 
-  const bookmarkPost = async (postId: string, userId: string) => {
-    try {
-      const response = await fetch('/api/posts', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ post_id: postId, action: 'bookmark', user_id: userId })
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok && result.bookmarked !== undefined) {
-        // Update the post's bookmark status in the local state
-        setPosts(posts.map(p => 
-          p.id === postId 
-            ? { ...p, bookmarked: result.bookmarked }
-            : p
-        ));
-        return { success: true, bookmarked: result.bookmarked };
-      } else {
-        return { success: false, error: result.error || 'Failed to bookmark post' };
-      }
-    } catch (error) {
-      console.error('Error bookmarking post:', error);
-      return { success: false, error: 'Failed to bookmark post' };
-    }
-  };
-
   return {
     posts,
     loading,
@@ -205,7 +178,6 @@ export const useNeonPosts = () => {
     createPost,
     likePost,
     giftPost,
-    sharePost,
-    bookmarkPost
+    sharePost
   };
 };

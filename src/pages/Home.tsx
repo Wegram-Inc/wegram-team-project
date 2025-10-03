@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { mockPosts } from '../data/mockData';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Users, Zap } from 'lucide-react';
@@ -13,8 +14,20 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('following');
   
-  // Use real posts from database
-  const displayPosts = posts;
+  // Use real posts from database, fallback to mock if none exist
+  const displayPosts = posts.length > 0 ? posts : mockPosts.map(post => ({
+    id: post.id,
+    user_id: post.userId,
+    content: post.content,
+    likes: post.likes,
+    replies: post.replies,
+    shares: post.shares,
+    gifts: post.gifts || 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    username: post.username.replace('@', ''),
+    avatar_url: null
+  }));
 
   // Handle tab changes
   const handleTabChange = (tab: 'following' | 'trenches' | 'trending') => {
@@ -33,12 +46,12 @@ export const Home: React.FC = () => {
     } else {
       fetchPosts(activeTab);
     }
-  }, [profile?.id, activeTab, fetchPosts]); // Include all dependencies
+  }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
 
-  const handlePost = useCallback(async (content: string) => {
+  const handlePost = async (content: string) => {
     if (!profile) return;
     await createPost(content, profile.id, profile.username);
-  }, [profile, createPost]);
+  };
 
   // Listen for quick composer posts from BottomNav modal
   useEffect(() => {
@@ -50,11 +63,11 @@ export const Home: React.FC = () => {
     return () => window.removeEventListener('wegram:new-post', handler as any);
   }, [profile]);
 
-  const handleLike = useCallback(async (postId: string) => {
+  const handleLike = async (postId: string) => {
     await likePost(postId);
-  }, [likePost]);
+  };
 
-  const handleGift = useCallback(async (postId: string) => {
+  const handleGift = async (postId: string) => {
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
@@ -65,9 +78,9 @@ export const Home: React.FC = () => {
       await giftPost(postId);
       alert(`🎁 Sent ${selectedGift} WGM to @${post.username}!`);
     }
-  }, [posts, giftPost]);
+  };
 
-  const handleShare = useCallback(async (postId: string) => {
+  const handleShare = async (postId: string) => {
     // Share functionality - copy link to clipboard
     const postUrl = `${window.location.origin}/post/${postId}`;
     try {
@@ -76,13 +89,13 @@ export const Home: React.FC = () => {
     } catch (error) {
       alert('Failed to copy link');
     }
-  }, []);
+  };
 
-  const handleBookmark = useCallback(async (postId: string) => {
+  const handleBookmark = async (postId: string) => {
     // Bookmark functionality - in real app this would save to user's bookmarks
     console.log('Bookmarking post:', postId);
     alert('Post bookmarked! 📖');
-  }, []);
+  };
 
   if (loading) {
     return (

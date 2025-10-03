@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Bookmark, Clock, Heart, MessageCircle, Share, Gift, Trash2, Filter } from 'lucide-react';
 import { PostCard } from '../components/Post/PostCard';
-import { useBookmarks } from '../hooks/useBookmarks';
-import { useNeonAuth } from '../hooks/useNeonAuth';
+import { mockPosts } from '../data/mockData';
 
 interface BookmarkedPost {
   id: string;
@@ -21,56 +20,75 @@ interface BookmarkedPost {
 
 export const Bookmarks: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'crypto' | 'defi' | 'nft' | 'general'>('all');
-  const { bookmarks, loading, removeBookmark, clearAllBookmarks } = useBookmarks();
-  const { profile } = useNeonAuth();
+  
+  // Mock bookmarked posts - in real app this would come from user's bookmarks
+  const bookmarkedPosts: BookmarkedPost[] = [
+    {
+      id: '1',
+      postId: '1',
+      userId: '1',
+      username: '@crypto_trader',
+      content: 'Up 40% since I joined WEGRAM 🚀 — real web3 experience!',
+      timestamp: '2h',
+      likes: 24,
+      replies: 8,
+      shares: 5,
+      gifts: 2,
+      bookmarkedAt: '1 day ago',
+      category: 'crypto'
+    },
+    {
+      id: '2',
+      postId: '2',
+      userId: '2',
+      username: '@defi_expert',
+      content: 'The future of social media is here. Earning while posting has never been this easy! #Web3 #SocialFi',
+      timestamp: '4h',
+      likes: 156,
+      replies: 32,
+      shares: 18,
+      gifts: 7,
+      bookmarkedAt: '2 days ago',
+      category: 'defi'
+    },
+    {
+      id: '3',
+      postId: '3',
+      userId: '3',
+      username: '@nft_collector',
+      content: 'Just completed my daily check-in and earned +2 WGM! These micro-rewards really add up over time.',
+      timestamp: '6h',
+      likes: 67,
+      replies: 12,
+      shares: 9,
+      gifts: 3,
+      bookmarkedAt: '3 days ago',
+      category: 'nft'
+    }
+  ];
 
   const filters = ['all', 'crypto', 'defi', 'nft', 'general'] as const;
 
-  // For now, we'll show all bookmarks since we don't have categories in the database yet
-  const filteredBookmarks = bookmarks;
+  const filteredBookmarks = activeFilter === 'all' 
+    ? bookmarkedPosts 
+    : bookmarkedPosts.filter(post => post.category === activeFilter);
 
   const handleLike = (postId: string) => {
     // Like functionality
     console.log('Liking post:', postId);
   };
 
-  const handleRemoveBookmark = async (postId: string) => {
-    const result = await removeBookmark(postId);
-    if (result.success) {
-      alert('Bookmark removed!');
-    } else {
-      alert('Failed to remove bookmark: ' + result.error);
-    }
+  const handleRemoveBookmark = (bookmarkId: string) => {
+    // Remove bookmark functionality
+    console.log('Removing bookmark:', bookmarkId);
+    alert('Bookmark removed!');
   };
 
-  const handleClearAll = async () => {
+  const handleClearAll = () => {
     if (confirm('Are you sure you want to clear all bookmarks?')) {
-      const result = await clearAllBookmarks();
-      if (result.success) {
-        alert('All bookmarks cleared!');
-      } else {
-        alert('Failed to clear bookmarks: ' + result.error);
-      }
+      alert('All bookmarks cleared!');
     }
   };
-
-  if (loading) {
-    return (
-      <div className="max-w-md mx-auto px-4 pt-20 pb-24 text-center">
-        <div className="animate-pulse">Loading bookmarks...</div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="max-w-md mx-auto px-4 pt-20 pb-24 text-center">
-        <Bookmark className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-primary font-semibold mb-2">Please log in</h3>
-        <p className="text-secondary text-sm">You need to be logged in to view your bookmarks.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-md mx-auto px-4 pt-20 pb-24">
@@ -82,11 +100,11 @@ export const Bookmarks: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-primary">Bookmarks</h1>
-            <p className="text-secondary text-sm">{bookmarks.length} saved posts</p>
+            <p className="text-secondary text-sm">{bookmarkedPosts.length} saved posts</p>
           </div>
         </div>
         
-        {bookmarks.length > 0 && (
+        {bookmarkedPosts.length > 0 && (
           <button
             onClick={handleClearAll}
             className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
@@ -97,7 +115,7 @@ export const Bookmarks: React.FC = () => {
       </div>
 
       {/* Filter Tabs */}
-      {bookmarks.length > 0 && (
+      {bookmarkedPosts.length > 0 && (
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {filters.map((filter) => (
             <button
@@ -124,10 +142,10 @@ export const Bookmarks: React.FC = () => {
               <div className="flex items-center justify-between mb-2 text-xs text-secondary">
                 <div className="flex items-center gap-2">
                   <Clock className="w-3 h-3" />
-                  <span>Saved {new Date(bookmark.created_at).toLocaleDateString()}</span>
+                  <span>Saved {bookmark.bookmarkedAt}</span>
                 </div>
                 <button
-                  onClick={() => handleRemoveBookmark(bookmark.post_id)}
+                  onClick={() => handleRemoveBookmark(bookmark.id)}
                   className="p-1 hover:bg-red-600 hover:bg-opacity-20 rounded transition-colors text-red-400"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -136,16 +154,15 @@ export const Bookmarks: React.FC = () => {
               
               <PostCard
                 post={{
-                  id: bookmark.post.id,
-                  userId: bookmark.post.user_id,
-                  username: `@${bookmark.post.username}`,
-                  content: bookmark.post.content,
-                  timestamp: new Date(bookmark.post.created_at).toLocaleDateString(),
-                  likes: bookmark.post.likes_count,
-                  replies: bookmark.post.comments_count,
-                  shares: bookmark.post.shares_count,
-                  gifts: bookmark.post.gifts_count,
-                  avatar_url: bookmark.post.avatar_url
+                  id: bookmark.postId,
+                  userId: bookmark.userId,
+                  username: bookmark.username,
+                  content: bookmark.content,
+                  timestamp: bookmark.timestamp,
+                  likes: bookmark.likes,
+                  replies: bookmark.replies,
+                  shares: bookmark.shares,
+                  gifts: bookmark.gifts
                 }}
                 onLike={handleLike}
               />
@@ -174,7 +191,7 @@ export const Bookmarks: React.FC = () => {
       )}
 
       {/* Stats Footer */}
-      {bookmarks.length > 0 && (
+      {bookmarkedPosts.length > 0 && (
         <div className="mt-8 card">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-secondary">

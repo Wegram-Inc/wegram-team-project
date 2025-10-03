@@ -3,9 +3,99 @@ import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, 
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
+import { mockPosts } from '../data/mockData';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 
+// Mock user data for the logged-in user
+const mockLoggedInUser = {
+  id: '1',
+  username: '@demo_user',
+  displayName: 'Demo User',
+  avatar: null,
+  avatarInitial: 'D',
+  verified: true,
+  bio: 'Web3 enthusiast building the future of social media. Love creating content about blockchain, DeFi, and the decentralized web. Always learning, always building! 🚀',
+  followers: 1234,
+  following: 567,
+  posts: 42,
+  isFollowing: false, // This is our own profile, so we're not following ourselves
+  connections: [
+    { platform: 'Twitter', url: 'https://twitter.com/demouser' },
+    { platform: 'Instagram', url: 'https://instagram.com/demouser' },
+    { platform: 'LinkedIn', url: 'https://linkedin.com/in/demouser' },
+    { platform: 'Discord', url: 'https://discord.gg/demouser' }
+  ],
+  mutualConnections: 12
+};
+
+// Mock NFT data
+const mockNFTs = [
+  {
+    id: '1',
+    name: 'Crypto Punk #1234',
+    collection: 'CryptoPunks',
+    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe4cb4?w=400&h=400&fit=crop',
+    floorPrice: '45.2 ETH',
+    value: '$89,450',
+    rarity: 'Legendary'
+  },
+  {
+    id: '2',
+    name: 'Bored Ape #5678',
+    collection: 'Bored Ape Yacht Club',
+    image: 'https://images.unsplash.com/photo-1639322537504-6427a16b0a28?w=400&h=400&fit=crop',
+    floorPrice: '12.8 ETH',
+    value: '$25,600',
+    rarity: 'Epic'
+  },
+  {
+    id: '3',
+    name: 'Cool Cat #9999',
+    collection: 'Cool Cats',
+    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe4cb4?w=400&h=400&fit=crop',
+    floorPrice: '2.1 ETH',
+    value: '$4,200',
+    rarity: 'Rare'
+  }
+];
+
+// Mock posts data
+const mockUserPosts = [
+  {
+    id: '1',
+    userId: mockLoggedInUser.id,
+    username: mockLoggedInUser.username,
+    content: 'Just hit my first 1000 followers on WEGRAM! 🚀 Thanks everyone for the support. The Web3 social revolution is here!',
+    timestamp: '2h',
+    likes: 89,
+    replies: 23,
+    shares: 12,
+    gifts: 5
+  },
+  {
+    id: '2',
+    userId: mockLoggedInUser.id,
+    username: mockLoggedInUser.username,
+    content: 'Building in Web3 is incredible. Every day brings new possibilities. WEGRAM is changing how we think about social media 💎',
+    timestamp: '1d',
+    likes: 156,
+    replies: 45,
+    shares: 28,
+    gifts: 12
+  },
+  {
+    id: '3',
+    userId: mockLoggedInUser.id,
+    username: mockLoggedInUser.username,
+    content: 'GM Web3 fam! ☀️ Another day, another opportunity to earn while we socialize. Love this community!',
+    timestamp: '2d',
+    likes: 67,
+    replies: 18,
+    shares: 9,
+    gifts: 3
+  }
+];
 
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -38,25 +128,19 @@ export const Profile: React.FC = () => {
     isFollowing: false,
     connections: [],
     mutualConnections: 0
-  } : null;
+  } : {
+    ...mockLoggedInUser,
+    wegramFollowers: 0,
+    wegramFollowing: 0,
+    twitterFollowers: mockLoggedInUser.followers,
+    twitterUsername: 'demo_user'
+  };
 
   // Filter posts to show only current user's posts
   const posts = useMemo(() => {
-    if (!profile?.id) return [];
+    if (!profile?.id) return mockUserPosts;
     return allPosts.filter(post => post.user_id === profile.id);
   }, [allPosts, profile?.id]);
-
-  // Show loading if no user data
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-secondary">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
