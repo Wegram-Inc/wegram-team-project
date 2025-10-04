@@ -1,10 +1,55 @@
-import React from 'react';
-import { Play, ExternalLink, Gamepad2, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Play, Gamepad2, ArrowRight, X, ArrowLeft } from 'lucide-react';
 
 export const Games: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const handlePlayGame = () => {
-    window.open('https://centricj20.github.io/We-Runner/', '_blank');
+    setIsPlaying(true);
   };
+
+  const handleCloseGame = () => {
+    setIsPlaying(false);
+  };
+
+  // If playing, show the game player
+  if (isPlaying) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black">
+        {/* Game Header with Close Button */}
+        <div className="absolute top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleCloseGame}
+                className="flex items-center gap-2 text-white hover:text-purple-400 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span className="font-medium">Back to Games</span>
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-white font-medium">WeRunner</span>
+              <button
+                onClick={handleCloseGame}
+                className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Game Iframe */}
+        <iframe
+          src="https://centricj20.github.io/We-Runner/"
+          className="w-full h-full border-0"
+          title="WeRunner Game"
+          allow="fullscreen; gamepad; microphone; camera"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto px-4 pt-20 pb-24" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -56,7 +101,6 @@ export const Games: React.FC = () => {
             >
               <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
               Play WeRunner
-              <ExternalLink className="w-4 h-4 opacity-60" />
             </button>
           </div>
         </div>
