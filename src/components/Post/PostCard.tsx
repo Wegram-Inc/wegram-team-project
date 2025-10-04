@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
-import { ShareModal } from './ShareModal';
 
 // Unified post interface that works with both mock and database posts
 interface UnifiedPost {
@@ -36,7 +35,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const { isDark } = useTheme();
   const { profile } = useNeonAuth();
   const [showMenu, setShowMenu] = React.useState(false);
-  const [showShareModal, setShowShareModal] = React.useState(false);
   const [isLiked, setIsLiked] = React.useState(false);
   const [isShared, setIsShared] = React.useState(false);
   const [isBookmarked, setIsBookmarked] = React.useState(false);
@@ -73,15 +71,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   };
 
   const handleShare = () => {
-    setShowShareModal(true);
-    // Don't increment share count until user actually shares
-    onShare?.(post.id);
-  };
-
-  const handleShareComplete = () => {
-    setShowShareModal(false);
     setIsShared(true);
     setSharesCount(prev => prev + 1);
+    onShare?.(post.id);
+
+    // Copy post link to clipboard
+    const postUrl = `${window.location.origin}/post/${post.id}`;
+    navigator.clipboard?.writeText(postUrl);
+    alert('Post link copied to clipboard! 📋');
+
     // Reset share state after animation
     setTimeout(() => setIsShared(false), 1000);
   };
@@ -307,14 +305,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         </button>
       </div>
 
-      {/* Share Modal */}
-      <ShareModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        postUrl={`${window.location.origin}/post/${post.id}`}
-        postText={post.content}
-        authorName={post.username.replace('@', '')}
-      />
     </div>
   );
 };
