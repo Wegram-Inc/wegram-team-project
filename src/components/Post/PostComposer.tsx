@@ -3,7 +3,7 @@ import { Image, Video, X, Upload } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 interface PostComposerProps {
-  onPost: (content: string) => void;
+  onPost: (content: string, files?: File[]) => void;
   onCancel: () => void;
   placeholder?: string;
 }
@@ -18,9 +18,10 @@ export const PostComposer: React.FC<PostComposerProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const handlePost = () => {
-    if (content.trim()) {
-      onPost(content);
+    if (content.trim() || selectedFiles.length > 0) {
+      onPost(content, selectedFiles.length > 0 ? selectedFiles : undefined);
       setContent('');
+      setSelectedFiles([]);
     }
   };
 
