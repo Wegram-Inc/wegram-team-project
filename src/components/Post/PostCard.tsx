@@ -75,11 +75,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
     setSharesCount(prev => prev + 1);
     onShare?.(post.id);
 
-    // Copy post link to clipboard
-    const postUrl = `${window.location.origin}/post/${post.id}`;
-    navigator.clipboard?.writeText(postUrl);
-    alert('Post link copied to clipboard! 📋');
-
     // Reset share state after animation
     setTimeout(() => setIsShared(false), 1000);
   };
