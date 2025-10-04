@@ -1,60 +1,159 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MoreHorizontal, Phone, Video, Search, Send, Image, Gift, Coins, Diamond, Plus } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, MoreHorizontal, Phone, Video, Search, Send, Image, Gift, Coins, Diamond, Plus, Loader2 } from 'lucide-react';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 interface Message {
   id: string;
-  text: string;
-  isFromUser: boolean;
-  timestamp: string;
-  hasImage?: boolean;
-  hasGift?: boolean;
-  hasToken?: boolean;
-  hasNFT?: boolean;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  created_at: string;
+  sender_username?: string;
+  sender_avatar?: string;
+  receiver_username?: string;
+  receiver_avatar?: string;
+}
+
+interface ChatState {
+  userId?: string;
+  username?: string;
+  name?: string;
+  isNewChat?: boolean;
 }
 
 export const ChatDetail: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { profile } = useNeonAuth();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const [messageText, setMessageText] = useState('');
   const [showActionButtons, setShowActionButtons] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Hey! Check out this new NFT drop 🚀',
-      isFromUser: false,
-      timestamp: '2m ago'
-    },
-    {
-      id: '2',
-      text: 'Looks amazing! What\'s the floor price?',
-      isFromUser: true,
-      timestamp: '1m ago'
-    },
-    {
-      id: '3',
-      text: 'Starting at 0.5 ETH, but I think it\'ll moon',
-      isFromUser: false,
-      timestamp: '1m ago'
-    },
-    {
-      id: '4',
-      text: 'I\'m definitely minting one!',
-      isFromUser: true,
-      timestamp: 'now'
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
+  const [otherUser, setOtherUser] = useState<ChatState | null>(null);
 
-  const handleSendMessage = () => {
-    if (messageText.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: messageText,
-        isFromUser: true,
-        timestamp: 'now'
-      };
-      setMessages([...messages, newMessage]);
-      setMessageText('');
+  // Get chat info from navigation state or fetch user info
+  useEffect(() => {
+    const state = location.state as ChatState;
+    if (state) {
+      setOtherUser(state);
+    } else if (username) {
+      // If no state provided, we need to fetch user info
+      fetchUserInfo();
+    }
+  }, [username, location.state]);
+
+  // Load messages when we have both profile and otherUser
+  useEffect(() => {
+    if (profile?.id && otherUser?.userId) {
+      loadMessages();
+    }
+  }, [profile?.id, otherUser?.userId]);
+
+  const fetchUserInfo = async () => {
+    if (!username) return;
+
+    try {
+      const response = await fetch(`/api/search-users?q=${encodeURIComponent(username.replace('@', ''))}`);
+      const data = await response.json();
+
+      if (data.success && data.users.length > 0) {
+        const user = data.users[0];
+        setOtherUser({
+          userId: user.id,
+          username: user.username,
+          name: user.displayName,
+          isNewChat: false
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    }
+  };
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const loadMessages = async () => {
+    if (!profile?.id || !otherUser?.userId) return;
+
+    try {
+      const response = await fetch(`/api/messages?user1_id=${profile.id}&user2_id=${otherUser.userId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessages(data.messages || []);
+        // Mark messages as read when viewing the conversation
+        markMessagesAsRead();
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const markMessagesAsRead = async () => {
+    if (!profile?.id || !otherUser?.userId) return;
+
+    try {
+      await fetch('/api/mark-read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: profile.id,
+          other_user_id: otherUser.userId,
+        }),
+      });
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !profile?.id || !otherUser?.userId || isSending) return;
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender_id: profile.id,
+          receiver_id: otherUser.userId,
+          content: messageText.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Add message to local state immediately for better UX
+        const newMessage = data.message;
+        setMessages(prev => [...prev, newMessage]);
+        setMessageText('');
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -63,6 +162,22 @@ export const ChatDetail: React.FC = () => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const formatMessageTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString();
   };
 
   const actionButtons = [
@@ -85,8 +200,12 @@ export const ChatDetail: React.FC = () => {
               <ArrowLeft className="w-5 h-5 text-primary" />
             </button>
             <div className="flex-1">
-              <h1 className="text-lg font-semibold text-primary">{username}</h1>
-              <p className="text-sm text-secondary">Online</p>
+              <h1 className="text-lg font-semibold text-primary">
+                {otherUser?.name || otherUser?.username || username}
+              </h1>
+              <p className="text-sm text-secondary">
+                {otherUser?.isNewChat ? 'Start a conversation' : 'Online'}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <button className="p-2 hover:bg-overlay-light rounded-lg transition-colors">
@@ -108,27 +227,45 @@ export const ChatDetail: React.FC = () => {
 
       {/* Messages */}
       <div className="px-4 py-4 space-y-4" style={{ paddingBottom: '120px' }}>
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.isFromUser ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-xs px-4 py-2 rounded-2xl ${
-                message.isFromUser
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                  : 'bg-overlay-light text-primary'
-              }`}
-            >
-              <p className="text-sm">{message.text}</p>
-              <p className={`text-xs mt-1 ${
-                message.isFromUser ? 'text-blue-100' : 'text-secondary'
-              }`}>
-                {message.timestamp}
-              </p>
-            </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-accent" />
           </div>
-        ))}
+        ) : messages.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 rounded-full bg-overlay-light flex items-center justify-center mx-auto mb-4">
+              <Send className="w-8 h-8 text-secondary" />
+            </div>
+            <h3 className="text-primary font-semibold mb-2">No messages yet</h3>
+            <p className="text-secondary text-sm">Send the first message to start the conversation</p>
+          </div>
+        ) : (
+          messages.map((message) => {
+            const isFromCurrentUser = message.sender_id === profile?.id;
+            return (
+              <div
+                key={message.id}
+                className={`flex ${isFromCurrentUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs px-4 py-2 rounded-2xl ${
+                    isFromCurrentUser
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      : 'bg-overlay-light text-primary'
+                  }`}
+                >
+                  <p className="text-sm">{message.content}</p>
+                  <p className={`text-xs mt-1 ${
+                    isFromCurrentUser ? 'text-blue-100' : 'text-secondary'
+                  }`}>
+                    {formatMessageTime(message.created_at)}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Action Buttons - Only show when + button is clicked */}
@@ -173,11 +310,15 @@ export const ChatDetail: React.FC = () => {
           </div>
           <button
             onClick={handleSendMessage}
-            disabled={!messageText.trim()}
+            disabled={!messageText.trim() || isSending}
             className="p-3 rounded-lg transition-colors disabled:opacity-50"
             style={{ backgroundColor: 'var(--accent)' }}
           >
-            <Send className="w-5 h-5 text-white" />
+            {isSending ? (
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
+            ) : (
+              <Send className="w-5 h-5 text-white" />
+            )}
           </button>
         </div>
       </div>
