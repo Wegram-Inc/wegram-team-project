@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Settings, Plus, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { MessageModal } from '../components/Layout/MessageModal';
 
 interface Chat {
   id: string;
@@ -34,6 +35,7 @@ export const Messages: React.FC = () => {
   const [isLoadingConversations, setIsLoadingConversations] = useState(true);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isComposeModalOpen, setIsComposeModalOpen] = useState(false);
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
 
@@ -129,7 +131,16 @@ export const Messages: React.FC = () => {
   };
 
   const handleCreateNew = () => {
-    navigate('/create-group');
+    setIsComposeModalOpen(true);
+  };
+
+  const handleComposeClose = () => {
+    setIsComposeModalOpen(false);
+  };
+
+  const handleMessageSent = () => {
+    // Refresh conversations list after sending a message
+    loadConversations();
   };
 
   const handleSettings = () => {
@@ -327,6 +338,13 @@ export const Messages: React.FC = () => {
           <p className="text-secondary text-sm mb-4">Search for users above to start your first conversation</p>
         </div>
       )}
+
+      {/* Compose Message Modal */}
+      <MessageModal
+        isOpen={isComposeModalOpen}
+        onClose={handleComposeClose}
+        onMessageSent={handleMessageSent}
+      />
     </div>
   );
 };

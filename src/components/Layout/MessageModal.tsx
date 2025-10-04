@@ -178,7 +178,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                         <span className="text-white text-sm font-semibold">
                           {user.displayName.charAt(0).toUpperCase()}
                         </span>
@@ -235,9 +235,9 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                       className="w-12 h-12 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mx-auto">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mx-auto">
                       <span className="text-white font-semibold">
-                        {profile?.username?.charAt(1)?.toUpperCase() || 'Y'}
+                        {(profile?.username?.replace('@', '').charAt(0) || profile?.email?.charAt(0) || 'Y').toUpperCase()}
                       </span>
                     </div>
                   )}
@@ -260,7 +260,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                       className="w-12 h-12 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mx-auto">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center mx-auto">
                       <span className="text-white font-semibold">
                         {selectedUser.displayName.charAt(0).toUpperCase()}
                       </span>
