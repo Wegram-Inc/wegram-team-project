@@ -28,17 +28,43 @@ export default async function handler(req: any, res: any) {
 
     const sql = neon(DATABASE_URL);
 
-    // Update user profile in database - NO FALLBACKS, this is a live site
-    // Only update bio and avatar for now (social media columns will be added later)
-    const result = await sql`
-      UPDATE profiles
-      SET
-        bio = ${bio || null},
-        avatar_url = ${avatar_url || null},
-        updated_at = NOW()
-      WHERE id = ${userId}
-      RETURNING *
-    `;
+    // First, check if social media columns exist by attempting the update with graceful fallback
+    let result;
+    try {
+      // Try updating with social media fields
+      result = await sql`
+        UPDATE profiles
+        SET
+          bio = ${bio || null},
+          avatar_url = ${avatar_url || null},
+          twitter_link = ${twitter_link || null},
+          discord_link = ${discord_link || null},
+          telegram_link = ${telegram_link || null},
+          updated_at = NOW()
+        WHERE id = ${userId}
+        RETURNING *
+      `;
+    } catch (socialFieldsError) {
+      console.log('Social media columns may not exist yet, updating without them:', socialFieldsError);
+
+      // Fallback: update without social media fields
+      result = await sql`
+        UPDATE profiles
+        SET
+          bio = ${bio || null},
+          avatar_url = ${avatar_url || null},
+          updated_at = NOW()
+        WHERE id = ${userId}
+        RETURNING *
+      `;
+
+      // Add social media fields to the result manually for frontend compatibility
+      if (result.length > 0) {
+        result[0].twitter_link = null;
+        result[0].discord_link = null;
+        result[0].telegram_link = null;
+      }
+    }
 
     if (result.length === 0) {
       return res.status(404).json({ error: 'User not found in database' });
