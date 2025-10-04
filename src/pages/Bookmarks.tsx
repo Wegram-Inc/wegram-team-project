@@ -84,14 +84,6 @@ export const Bookmarks: React.FC = () => {
     }
   };
 
-  const handleClearAll = async () => {
-    if (!confirm('Are you sure you want to clear all bookmarks?')) return;
-
-    // Remove all bookmarks one by one
-    for (const post of bookmarkedPosts) {
-      await handleRemoveBookmark(post.id);
-    }
-  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -155,14 +147,6 @@ export const Bookmarks: React.FC = () => {
           </div>
         </div>
 
-        {bookmarkedPosts.length > 0 && (
-          <button
-            onClick={handleClearAll}
-            className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
-          >
-            Clear All
-          </button>
-        )}
       </div>
 
       {/* Bookmarked Posts */}
