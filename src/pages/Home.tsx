@@ -3,7 +3,7 @@ import { PostCard } from '../components/Post/PostCard';
 import { useNeonPosts } from '../hooks/useNeonPosts';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { TrendingUp, Users, Zap } from 'lucide-react';
 
 export const Home: React.FC = () => {
@@ -11,7 +11,17 @@ export const Home: React.FC = () => {
   const { posts, loading, createPost, likePost, giftPost, fetchPosts } = useNeonPosts();
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('trenches');
+
+  // Check URL params to set initial tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'trending') {
+      setActiveTab('trending');
+    }
+  }, [location.search]);
   
   // Use real posts from database only - NO MOCK FALLBACKS
   const displayPosts = posts;

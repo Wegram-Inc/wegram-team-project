@@ -19,7 +19,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/home' },
     { id: 'launch-token', label: 'Launch Your Token', icon: Coins, path: '/launch-token' },
-    { id: 'trending', label: 'Trending', icon: TrendingUp, path: '/trending' },
+    { id: 'trending', label: 'Trending', icon: TrendingUp, path: '/home?tab=trending' },
     { id: 'verification', label: 'Get Verified', icon: CheckCircle, path: '/verification' },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
     { id: 'explore', label: 'Explore', icon: Compass, path: '/explore' },
