@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { ArrowLeft, MoreHorizontal, CheckCircle, XCircle, Flag, Share, Twitter, Instagram, Linkedin, MessageCircle, ExternalLink, Camera, X, BarChart3, Heart, Users, Bookmark, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
