@@ -28,59 +28,51 @@ export default async function handler(
 
     const sql = neon(DATABASE_URL);
 
-    // Get all conversations for the user with the most recent message
+    // Get all unique users this person has messaged with
     const conversations = await sql`
-      WITH latest_messages AS (
-        SELECT DISTINCT
-          CASE
-            WHEN sender_id = ${user_id} THEN receiver_id
-            ELSE sender_id
-          END as other_user_id,
-          FIRST_VALUE(content) OVER (
-            PARTITION BY CASE
-              WHEN sender_id = ${user_id} THEN receiver_id
-              ELSE sender_id
-            END
-            ORDER BY created_at DESC
-          ) as last_message,
-          FIRST_VALUE(created_at) OVER (
-            PARTITION BY CASE
-              WHEN sender_id = ${user_id} THEN receiver_id
-              ELSE sender_id
-            END
-            ORDER BY created_at DESC
-          ) as last_message_time,
-          FIRST_VALUE(sender_id) OVER (
-            PARTITION BY CASE
-              WHEN sender_id = ${user_id} THEN receiver_id
-              ELSE sender_id
-            END
-            ORDER BY created_at DESC
-          ) as last_sender_id
-        FROM messages
-        WHERE sender_id = ${user_id} OR receiver_id = ${user_id}
-      ),
-      unread_counts AS (
-        SELECT
-          sender_id as other_user_id,
-          COUNT(*) as unread_count
-        FROM messages
-        WHERE receiver_id = ${user_id} AND read_at IS NULL
-        GROUP BY sender_id
-      )
-      SELECT
-        lm.other_user_id,
-        lm.last_message,
-        lm.last_message_time,
-        lm.last_sender_id,
+      SELECT DISTINCT
+        CASE
+          WHEN m.sender_id = ${user_id} THEN m.receiver_id
+          ELSE m.sender_id
+        END as other_user_id,
         p.username,
         p.avatar_url,
         p.verified,
-        COALESCE(uc.unread_count, 0) as unread_count
-      FROM latest_messages lm
-      JOIN profiles p ON lm.other_user_id = p.id
-      LEFT JOIN unread_counts uc ON lm.other_user_id = uc.other_user_id
-      ORDER BY lm.last_message_time DESC
+        (
+          SELECT content
+          FROM messages m2
+          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+          ORDER BY m2.created_at DESC
+          LIMIT 1
+        ) as last_message,
+        (
+          SELECT created_at
+          FROM messages m2
+          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+          ORDER BY m2.created_at DESC
+          LIMIT 1
+        ) as last_message_time,
+        (
+          SELECT sender_id
+          FROM messages m2
+          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
+          ORDER BY m2.created_at DESC
+          LIMIT 1
+        ) as last_sender_id,
+        (
+          SELECT COUNT(*)
+          FROM messages m3
+          WHERE m3.receiver_id = ${user_id}
+            AND m3.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END
+            AND m3.read_at IS NULL
+        ) as unread_count
+      FROM messages m
+      JOIN profiles p ON p.id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END
+      WHERE m.sender_id = ${user_id} OR m.receiver_id = ${user_id}
+      ORDER BY last_message_time DESC
     `;
 
     // Format conversations for frontend
