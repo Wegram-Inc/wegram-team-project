@@ -22,7 +22,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({ isOpen, onClose }) => {
     { id: 'trending', label: 'Trending', icon: TrendingUp, path: '/home?tab=trending' },
     { id: 'verification', label: 'Get Verified', icon: CheckCircle, path: '/verification' },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, path: '/bookmarks' },
-    { id: 'explore', label: 'Explore', icon: Compass, path: '/explore' },
+    { id: 'explore', label: 'Explore', icon: Compass, path: '/home?tab=trenches' },
     { id: 'staking', label: 'Staking', icon: Coins, path: '/staking' },
     { id: 'games', label: 'Games', icon: Gamepad2, path: '/games' },
     { id: 'messages', label: 'Messages', icon: MessageCircle, path: '/messages' },

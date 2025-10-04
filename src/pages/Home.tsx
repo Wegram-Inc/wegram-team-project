@@ -20,6 +20,8 @@ export const Home: React.FC = () => {
     const tabParam = urlParams.get('tab');
     if (tabParam === 'trending') {
       setActiveTab('trending');
+    } else if (tabParam === 'trenches') {
+      setActiveTab('trenches');
     }
   }, [location.search]);
   
