@@ -60,9 +60,9 @@ export default async function handler(req: any, res: any) {
 
       // Add social media fields to the result manually for frontend compatibility
       if (result.length > 0) {
-        result[0].twitter_link = null;
-        result[0].discord_link = null;
-        result[0].telegram_link = null;
+        result[0].twitter_link = twitter_link || null;
+        result[0].discord_link = discord_link || null;
+        result[0].telegram_link = telegram_link || null;
       }
     }
 
