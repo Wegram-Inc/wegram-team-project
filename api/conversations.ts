@@ -28,52 +28,52 @@ export default async function handler(
 
     const sql = neon(DATABASE_URL);
 
-    // Get all unique users this person has messaged with
-    const conversations = await sql`
-      SELECT DISTINCT
-        CASE
-          WHEN m.sender_id = ${user_id} THEN m.receiver_id
-          ELSE m.sender_id
-        END as other_user_id,
-        p.username,
-        p.avatar_url,
-        p.verified,
-        (
-          SELECT content
-          FROM messages m2
-          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-          ORDER BY m2.created_at DESC
-          LIMIT 1
-        ) as last_message,
-        (
-          SELECT created_at
-          FROM messages m2
-          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-          ORDER BY m2.created_at DESC
-          LIMIT 1
-        ) as last_message_time,
-        (
-          SELECT sender_id
-          FROM messages m2
-          WHERE (m2.sender_id = ${user_id} AND m2.receiver_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-             OR (m2.receiver_id = ${user_id} AND m2.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END)
-          ORDER BY m2.created_at DESC
-          LIMIT 1
-        ) as last_sender_id,
-        (
-          SELECT COUNT(*)
-          FROM messages m3
-          WHERE m3.receiver_id = ${user_id}
-            AND m3.sender_id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END
-            AND m3.read_at IS NULL
-        ) as unread_count
+    // Simple approach: get all messages involving this user
+    const allMessages = await sql`
+      SELECT
+        m.id,
+        m.sender_id,
+        m.receiver_id,
+        m.content,
+        m.created_at,
+        sender.username as sender_username,
+        sender.avatar_url as sender_avatar,
+        receiver.username as receiver_username,
+        receiver.avatar_url as receiver_avatar,
+        receiver.verified as receiver_verified,
+        sender.verified as sender_verified
       FROM messages m
-      JOIN profiles p ON p.id = CASE WHEN m.sender_id = ${user_id} THEN m.receiver_id ELSE m.sender_id END
+      JOIN profiles sender ON m.sender_id = sender.id
+      JOIN profiles receiver ON m.receiver_id = receiver.id
       WHERE m.sender_id = ${user_id} OR m.receiver_id = ${user_id}
-      ORDER BY last_message_time DESC
+      ORDER BY m.created_at DESC
     `;
+
+    // Group messages by the other person
+    const conversationMap = new Map();
+
+    allMessages.forEach(msg => {
+      const isFromMe = msg.sender_id === user_id;
+      const otherUserId = isFromMe ? msg.receiver_id : msg.sender_id;
+      const otherUsername = isFromMe ? msg.receiver_username : msg.sender_username;
+      const otherAvatar = isFromMe ? msg.receiver_avatar : msg.sender_avatar;
+      const otherVerified = isFromMe ? msg.receiver_verified : msg.sender_verified;
+
+      if (!conversationMap.has(otherUserId)) {
+        conversationMap.set(otherUserId, {
+          other_user_id: otherUserId,
+          username: otherUsername,
+          avatar_url: otherAvatar,
+          verified: otherVerified,
+          last_message: msg.content,
+          last_message_time: msg.created_at,
+          last_sender_id: msg.sender_id,
+          unread_count: 0
+        });
+      }
+    });
+
+    const conversations = Array.from(conversationMap.values());
 
     // Format conversations for frontend
     const formattedConversations = conversations.map(conv => {
