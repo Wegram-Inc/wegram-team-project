@@ -15,7 +15,14 @@ export const Games: React.FC = () => {
   // If playing, show the game player
   if (isPlaying) {
     return (
-      <div className="fixed inset-0 z-50 bg-black">
+      <div
+        className="fixed inset-0 z-50 bg-black"
+        style={{
+          height: '100vh',
+          height: '100dvh', // Dynamic viewport height for mobile
+          overflow: 'hidden'
+        }}
+      >
         {/* Game Header with Close Button */}
         <div className="absolute top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm">
           <div className="flex items-center justify-between p-4">
@@ -43,9 +50,16 @@ export const Games: React.FC = () => {
         {/* Game Iframe */}
         <iframe
           src="https://centricj20.github.io/We-Runner/"
-          className="w-full h-full border-0"
+          className="w-full border-0"
           title="WeRunner Game"
           allow="fullscreen; gamepad; microphone; camera"
+          style={{
+            height: 'calc(100vh - 64px)', // Subtract header height
+            height: 'calc(100dvh - 64px)', // Dynamic viewport for mobile
+            WebkitOverflowScrolling: 'touch',
+            overflowScrolling: 'touch',
+            touchAction: 'manipulation'
+          }}
         />
       </div>
     );
