@@ -195,6 +195,10 @@ function AppContent() {
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
         recipientUsername={messageRecipient}
+        onMessageSent={() => {
+          // Message sent successfully
+          console.log('Message sent successfully from App');
+        }}
       />
     </div>
   );

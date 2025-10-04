@@ -912,6 +912,10 @@ export const Profile: React.FC = () => {
       <MessageModal
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
+        onMessageSent={() => {
+          // Message sent successfully
+          console.log('Message sent successfully');
+        }}
       />
     </div>
   );

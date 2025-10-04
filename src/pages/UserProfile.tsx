@@ -1118,6 +1118,10 @@ export const UserProfile: React.FC = () => {
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
         recipientUsername={username}
+        onMessageSent={() => {
+          // Message sent successfully from DM
+          console.log('DM sent successfully');
+        }}
       />
     </div>
   );

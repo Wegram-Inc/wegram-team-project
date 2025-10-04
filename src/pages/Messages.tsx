@@ -39,11 +39,34 @@ export const Messages: React.FC = () => {
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
 
-  // Load conversations on component mount
+  // Load conversations on component mount and when page becomes visible
   useEffect(() => {
     if (profile?.id) {
       loadConversations();
     }
+  }, [profile?.id]);
+
+  // Refresh conversations when page becomes visible (user navigates back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && profile?.id) {
+        loadConversations();
+      }
+    };
+
+    const handleFocus = () => {
+      if (profile?.id) {
+        loadConversations();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [profile?.id]);
 
   // Search users when search query changes
