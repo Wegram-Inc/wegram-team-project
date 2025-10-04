@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Gamepad2, ArrowRight, X, ArrowLeft } from 'lucide-react';
 
 export const Games: React.FC = () => {
@@ -11,6 +11,29 @@ export const Games: React.FC = () => {
   const handleCloseGame = () => {
     setIsPlaying(false);
   };
+
+  // Prevent body scrolling when game is active
+  useEffect(() => {
+    if (isPlaying) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, [isPlaying]);
 
   // If playing, show the game player
   if (isPlaying) {
@@ -56,9 +79,12 @@ export const Games: React.FC = () => {
           style={{
             height: 'calc(100vh - 64px)', // Subtract header height
             height: 'calc(100dvh - 64px)', // Dynamic viewport for mobile
-            WebkitOverflowScrolling: 'touch',
-            overflowScrolling: 'touch',
-            touchAction: 'manipulation'
+            touchAction: 'none', // Let game handle all touch events
+            pointerEvents: 'auto',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'transparent'
           }}
         />
       </div>
