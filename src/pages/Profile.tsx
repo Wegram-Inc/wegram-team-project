@@ -316,36 +316,21 @@ export const Profile: React.FC = () => {
       
       case 'nft':
         return (
-          <div className="space-y-4">
-            {mockNFTs.map(nft => (
-              <div key={nft.id} className="card p-4">
-                <div className="flex gap-4">
-                  <img
-                    src={nft.image}
-                    alt={nft.name}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="text-primary font-semibold">{nft.name}</h3>
-                    <p className="text-secondary text-sm">{nft.collection}</p>
-                    <div className="flex items-center gap-4 mt-2">
-                      <div>
-                        <span className="text-xs text-secondary">Floor</span>
-                        <p className="text-primary font-medium">{nft.floorPrice}</p>
-                      </div>
-                      <div>
-                        <span className="text-xs text-secondary">Value</span>
-                        <p className="text-primary font-medium">{nft.value}</p>
-                      </div>
-                      <div>
-                        <span className="text-xs text-secondary">Rarity</span>
-                        <p className="text-accent font-medium">{nft.rarity}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg">
+              <div className="text-3xl">🎨</div>
+            </div>
+            <h3 className="text-xl font-bold text-primary mb-3">Coming Soon</h3>
+            <p className="text-secondary text-sm max-w-xs mx-auto leading-relaxed">
+              NFT collection display is being developed. Soon you'll be able to showcase your digital art and collectibles here!
+            </p>
+            <div className="mt-6 flex justify-center">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
               </div>
-            ))}
+            </div>
           </div>
         );
       
