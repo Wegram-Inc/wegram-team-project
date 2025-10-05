@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
+import { CommentComposer } from '../Comments/CommentComposer';
 
 // Unified post interface that works with both mock and database posts
 interface UnifiedPost {
@@ -43,6 +44,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [likesCount, setLikesCount] = React.useState(post.likes);
   const [sharesCount, setSharesCount] = React.useState(post.shares);
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
+  const [commentsCount, setCommentsCount] = React.useState(post.replies);
+  const [showCommentComposer, setShowCommentComposer] = React.useState(false);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
@@ -115,6 +118,22 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const handleReportPost = () => {
     setShowMenu(false);
     alert('Post reported. Thank you for keeping WEGRAM safe! 🛡️');
+  };
+
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowCommentComposer(true);
+  };
+
+  const handlePostContentClick = () => {
+    // Only navigate to comments if there are comments to see
+    if (commentsCount > 0) {
+      navigate(`/post/${post.id}/comments`);
+    }
+  };
+
+  const handleCommentAdded = () => {
+    setCommentsCount(prev => prev + 1);
   };
 
   return (
@@ -234,11 +253,19 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         </div>
       </div>
 
-      <p className="text-primary mb-4 leading-relaxed">{post.content}</p>
+      <div
+        onClick={handlePostContentClick}
+        className="cursor-pointer"
+      >
+        <p className="text-primary mb-4 leading-relaxed">{post.content}</p>
+      </div>
 
       {/* Image Display */}
       {post.image_url && (
-        <div className="mb-4">
+        <div
+          onClick={handlePostContentClick}
+          className="mb-4 cursor-pointer"
+        >
           <img
             src={post.image_url}
             alt="Post image"
@@ -267,11 +294,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         </button>
         
         <button
-          onClick={() => onReply?.(post.id)}
+          onClick={handleCommentClick}
           className="flex items-center gap-2 hover:text-blue-400 hover:scale-105 transition-all duration-200"
         >
           <MessageCircle className="w-4 h-4" />
-          <span className="text-sm">{post.replies}</span>
+          <span className="text-sm">{commentsCount}</span>
         </button>
         
         <button
@@ -316,6 +343,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         </button>
       </div>
 
+      {/* Comment Composer Modal */}
+      <CommentComposer
+        isOpen={showCommentComposer}
+        onClose={() => setShowCommentComposer(false)}
+        postId={post.id}
+        onCommentAdded={handleCommentAdded}
+      />
     </div>
   );
 };

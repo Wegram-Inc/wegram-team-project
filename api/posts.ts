@@ -17,6 +17,35 @@ export default async function handler(
   try {
     switch (req.method) {
       case 'GET':
+        // Check if this is a request for a single post
+        const { id: postId } = req.query;
+
+        if (postId) {
+          // Fetch single post by ID
+          const post = await sql`
+            SELECT
+              p.id,
+              p.user_id,
+              p.content,
+              p.image_url,
+              p.likes_count,
+              p.comments_count,
+              p.shares_count,
+              p.created_at,
+              pr.username,
+              pr.avatar_url
+            FROM posts p
+            JOIN profiles pr ON p.user_id = pr.id
+            WHERE p.id = ${postId}
+          `;
+
+          if (post.length === 0) {
+            return res.status(404).json({ success: false, error: 'Post not found' });
+          }
+
+          return res.status(200).json({ success: true, post: post[0] });
+        }
+
         // Fetch posts with different feed types
         const { feed_type = 'all', user_id: current_user_id, user_posts } = req.query;
         

@@ -51,6 +51,7 @@ import { WeRunner } from './pages/WeRunner';
 import { AuthCallback } from './pages/AuthCallback';
 import { TwitterCallback } from './pages/TwitterCallback';
 import { DirectMessage } from './pages/DirectMessage';
+import { PostComments } from './pages/PostComments';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -153,6 +154,9 @@ function AppContent() {
           
           {/* User Profile */}
           <Route path="/user/:username" element={<UserProfile />} />
+
+          {/* Post Comments */}
+          <Route path="/post/:postId/comments" element={<PostComments />} />
           
           {/* Chat Routes */}
           <Route path="/chat/:username" element={<ChatDetail />} />
