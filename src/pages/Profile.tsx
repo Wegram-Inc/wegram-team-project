@@ -645,7 +645,7 @@ export const Profile: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className={`grid gap-4 mb-6 ${user.twitterUsername || user.twitterLink ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          <div className={`grid gap-4 mb-6 ${profile.twitter_username ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {/* WEGRAM Followers */}
             <div className="text-center">
               <div className="text-lg font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
@@ -658,8 +658,8 @@ export const Profile: React.FC = () => {
               <div className="text-secondary text-xs">FOLLOWING</div>
             </div>
 
-            {/* Twitter Followers - Only show if user has Twitter data */}
-            {(user.twitterUsername || user.twitterLink) && (
+            {/* Twitter Followers - Only show if user actually signed up with Twitter */}
+            {profile.twitter_username && (
               <div className="text-center">
                 <button
                   onClick={() => window.open(`https://twitter.com/${user.twitterUsername}`, '_blank')}
