@@ -130,10 +130,6 @@ export const Home: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto px-4 pt-20 pb-24">
-      {/* RESTORE POINT MARKER */}
-      <div className="mb-4 p-4 bg-red-600 text-white text-center font-bold text-lg rounded-lg shadow-lg">
-        🔴 RESTORE POINT - STABLE VERSION 🔴
-      </div>
       
       {/* Crypto Performance Notification */}
       <div 
