@@ -28,7 +28,7 @@ export default async function handler(
         const cleanUsername = username.toString().replace('@', '');
 
         const users = await sql`
-          SELECT 
+          SELECT
             id,
             username,
             email,
@@ -40,9 +40,12 @@ export default async function handler(
             posts_count,
             twitter_id,
             twitter_username,
+            twitter_link,
+            discord_link,
+            telegram_link,
             created_at,
             updated_at
-          FROM profiles 
+          FROM profiles
           WHERE username = ${`@${cleanUsername}`} OR username = ${cleanUsername}
         `;
 
@@ -73,7 +76,7 @@ export default async function handler(
           LIMIT 20
         `;
 
-        return res.status(200).json({ 
+        return res.status(200).json({
           user: {
             id: user.id,
             username: user.username,
@@ -86,6 +89,9 @@ export default async function handler(
             posts_count: user.posts_count,
             twitter_id: user.twitter_id,
             twitter_username: user.twitter_username,
+            twitter_link: user.twitter_link,
+            discord_link: user.discord_link,
+            telegram_link: user.telegram_link,
             created_at: user.created_at,
             updated_at: user.updated_at
           },
