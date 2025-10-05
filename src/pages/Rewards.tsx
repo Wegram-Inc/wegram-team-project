@@ -14,7 +14,6 @@ interface ReferralTier {
 
 interface ReferralStats {
   totalReferrals: number;
-  activeReferrals: number;
   totalEarned: number;
   thisMonthEarned: number;
   currentTier: string;
@@ -56,7 +55,6 @@ export const Rewards: React.FC = () => {
   // Real user referral stats (currently 0 - ready for smart contract integration)
   const referralStats: ReferralStats = {
     totalReferrals: 0,
-    activeReferrals: 0,
     totalEarned: 0,
     thisMonthEarned: 0,
     currentTier: 'Bronze'
@@ -77,16 +75,6 @@ export const Rewards: React.FC = () => {
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const handleShareTwitter = () => {
-    const text = encodeURIComponent("Join me on Wegram - the Web3 social platform! Use my referral link and let's earn together 🚀");
-    const url = encodeURIComponent(referralLink);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-  };
-
-  const handleShareTelegram = () => {
-    const text = encodeURIComponent(`Join me on Wegram - the Web3 social platform! Use my referral link: ${referralLink}`);
-    window.open(`https://t.me/share/url?url=${referralLink}&text=${text}`, '_blank');
-  };
 
   // Function to render tier icon
   const renderTierIcon = (iconString: string, className: string = 'w-6 h-6') => {
@@ -154,23 +142,6 @@ export const Rewards: React.FC = () => {
           </div>
         </div>
 
-        {/* Social Sharing */}
-        <div className="flex gap-2">
-          <button
-            onClick={handleShareTwitter}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-          >
-            <Twitter className="w-4 h-4" />
-            Twitter
-          </button>
-          <button
-            onClick={handleShareTelegram}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-          >
-            <Send className="w-4 h-4" />
-            Telegram
-          </button>
-        </div>
       </div>
 
       {/* Stats Dashboard */}
@@ -180,14 +151,10 @@ export const Rewards: React.FC = () => {
           <h3 className="text-primary font-semibold">Your Stats</h3>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="text-center p-4 bg-overlay-light rounded-lg">
             <div className="text-2xl font-bold text-primary">{referralStats.totalReferrals}</div>
             <div className="text-secondary text-sm">Total Referrals</div>
-          </div>
-          <div className="text-center p-4 bg-overlay-light rounded-lg">
-            <div className="text-2xl font-bold text-primary">{referralStats.activeReferrals}</div>
-            <div className="text-secondary text-sm">Active Referrals</div>
           </div>
           <div className="text-center p-4 bg-overlay-light rounded-lg">
             <div className="text-2xl font-bold text-green-400">{referralStats.totalEarned}</div>
@@ -213,8 +180,10 @@ export const Rewards: React.FC = () => {
             </div>
           </div>
           <div className="text-secondary text-sm">
-            {currentTier.maxReferrals
-              ? `${referralStats.totalReferrals}/${currentTier.maxReferrals + 1} referrals to next tier`
+            {currentTier.name === 'Bronze'
+              ? `${referralStats.totalReferrals}/5 referrals to Silver tier`
+              : currentTier.name === 'Silver'
+              ? `${referralStats.totalReferrals}/20 referrals to Gold tier`
               : 'Maximum tier reached!'
             }
           </div>
@@ -267,7 +236,7 @@ export const Rewards: React.FC = () => {
           <Users className="w-12 h-12 text-gray-500 mx-auto mb-3" />
           <h4 className="text-primary font-medium mb-2">No referrals yet</h4>
           <p className="text-secondary text-sm">
-            Share your referral link above to start earning WEGRAM!
+            When friends join using your referral link, they will appear here with their join date and your earned WEGRAM.
           </p>
         </div>
       </div>
