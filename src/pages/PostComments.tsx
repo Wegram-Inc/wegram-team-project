@@ -52,7 +52,7 @@ export const PostComments: React.FC = () => {
 
     try {
       // Fetch post data
-      const postResponse = await fetch(`/api/posts/${postId}`);
+      const postResponse = await fetch(`/api/posts?id=${postId}`);
       const postData = await postResponse.json();
 
       if (postData.success) {
