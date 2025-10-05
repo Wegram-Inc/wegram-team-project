@@ -645,38 +645,40 @@ export const Profile: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className={`grid gap-4 mb-6 ${user.twitterUsername || user.twitterLink ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {/* WEGRAM Followers */}
             <div className="text-center">
               <div className="text-lg font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWERS</div>
             </div>
-            
+
             {/* WEGRAM Following */}
             <div className="text-center">
               <div className="text-lg font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWING</div>
             </div>
-            
-            {/* Twitter Followers - Clickable */}
-            <div className="text-center">
-              <button
-                onClick={() => window.open(`https://twitter.com/${user.twitterUsername}`, '_blank')}
-                className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
-              >
-                <div className="flex items-center gap-1">
-                  <div className="text-lg font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
-                  {/* Real X Logo */}
-                  <svg className="w-4 h-4 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </div>
-                <div className="text-secondary text-xs flex items-center gap-1">
-                  X
-                  <ExternalLink className="w-3 h-3" />
-                </div>
-              </button>
-            </div>
+
+            {/* Twitter Followers - Only show if user has Twitter data */}
+            {(user.twitterUsername || user.twitterLink) && (
+              <div className="text-center">
+                <button
+                  onClick={() => window.open(`https://twitter.com/${user.twitterUsername}`, '_blank')}
+                  className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+                >
+                  <div className="flex items-center gap-1">
+                    <div className="text-lg font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
+                    {/* Real X Logo */}
+                    <svg className="w-4 h-4 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </div>
+                  <div className="text-secondary text-xs flex items-center gap-1">
+                    X
+                    <ExternalLink className="w-3 h-3" />
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Bio */}
