@@ -232,7 +232,8 @@ export const Home: React.FC = () => {
                 replies: post.replies,
                 shares: post.shares,
                 gifts: post.gifts,
-                avatar_url: post.avatar_url
+                avatar_url: post.avatar_url,
+                image_url: post.image_url
               }}
               onLike={handleLike}
               onShare={handleShare}

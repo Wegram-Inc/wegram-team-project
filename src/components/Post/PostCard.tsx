@@ -19,6 +19,7 @@ interface UnifiedPost {
   shares: number;
   gifts?: number;
   avatar_url?: string | null;
+  image_url?: string | null;
 }
 
 interface PostCardProps {
@@ -234,6 +235,21 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
       </div>
 
       <p className="text-primary mb-4 leading-relaxed">{post.content}</p>
+
+      {/* Image Display */}
+      {post.image_url && (
+        <div className="mb-4">
+          <img
+            src={post.image_url}
+            alt="Post image"
+            className="w-full rounded-lg object-cover max-h-96 border border-gray-200 dark:border-gray-700"
+            onError={(e) => {
+              // Hide image if it fails to load
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-secondary">
         <button
