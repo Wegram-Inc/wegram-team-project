@@ -125,9 +125,9 @@ export const Profile: React.FC = () => {
     twitterLink: profile.twitter_link || null,
     discordLink: profile.discord_link || null,
     telegramLink: profile.telegram_link || null,
-    // WEGRAM followers/following (from our database - starts at 0)
-    wegramFollowers: 0, // TODO: Get from database
-    wegramFollowing: 0, // TODO: Get from database
+    // WEGRAM followers/following (from our database)
+    wegramFollowers: profile.followers_count || 0,
+    wegramFollowing: profile.following_count || 0
     // Twitter followers (from Twitter API)
     twitterFollowers: profile.followers_count || 0,
     twitterUsername: profile.twitter_username || profile.username.replace('@', ''),
