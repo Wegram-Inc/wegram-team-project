@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { X, Share, Smartphone } from 'lucide-react';
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+
+  useEffect(() => {
+    // Show install prompt after 3 seconds on mobile devices
+    const timer = setTimeout(() => {
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        setShowInstallPrompt(true);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleGuestEntry = () => {
     // Navigate directly to main app as guest
@@ -82,15 +95,6 @@ export const Landing: React.FC = () => {
           </button>
         </div>
 
-        {/* Guest Entry */}
-        <div className="mb-8">
-          <button
-            onClick={handleGuestEntry}
-            className="text-gray-400 hover:text-white transition-colors text-sm underline"
-          >
-            Enter as guest
-          </button>
-        </div>
 
         {/* Terms */}
         <div className="text-center text-sm text-gray-400 max-w-sm mb-8">
@@ -99,6 +103,71 @@ export const Landing: React.FC = () => {
           <span className="text-white underline">privacy policy</span>.
         </div>
       </div>
+
+      {/* Install App Popup */}
+      {showInstallPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
+          <div className="relative bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl max-w-sm w-full mx-4 border border-purple-500/30">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowInstallPrompt(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Green Arc */}
+            <div className="absolute top-0 left-0 w-20 h-20 overflow-hidden">
+              <div className="absolute -top-10 -left-10 w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full"></div>
+            </div>
+
+            <div className="p-6 pt-8">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <Smartphone className="w-12 h-12 mx-auto mb-3 text-purple-400" />
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Install the app for easier access!
+                </h3>
+              </div>
+
+              {/* Instructions */}
+              <div className="space-y-4 mb-6 text-gray-300 text-sm">
+                <div className="flex items-start gap-3">
+                  <span className="text-white font-semibold">1.</span>
+                  <div className="flex items-center gap-2">
+                    <span>Tap on the</span>
+                    <Share className="w-4 h-4 text-blue-400" />
+                    <span>button in the browser menu</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-white font-semibold">2.</span>
+                  <span>Scroll down and select add to homescreen</span>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="text-white font-semibold">3.</span>
+                  <div className="flex items-center gap-2">
+                    <span>Look for the</span>
+                    <div className="w-4 h-4 rounded bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-xs text-white font-bold">W</div>
+                    <span>icon on your homescreen</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <button
+                onClick={() => setShowInstallPrompt(false)}
+                className="w-full py-3 px-6 rounded-full font-semibold text-white transition-all transform hover:scale-105 shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)' }}
+              >
+                I already installed the app
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
