@@ -642,7 +642,7 @@ export const UserProfile: React.FC = () => {
   const location = useLocation();
   const { profile: currentUser } = useNeonAuth();
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'posts' | 'nft' | 'stats'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'nft'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -863,28 +863,38 @@ export const UserProfile: React.FC = () => {
       case 'posts':
         return (
           <div className="space-y-4">
-            {feedPosts.map(post => (
-              <div key={post.id} className="relative">
-                <PostCard
-                  post={{
-                    id: post.id,
-                    userId: post.userId,
-                    username: post.username,
-                    content: post.content,
-                    timestamp: post.timestamp,
-                    likes: post.likes,
-                    replies: post.replies,
-                    shares: post.shares,
-                    gifts: post.gifts
-                  }}
-                  onLike={handleLike}
-                  onReply={handleReply}
-                  onShare={handleShare}
-                  onGift={handleGift}
-                  onBookmark={handleBookmark}
-                />
+            {userPosts.length > 0 ? (
+              userPosts.map(post => (
+                <div key={post.id} className="relative">
+                  <PostCard
+                    post={{
+                      id: post.id,
+                      userId: post.user_id,
+                      username: `@${post.username}`,
+                      content: post.content,
+                      timestamp: new Date(post.created_at).toLocaleDateString(),
+                      likes: post.likes,
+                      replies: post.replies,
+                      shares: post.shares,
+                      gifts: 0,
+                      avatar_url: post.avatar_url,
+                      image_url: post.image_url
+                    }}
+                    onLike={handleLike}
+                    onReply={handleReply}
+                    onShare={handleShare}
+                    onGift={handleGift}
+                    onBookmark={handleBookmark}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">📝</div>
+                <h3 className="text-xl font-semibold text-primary mb-2">No posts yet</h3>
+                <p className="text-secondary text-sm">This user hasn't posted anything yet</p>
               </div>
-            ))}
+            )}
           </div>
         );
       case 'nft':
@@ -904,16 +914,6 @@ export const UserProfile: React.FC = () => {
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
               </div>
             </div>
-          </div>
-        );
-      case 'stats':
-        return (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-overlay-light flex items-center justify-center">
-              <div className="text-2xl">🚧</div>
-            </div>
-            <h3 className="text-primary font-semibold mb-2">Coming Soon</h3>
-            <p className="text-secondary text-sm">The stats section is under development</p>
           </div>
         );
       default:
@@ -1186,8 +1186,7 @@ export const UserProfile: React.FC = () => {
           <div className="flex border-b" style={{ borderColor: 'var(--border)' }}>
             {[
               { id: 'posts', label: 'Posts' },
-              { id: 'nft', label: 'NFT Holds' },
-              { id: 'stats', label: 'Stats' }
+              { id: 'nft', label: 'NFT Holds' }
             ].map((tab) => (
               <button
                 key={tab.id}
