@@ -989,7 +989,7 @@ export const UserProfile: React.FC = () => {
         </button>
         <div>
           <h1 className="text-lg font-bold text-primary">{user.displayName}</h1>
-          <p className="text-sm text-secondary">{user.posts} posts</p>
+          <p className="text-sm text-secondary">{user.posts_count || 0} posts</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           {/* Empty space - 3 dots are in profile section, not header */}
