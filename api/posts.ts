@@ -165,6 +165,13 @@ export default async function handler(
           RETURNING *
         `;
 
+        // Update user's post count
+        await sql`
+          UPDATE profiles
+          SET posts_count = posts_count + 1
+          WHERE id = ${user_id}
+        `;
+
         // Get the post with user profile
         const postWithProfile = await sql`
           SELECT 
