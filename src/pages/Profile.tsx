@@ -100,7 +100,7 @@ const mockUserPosts = [
 export const Profile: React.FC = () => {
   const navigate = useNavigate();
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'posts' | 'nft' | 'stats'>('posts');
+  const [activeTab, setActiveTab] = useState<'posts' | 'nft'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editBio, setEditBio] = useState('');
@@ -346,51 +346,6 @@ export const Profile: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-        );
-      
-      case 'stats':
-        return (
-          <div className="space-y-4">
-            <div className="card p-4">
-              <h3 className="text-primary font-semibold mb-4">Engagement Stats</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">2.4K</div>
-                  <div className="text-secondary text-sm">Total Likes</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">156</div>
-                  <div className="text-secondary text-sm">Comments</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">89</div>
-                  <div className="text-secondary text-sm">Shares</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">45</div>
-                  <div className="text-secondary text-sm">Gifts</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="card p-4">
-              <h3 className="text-primary font-semibold mb-4">Content Performance</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-secondary">Best Performing Post</span>
-                  <span className="text-primary font-medium">234 likes</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-secondary">Average Engagement</span>
-                  <span className="text-primary font-medium">12.5%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-secondary">Posts This Month</span>
-                  <span className="text-primary font-medium">8</span>
-                </div>
-              </div>
-            </div>
           </div>
         );
       
@@ -890,14 +845,6 @@ export const Profile: React.FC = () => {
               }`}
             >
               NFT Holds
-            </button>
-            <button
-              onClick={() => setActiveTab('stats')}
-              className={`flex-1 py-3 text-center font-medium transition-colors ${
-                activeTab === 'stats' ? 'text-accent border-b-2 border-accent' : 'text-secondary hover:text-primary'
-              }`}
-            >
-              Stats
             </button>
           </div>
         </div>
