@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share, Bookmark, User, Play, Volume2, VolumeX, Plus, Upload, X, Camera } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Heart, MessageCircle, Share, Bookmark, User, Play, Volume2, VolumeX, Plus, Upload, X, Camera, Video as VideoIcon, RotateCcw, CheckCircle, StopCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface VideoPost {
@@ -23,6 +23,18 @@ export const Video: React.FC = () => {
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadDescription, setUploadDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+
+  // Camera states
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedVideo, setRecordedVideo] = useState<string | null>(null);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+  const [recordingTime, setRecordingTime] = useState(0);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunks = useRef<Blob[]>([]);
 
   const [videos] = useState<VideoPost[]>([
     {
@@ -135,6 +147,97 @@ export const Video: React.FC = () => {
     setShowUploadModal(true);
   };
 
+  const handleRecordVideo = () => {
+    setShowCameraModal(true);
+    startCamera();
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode },
+        audio: true
+      });
+      setCameraStream(stream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      alert('Camera access denied. Please allow camera permissions.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+  };
+
+  const toggleCamera = () => {
+    stopCamera();
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    setTimeout(startCamera, 100);
+  };
+
+  const startRecording = () => {
+    if (!cameraStream) return;
+
+    recordedChunks.current = [];
+    const mediaRecorder = new MediaRecorder(cameraStream);
+    mediaRecorderRef.current = mediaRecorder;
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        recordedChunks.current.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks.current, { type: 'video/webm' });
+      const videoUrl = URL.createObjectURL(blob);
+      setRecordedVideo(videoUrl);
+      stopCamera();
+    };
+
+    mediaRecorder.start();
+    setIsRecording(true);
+    setRecordingTime(0);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const retryRecording = () => {
+    setRecordedVideo(null);
+    setRecordingTime(0);
+    startCamera();
+  };
+
+  const closeCameraModal = () => {
+    stopCamera();
+    setShowCameraModal(false);
+    setRecordedVideo(null);
+    setIsRecording(false);
+    setRecordingTime(0);
+  };
+
+  // Recording timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isRecording]);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -154,16 +257,16 @@ export const Video: React.FC = () => {
     }
 
     setIsUploading(true);
-    
+
     // Simulate upload process
     setTimeout(() => {
-      alert('Video uploaded successfully! 🎉');
+      alert('📱 Video selected successfully! Upload feature coming soon with database integration.');
       setShowUploadModal(false);
       setUploadFile(null);
       setUploadTitle('');
       setUploadDescription('');
       setIsUploading(false);
-    }, 2000);
+    }, 1000);
   };
 
   const handleCloseUpload = () => {
@@ -189,14 +292,24 @@ export const Video: React.FC = () => {
         <div className="px-4 mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold text-primary">Videos</h1>
-            <button
-              onClick={handleUploadVideo}
-              className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center hover:scale-105 transition-transform"
-            >
-              <Plus className="w-5 h-5 text-white" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleRecordVideo}
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center hover:scale-105 transition-transform"
+                title="Record video"
+              >
+                <Camera className="w-5 h-5 text-white" />
+              </button>
+              <button
+                onClick={handleUploadVideo}
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center hover:scale-105 transition-transform"
+                title="Upload from gallery"
+              >
+                <Upload className="w-5 h-5 text-white" />
+              </button>
+            </div>
           </div>
-          <p className="text-secondary text-sm">Discover and share Web3 content</p>
+          <p className="text-secondary text-sm">Record or upload Web3 videos</p>
         </div>
 
         {/* Video Feed */}
@@ -351,6 +464,124 @@ export const Video: React.FC = () => {
         </div>
       </div>
 
+      {/* Camera Recording Modal */}
+      {showCameraModal && (
+        <div className="fixed inset-0 z-50 bg-black">
+          {/* Camera View */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            {recordedVideo ? (
+              /* Playback recorded video */
+              <video
+                src={recordedVideo}
+                className="w-full h-full object-cover"
+                controls
+                autoPlay
+                loop
+              />
+            ) : (
+              /* Live camera feed */
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                autoPlay
+                playsInline
+                muted
+              />
+            )}
+
+            {/* Top Controls */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+              <button
+                onClick={closeCameraModal}
+                className="w-10 h-10 rounded-full bg-black bg-opacity-50 flex items-center justify-center text-white"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              {!recordedVideo && (
+                <>
+                  <div className="flex items-center gap-2 bg-black bg-opacity-50 px-3 py-1 rounded-full">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-white text-sm font-mono">
+                      {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={toggleCamera}
+                    className="w-10 h-10 rounded-full bg-black bg-opacity-50 flex items-center justify-center text-white"
+                  >
+                    <RotateCcw className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Bottom Controls */}
+            <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center">
+              {recordedVideo ? (
+                /* Post-recording controls */
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={retryRecording}
+                    className="w-16 h-16 rounded-full bg-gray-600 bg-opacity-80 flex items-center justify-center text-white"
+                  >
+                    <RotateCcw className="w-8 h-8" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      alert('🎬 Video recorded successfully! Upload feature coming soon with database integration.');
+                      closeCameraModal();
+                    }}
+                    className="w-16 h-16 rounded-full bg-green-600 flex items-center justify-center text-white"
+                  >
+                    <CheckCircle className="w-8 h-8" />
+                  </button>
+                </div>
+              ) : (
+                /* Recording controls */
+                <div className="flex items-center gap-8">
+                  <button
+                    onClick={handleUploadVideo}
+                    className="w-12 h-12 rounded-full bg-gray-600 bg-opacity-80 flex items-center justify-center text-white"
+                  >
+                    <Upload className="w-6 h-6" />
+                  </button>
+
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
+                      isRecording
+                        ? 'bg-red-600 scale-110'
+                        : 'bg-white border-4 border-gray-300'
+                    }`}
+                  >
+                    {isRecording ? (
+                      <StopCircle className="w-10 h-10 text-white" />
+                    ) : (
+                      <div className="w-16 h-16 bg-red-600 rounded-full"></div>
+                    )}
+                  </button>
+
+                  <div className="w-12 h-12 rounded-full bg-gray-600 bg-opacity-80 flex items-center justify-center">
+                    <VideoIcon className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Recording indicator */}
+            {isRecording && (
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="bg-red-600 bg-opacity-20 rounded-full p-8 animate-pulse">
+                  <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -464,7 +695,7 @@ export const Video: React.FC = () => {
             {/* Info */}
             <div className="mt-4 p-3 bg-purple-600 bg-opacity-10 rounded-lg">
               <p className="text-purple-400 text-xs text-center">
-                📹 Video processing and Web3 integration coming soon
+                📹 Upload functionality ready! Database integration coming soon
               </p>
             </div>
           </div>
