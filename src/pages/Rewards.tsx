@@ -1,437 +1,321 @@
 import React, { useState } from 'react';
-import { Gift, Calendar, Users, Trophy, Zap, Star, Clock, CheckCircle, Copy, Coins, Target, Heart, MessageCircle, PenTool, ThumbsUp, Lock, Flame } from 'lucide-react';
-import { mockRewards, Reward } from '../data/mockData';
+import { Gift, Users, Trophy, Star, CheckCircle, Copy, Coins, TrendingUp, Award, ExternalLink, Share, Twitter, MessageCircle, Send, Info, Crown, Medal, Zap } from 'lucide-react';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
 
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  reward: string;
-  progress: number;
-  maxProgress: number;
-  completed: boolean;
+interface ReferralTier {
+  name: string;
+  minReferrals: number;
+  maxReferrals: number | null;
+  reward: number;
   icon: string;
+  color: string;
 }
 
-interface DailyTask {
-  id: string;
-  title: string;
-  description: string;
-  reward: string;
-  completed: boolean;
-  icon: string;
+interface ReferralStats {
+  totalReferrals: number;
+  activeReferrals: number;
+  totalEarned: number;
+  thisMonthEarned: number;
+  currentTier: string;
 }
 
 export const Rewards: React.FC = () => {
   const { isDark } = useTheme();
-  const [rewards, setRewards] = useState<Reward[]>(mockRewards);
-  const [activeTab, setActiveTab] = useState<'daily' | 'achievements' | 'referrals'>('daily');
+  const { profile } = useNeonAuth();
   const [linkCopied, setLinkCopied] = useState(false);
 
-  // Mock achievements
-  const achievements: Achievement[] = [
+  // Referral tiers configuration
+  const referralTiers: ReferralTier[] = [
     {
-      id: '1',
-      title: 'First Steps',
-      description: 'Create your first post',
-      reward: '5 WGM',
-      progress: 1,
-      maxProgress: 1,
-      completed: true,
-      icon: 'target'
+      name: 'Bronze',
+      minReferrals: 0,
+      maxReferrals: 4,
+      reward: 5,
+      icon: 'medal',
+      color: 'text-orange-400'
     },
     {
-      id: '2',
-      title: 'Social Butterfly',
-      description: 'Get 10 likes on your posts',
-      reward: '15 WGM',
-      progress: 7,
-      maxProgress: 10,
-      completed: false,
-      icon: 'heart'
+      name: 'Silver',
+      minReferrals: 5,
+      maxReferrals: 19,
+      reward: 7,
+      icon: 'award',
+      color: 'text-gray-300'
     },
     {
-      id: '3',
-      title: 'Engagement Master',
-      description: 'Comment on 25 posts',
-      reward: '25 WGM',
-      progress: 12,
-      maxProgress: 25,
-      completed: false,
-      icon: 'message'
-    },
-    {
-      id: '4',
-      title: 'Generous Giver',
-      description: 'Send 50 WGM in gifts',
-      reward: '100 WGM',
-      progress: 23,
-      maxProgress: 50,
-      completed: false,
-      icon: 'gift'
-    },
-    {
-      id: '5',
-      title: 'Streak Master',
-      description: 'Login for 30 consecutive days',
-      reward: '200 WGM',
-      progress: 18,
-      maxProgress: 30,
-      completed: false,
-      icon: 'flame'
+      name: 'Gold',
+      minReferrals: 20,
+      maxReferrals: null,
+      reward: 10,
+      icon: 'crown',
+      color: 'text-yellow-400'
     }
   ];
 
-  // Mock daily tasks
-  const dailyTasks: DailyTask[] = [
-    {
-      id: '1',
-      title: 'Daily Check-in',
-      description: 'Open the app and claim your daily bonus',
-      reward: '2 WGM',
-      completed: false,
-      icon: 'calendar'
-    },
-    {
-      id: '2',
-      title: 'Create a Post',
-      description: 'Share something with the community',
-      reward: '5 WGM',
-      completed: true,
-      icon: 'pen'
-    },
-    {
-      id: '3',
-      title: 'Like 5 Posts',
-      description: 'Show some love to other creators',
-      reward: '3 WGM',
-      completed: false,
-      icon: 'thumbsup'
-    },
-    {
-      id: '4',
-      title: 'Send a Gift',
-      description: 'Support a creator with a gift',
-      reward: '10 WGM',
-      completed: false,
-      icon: 'gift'
-    }
-  ];
-
-  const handleClaim = (rewardId: string) => {
-    setRewards(rewards.map(reward => 
-      reward.id === rewardId 
-        ? { ...reward, claimed: true }
-        : reward
-    ));
+  // Real user referral stats (currently 0 - ready for smart contract integration)
+  const referralStats: ReferralStats = {
+    totalReferrals: 0,
+    activeReferrals: 0,
+    totalEarned: 0,
+    thisMonthEarned: 0,
+    currentTier: 'Bronze'
   };
 
-  const handleTaskComplete = (taskId: string) => {
-    // In real app, this would update the backend
-    console.log('Completing task:', taskId);
-    alert('Task completed! Reward claimed.');
+  // Generate unique referral link for user
+  const generateReferralLink = () => {
+    if (!profile?.username) return 'https://wegram.com/invite/demo';
+    const cleanUsername = profile.username.replace('@', '');
+    return `https://wegram.com/invite/${cleanUsername}`;
   };
 
-  const handleGetLink = () => {
-    const referralLink = 'https://wegram.com/invite/demo123';
+  const referralLink = generateReferralLink();
+
+  const handleCopyLink = () => {
     navigator.clipboard?.writeText(referralLink);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const totalEarned = 156.5; // Mock total earnings
-  const todayEarned = 12.5; // Mock today's earnings
-  const streakDays = 7; // Mock streak
+  const handleShareTwitter = () => {
+    const text = encodeURIComponent("Join me on Wegram - the Web3 social platform! Use my referral link and let's earn together 🚀");
+    const url = encodeURIComponent(referralLink);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  };
 
-  // Function to render icon based on icon string
-  const renderIcon = (iconString: string, size: string = 'w-6 h-6') => {
-    const iconProps = { className: size };
-    
+  const handleShareTelegram = () => {
+    const text = encodeURIComponent(`Join me on Wegram - the Web3 social platform! Use my referral link: ${referralLink}`);
+    window.open(`https://t.me/share/url?url=${referralLink}&text=${text}`, '_blank');
+  };
+
+  // Function to render tier icon
+  const renderTierIcon = (iconString: string, className: string = 'w-6 h-6') => {
+    const iconProps = { className };
+
     switch (iconString) {
-      case 'target':
-        return <Target {...iconProps} />;
-      case 'heart':
-        return <Heart {...iconProps} />;
-      case 'message':
-        return <MessageCircle {...iconProps} />;
-      case 'gift':
-        return <Gift {...iconProps} />;
-      case 'flame':
-        return <Flame {...iconProps} />;
-      case 'calendar':
-        return <Calendar {...iconProps} />;
-      case 'pen':
-        return <PenTool {...iconProps} />;
-      case 'thumbsup':
-        return <ThumbsUp {...iconProps} />;
+      case 'medal':
+        return <Medal {...iconProps} />;
+      case 'award':
+        return <Award {...iconProps} />;
+      case 'crown':
+        return <Crown {...iconProps} />;
       default:
-        return <Star {...iconProps} />;
+        return <Trophy {...iconProps} />;
     }
   };
+
+  const getCurrentTier = () => {
+    return referralTiers.find(tier =>
+      referralStats.totalReferrals >= tier.minReferrals &&
+      (tier.maxReferrals === null || referralStats.totalReferrals <= tier.maxReferrals)
+    ) || referralTiers[0];
+  };
+
+  const currentTier = getCurrentTier();
 
   return (
     <div className="max-w-md mx-auto px-4 pt-20 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-          <Gift className="w-5 h-5 text-white" />
+          <Users className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-primary">Rewards</h1>
-          <p className="text-secondary text-sm">Earn WGM by staying active</p>
+          <h1 className="text-xl font-bold text-primary">Referral Rewards</h1>
+          <p className="text-secondary text-sm">Invite friends and earn WEGRAM</p>
         </div>
       </div>
 
-      {/* Stats Overview */}
+      {/* Referral Link Section */}
       <div className="card mb-6">
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-primary">{totalEarned}</div>
-            <div className="text-secondary text-sm">Total Earned</div>
-            <div className="text-xs text-green-400">WGM</div>
+        <div className="flex items-center gap-3 mb-4">
+          <Share className="w-5 h-5 text-purple-400" />
+          <h3 className="text-primary font-semibold">Your Referral Link</h3>
+        </div>
+
+        <div className="mb-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={referralLink}
+              readOnly
+              className="input flex-1 text-sm bg-overlay-medium"
+            />
+            <button
+              onClick={handleCopyLink}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                linkCopied
+                  ? 'bg-green-600 text-white'
+                  : 'bg-purple-600 hover:bg-purple-700 text-white'
+              }`}
+            >
+              {linkCopied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            </button>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary">{todayEarned}</div>
-            <div className="text-secondary text-sm">Today</div>
-            <div className="text-xs text-blue-400">WGM</div>
+        </div>
+
+        {/* Social Sharing */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleShareTwitter}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <Twitter className="w-4 h-4" />
+            Twitter
+          </button>
+          <button
+            onClick={handleShareTelegram}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <Send className="w-4 h-4" />
+            Telegram
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Dashboard */}
+      <div className="card mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <TrendingUp className="w-5 h-5 text-green-400" />
+          <h3 className="text-primary font-semibold">Your Stats</h3>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="text-center p-4 bg-overlay-light rounded-lg">
+            <div className="text-2xl font-bold text-primary">{referralStats.totalReferrals}</div>
+            <div className="text-secondary text-sm">Total Referrals</div>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary">{streakDays}</div>
-            <div className="text-secondary text-sm">Day Streak</div>
-            <div className="text-xs text-orange-400 flex items-center justify-center">
-              <Flame className="w-3 h-3" />
+          <div className="text-center p-4 bg-overlay-light rounded-lg">
+            <div className="text-2xl font-bold text-primary">{referralStats.activeReferrals}</div>
+            <div className="text-secondary text-sm">Active Referrals</div>
+          </div>
+          <div className="text-center p-4 bg-overlay-light rounded-lg">
+            <div className="text-2xl font-bold text-green-400">{referralStats.totalEarned}</div>
+            <div className="text-secondary text-sm">Total WEGRAM</div>
+          </div>
+          <div className="text-center p-4 bg-overlay-light rounded-lg">
+            <div className="text-2xl font-bold text-blue-400">{referralStats.thisMonthEarned}</div>
+            <div className="text-secondary text-sm">This Month</div>
+          </div>
+        </div>
+
+        {/* Current Tier */}
+        <div className="bg-overlay-light rounded-lg p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className={currentTier.color}>
+                {renderTierIcon(currentTier.icon, 'w-5 h-5')}
+              </div>
+              <span className="text-primary font-medium">Current Tier: {currentTier.name}</span>
             </div>
+            <div className="text-sm text-green-400 font-bold">
+              {currentTier.reward} WEGRAM per referral
+            </div>
+          </div>
+          <div className="text-secondary text-sm">
+            {currentTier.maxReferrals
+              ? `${referralStats.totalReferrals}/${currentTier.maxReferrals + 1} referrals to next tier`
+              : 'Maximum tier reached!'
+            }
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className={`flex gap-1 mb-6 rounded-lg p-1 ${
-        isDark ? 'bg-gray-800 bg-opacity-50' : 'bg-gray-200 bg-opacity-70'
-      }`}>
-        {(['daily', 'achievements', 'referrals'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab
-                ? 'bg-purple-600 text-white'
-                : isDark 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-300'
-            }`}
-          >
-            {tab === 'daily' && <Calendar className="w-4 h-4 inline mr-2" />}
-            {tab === 'achievements' && <Trophy className="w-4 h-4 inline mr-2" />}
-            {tab === 'referrals' && <Users className="w-4 h-4 inline mr-2" />}
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
+      {/* Tier System */}
+      <div className="card mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Trophy className="w-5 h-5 text-yellow-400" />
+          <h3 className="text-primary font-semibold">Reward Tiers</h3>
+        </div>
 
-      {/* Content */}
-      <div className="space-y-4">
-        {activeTab === 'daily' && (
-          <>
-            <div className="card">
-              <div className="flex items-center gap-3 mb-4">
-                <Zap className="w-5 h-5 text-yellow-400" />
-                <h3 className="text-primary font-semibold">Daily Tasks</h3>
-                <div className="ml-auto text-sm text-secondary">
-                  {dailyTasks.filter(t => t.completed).length}/{dailyTasks.length} completed
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                {dailyTasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-3 bg-overlay-light rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="text-purple-400">{renderIcon(task.icon, 'w-6 h-6')}</div>
-                      <div>
-                        <h4 className="text-primary font-medium">{task.title}</h4>
-                        <p className="text-secondary text-sm">{task.description}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-green-400 font-bold text-sm">{task.reward}</div>
-                      {task.completed ? (
-                        <CheckCircle className="w-5 h-5 text-green-400 ml-auto mt-1" />
-                      ) : (
-                        <button
-                          onClick={() => handleTaskComplete(task.id)}
-                          className="text-purple-400 text-sm hover:text-purple-300 transition-colors"
-                        >
-                          Complete
-                        </button>
-                      )}
-                    </div>
+        <div className="space-y-3">
+          {referralTiers.map((tier) => (
+            <div key={tier.name} className={`p-3 rounded-lg border-2 transition-colors ${
+              tier.name === currentTier.name
+                ? 'border-purple-500 bg-purple-600 bg-opacity-10'
+                : 'border-gray-600 bg-overlay-light'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={tier.color}>
+                    {renderTierIcon(tier.icon, 'w-6 h-6')}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Legacy Daily Rewards */}
-            {rewards.filter(r => r.type === 'daily').map(reward => (
-              <div key={reward.id} className="card">
-                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-primary font-semibold mb-1">{reward.title}</h3>
-                    <p className="text-green-400 font-bold">{reward.amount}</p>
-                  </div>
-                  <button
-                    onClick={() => handleClaim(reward.id)}
-                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                      reward.claimed 
-                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
-                        : 'btn-primary'
-                    }`}
-                    disabled={reward.claimed}
-                  >
-                    {reward.claimed ? 'Claimed' : 'Claim'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
-
-        {activeTab === 'achievements' && (
-          <>
-            {achievements.map((achievement) => (
-              <div key={achievement.id} className="card">
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    achievement.completed 
-                      ? 'bg-yellow-400 bg-opacity-20' 
-                      : isDark ? 'bg-gray-700' : 'bg-gray-300'
-                  }`}>
-                    {achievement.completed ? (
-                      <div className="text-purple-400">{renderIcon(achievement.icon, 'w-6 h-6')}</div>
-                    ) : (
-                      <Lock className="w-6 h-6 text-gray-400" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className={`font-semibold ${achievement.completed ? 'text-yellow-400' : 'text-primary'}`}>
-                        {achievement.title}
-                      </h3>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Coins className="w-4 h-4 text-green-400" />
-                        <span className="text-green-400 font-bold">{achievement.reward}</span>
-                      </div>
+                    <div className="text-primary font-medium">{tier.name}</div>
+                    <div className="text-secondary text-sm">
+                      {tier.maxReferrals ? `${tier.minReferrals}-${tier.maxReferrals}` : `${tier.minReferrals}+`} referrals
                     </div>
-                    <p className="text-secondary text-sm mb-3">{achievement.description}</p>
-                    
-                    {!achievement.completed && (
-                      <>
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-secondary">Progress</span>
-                          <span className="text-primary">
-                            {achievement.progress}/{achievement.maxProgress}
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
-                          ></div>
-                        </div>
-                      </>
-                    )}
-                    
-                    {achievement.completed && (
-                      <div className="flex items-center gap-2 text-sm text-green-400">
-                        <Trophy className="w-4 h-4" />
-                        <span>Completed!</span>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </>
-        )}
-
-        {activeTab === 'referrals' && (
-          <>
-            <div className="card">
-              <div className="flex items-center gap-3 mb-4">
-                <Users className="w-5 h-5 text-purple-400" />
-                <h3 className="text-primary font-semibold">Invite Friends</h3>
-              </div>
-              
-              <div className="mb-6">
-                <p className="text-secondary text-sm mb-4">
-                  Earn 10 WGM for each friend who joins using your link!
-                </p>
-                
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value="https://wegram.com/invite/demo123"
-                    readOnly
-                    className="input flex-1 text-sm bg-overlay-medium"
-                  />
-                  <button
-                    onClick={handleGetLink}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      linkCopied 
-                        ? 'bg-green-600 text-white' 
-                        : 'bg-purple-600 hover:bg-purple-700 text-white'
-                    }`}
-                  >
-                    {linkCopied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-overlay-light rounded-lg">
-                  <div className="text-2xl font-bold text-green-400">3</div>
-                  <div className="text-secondary text-sm">Friends Joined</div>
-                  <div className="text-xs text-green-400">+30 WGM earned</div>
-                </div>
-                <div className="text-center p-4 bg-overlay-light rounded-lg">
-                  <div className="text-2xl font-bold text-purple-400">1</div>
-                  <div className="text-secondary text-sm">Pending</div>
-                  <div className="text-xs text-purple-400">+10 WGM potential</div>
+                <div className="text-green-400 font-bold">
+                  {tier.reward} WEGRAM
                 </div>
               </div>
             </div>
-
-            {/* Legacy Invite Rewards */}
-            {rewards.filter(r => r.type === 'invite').map(reward => (
-              <div key={reward.id} className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-primary font-semibold mb-1">{reward.title}</h3>
-                    <p className="text-green-400 font-bold">{reward.amount}</p>
-                  </div>
-                  <button
-                    onClick={handleGetLink}
-                    className="btn-primary px-6 py-2"
-                  >
-                    Get Link
-                  </button>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Bottom Info */}
-      <div className="mt-8 card">
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2 text-secondary">
-            <Clock className="w-4 h-4" />
-            <span>Rewards reset daily at midnight</span>
+      {/* Referral History */}
+      <div className="card mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Coins className="w-5 h-5 text-blue-400" />
+          <h3 className="text-primary font-semibold">Referral History</h3>
+        </div>
+
+        <div className="text-center py-8">
+          <Users className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+          <h4 className="text-primary font-medium mb-2">No referrals yet</h4>
+          <p className="text-secondary text-sm">
+            Share your referral link above to start earning WEGRAM!
+          </p>
+        </div>
+      </div>
+
+      {/* How It Works */}
+      <div className="card">
+        <div className="flex items-center gap-3 mb-4">
+          <Info className="w-5 h-5 text-blue-400" />
+          <h3 className="text-primary font-semibold">How It Works</h3>
+        </div>
+
+        <div className="space-y-4 text-sm">
+          <div>
+            <h4 className="text-primary font-medium mb-2">🎯 How Referral Rewards Work</h4>
+            <div className="space-y-2 text-secondary">
+              <div><strong>1. Share Your Link</strong><br />Share your unique referral link with friends and earn WEGRAM when they join</div>
+              <div><strong>2. Friend Signs Up</strong><br />When someone creates an account using your link, they become your referral</div>
+              <div><strong>3. Earn WEGRAM</strong><br />You earn WEGRAM tokens for each successful referral based on your tier level</div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-purple-400">
-            <Star className="w-4 h-4" />
-            <span>More rewards coming soon</span>
+
+          <div>
+            <h4 className="text-primary font-medium mb-2">💰 Reward Tiers</h4>
+            <div className="space-y-1 text-secondary">
+              <div><strong>Bronze (0-4 referrals):</strong> 5 WEGRAM per referral</div>
+              <div><strong>Silver (5-19 referrals):</strong> 7 WEGRAM per referral</div>
+              <div><strong>Gold (20+ referrals):</strong> 10 WEGRAM per referral</div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-primary font-medium mb-2">📋 Terms</h4>
+            <div className="space-y-1 text-secondary">
+              <div>• Referrals must be genuine new users</div>
+              <div>• WEGRAM rewards are credited within 24 hours</div>
+              <div>• Self-referrals or fake accounts are not eligible</div>
+              <div>• Wegram reserves the right to review suspicious activity</div>
+            </div>
+          </div>
+
+          <div className="bg-purple-600 bg-opacity-10 p-3 rounded-lg">
+            <div className="flex items-center gap-2 text-purple-400">
+              <Zap className="w-4 h-4" />
+              <span className="font-medium">🚀 Start Earning</span>
+            </div>
+            <div className="text-secondary text-xs mt-1">
+              Copy your referral link above and start sharing with friends to earn WEGRAM!
+            </div>
           </div>
         </div>
       </div>
