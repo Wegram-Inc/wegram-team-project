@@ -27,27 +27,51 @@ export default async function handler(
         // Clean username (remove @ if present)
         const cleanUsername = username.toString().replace('@', '');
 
-        const users = await sql`
-          SELECT
-            id,
-            username,
-            email,
-            avatar_url,
-            bio,
-            verified,
-            followers_count,
-            following_count,
-            posts_count,
-            twitter_id,
-            twitter_username,
-            twitter_link,
-            discord_link,
-            telegram_link,
-            created_at,
-            updated_at
-          FROM profiles
-          WHERE username = ${`@${cleanUsername}`} OR username = ${cleanUsername}
-        `;
+        // Try with social media fields first, fallback to basic fields if columns don't exist
+        let users;
+        try {
+          users = await sql`
+            SELECT
+              id,
+              username,
+              email,
+              avatar_url,
+              bio,
+              verified,
+              followers_count,
+              following_count,
+              posts_count,
+              twitter_id,
+              twitter_username,
+              twitter_link,
+              discord_link,
+              telegram_link,
+              created_at,
+              updated_at
+            FROM profiles
+            WHERE username = ${`@${cleanUsername}`} OR username = ${cleanUsername}
+          `;
+        } catch (socialFieldsError) {
+          // Fallback to basic fields if social media columns don't exist
+          users = await sql`
+            SELECT
+              id,
+              username,
+              email,
+              avatar_url,
+              bio,
+              verified,
+              followers_count,
+              following_count,
+              posts_count,
+              twitter_id,
+              twitter_username,
+              created_at,
+              updated_at
+            FROM profiles
+            WHERE username = ${`@${cleanUsername}`} OR username = ${cleanUsername}
+          `;
+        }
 
         if (users.length === 0) {
           return res.status(404).json({ error: 'User not found' });
@@ -89,9 +113,9 @@ export default async function handler(
             posts_count: user.posts_count,
             twitter_id: user.twitter_id,
             twitter_username: user.twitter_username,
-            twitter_link: user.twitter_link,
-            discord_link: user.discord_link,
-            telegram_link: user.telegram_link,
+            twitter_link: user.twitter_link || null,
+            discord_link: user.discord_link || null,
+            telegram_link: user.telegram_link || null,
             created_at: user.created_at,
             updated_at: user.updated_at
           },
