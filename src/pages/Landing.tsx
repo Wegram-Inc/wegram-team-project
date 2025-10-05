@@ -7,14 +7,10 @@ export const Landing: React.FC = () => {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   useEffect(() => {
-    // Show install prompt after 3 seconds on mobile devices
-    const timer = setTimeout(() => {
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        setShowInstallPrompt(true);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    // Show install prompt immediately on mobile devices
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      setShowInstallPrompt(true);
+    }
   }, []);
 
   const handleGuestEntry = () => {
