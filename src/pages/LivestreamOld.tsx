@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Video, Users, MessageCircle, Heart, Share, Settings, Mic, MicOff, VideoOff, X, Send, Eye, Gift, User } from 'lucide-react';
-import { useNeonAuth } from '../hooks/useNeonAuth';
+import { Video, Users, MessageCircle, Heart, Share, Settings, Mic, MicOff, VideoOff, X, Send, Eye, Gift } from 'lucide-react';
 
 interface StreamComment {
   id: string;
@@ -20,7 +19,6 @@ interface StreamStats {
 }
 
 export const Livestream: React.FC = () => {
-  const { profile } = useNeonAuth();
   const [isStreaming, setIsStreaming] = useState(false);
   const [isSetupMode, setIsSetupMode] = useState(false);
   const [streamTitle, setStreamTitle] = useState('');
@@ -37,7 +35,7 @@ export const Livestream: React.FC = () => {
     shares: 0,
     earnings: 0
   });
-
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -112,7 +110,7 @@ export const Livestream: React.FC = () => {
       alert('Please enter a stream title');
       return;
     }
-
+    
     setIsStreaming(true);
     setIsSetupMode(false);
     setCameraAccessDenied(false);
@@ -171,14 +169,14 @@ export const Livestream: React.FC = () => {
 
   const sendComment = () => {
     if (!newComment.trim()) return;
-
+    
     const comment: StreamComment = {
       id: Date.now().toString(),
       username: '@demo_user',
       message: newComment,
       timestamp: 'now'
     };
-
+    
     setComments([comment, ...comments]);
     setNewComment('');
     setStats(prev => ({ ...prev, comments: prev.comments + 1 }));
@@ -196,7 +194,7 @@ export const Livestream: React.FC = () => {
           <div className="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6">
             <Video className="w-10 h-10 text-white" />
           </div>
-
+          
           <h1 className="text-2xl font-bold text-primary mb-2">Go Live</h1>
           <p className="text-secondary mb-8">Share your thoughts with the Wegram community</p>
 
@@ -208,7 +206,7 @@ export const Livestream: React.FC = () => {
               <Video className="w-5 h-5" />
               Start Streaming
             </button>
-
+            
             <button
               onClick={() => alert('Schedule feature coming soon!')}
               className="btn-secondary w-full py-4 flex items-center justify-center gap-3"
@@ -279,7 +277,7 @@ export const Livestream: React.FC = () => {
                 </div>
               )}
             </div>
-
+            
             {/* Camera Controls */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-3">
               <button
@@ -316,7 +314,7 @@ export const Livestream: React.FC = () => {
                 maxLength={100}
               />
             </div>
-
+            
             <div>
               <label className="block text-secondary text-sm mb-2">Category</label>
               <select
@@ -357,156 +355,154 @@ export const Livestream: React.FC = () => {
   // Full-Screen Live Streaming Interface
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      {/* Full-Screen Camera Feed */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        {isCameraOn ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-            <div className="text-center">
-              <div className="w-40 h-40 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6 border-4 border-purple-500/30 shadow-2xl">
-                <VideoOff className="w-20 h-20 text-white/70" />
-              </div>
-              <p className="text-white text-2xl font-bold mb-2">Camera Off</p>
-              <p className="text-gray-400 text-lg">Enable camera to start streaming</p>
-            </div>
+      {/* Stream Header */}
+      <div className="card mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-red-400 font-semibold">LIVE</span>
           </div>
-        )}
-
-        {/* Top Overlay Controls */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-          {/* Live Indicator & Title */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-black bg-opacity-50 backdrop-blur-sm px-4 py-2 rounded-full">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-white font-bold text-sm">LIVE</span>
-            </div>
-            <div className="bg-black bg-opacity-50 backdrop-blur-sm px-4 py-2 rounded-full">
-              <span className="text-white font-medium text-sm">{streamTitle}</span>
-            </div>
-          </div>
-
-          {/* End Stream Button */}
           <button
             onClick={stopStreaming}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition-colors shadow-lg"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             End Stream
           </button>
         </div>
-
-        {/* Right Side Stats Panel */}
-        <div className="absolute top-20 right-4 flex flex-col gap-4">
-          {/* Viewers */}
-          <div className="flex flex-col items-center bg-black bg-opacity-50 backdrop-blur-sm p-3 rounded-full">
-            <Eye className="w-6 h-6 text-white mb-1" />
-            <span className="text-white font-bold text-lg">{stats.viewers}</span>
-            <span className="text-gray-300 text-xs">Viewers</span>
+        
+        <h2 className="text-primary font-semibold mb-2">{streamTitle}</h2>
+        
+        {/* Live Stats */}
+        <div className="grid grid-cols-4 gap-4 text-center">
+          <div>
+            <div className="flex items-center justify-center gap-1 text-purple-400 mb-1">
+              <Eye className="w-4 h-4" />
+            </div>
+            <div className="text-primary font-bold">{stats.viewers}</div>
+            <div className="text-secondary text-xs">Viewers</div>
           </div>
-
-          {/* Likes */}
-          <div className="flex flex-col items-center bg-black bg-opacity-50 backdrop-blur-sm p-3 rounded-full">
-            <Heart className="w-6 h-6 text-red-400 mb-1" />
-            <span className="text-white font-bold text-lg">{stats.likes}</span>
-            <span className="text-gray-300 text-xs">Likes</span>
+          <div>
+            <div className="flex items-center justify-center gap-1 text-red-400 mb-1">
+              <Heart className="w-4 h-4" />
+            </div>
+            <div className="text-primary font-bold">{stats.likes}</div>
+            <div className="text-secondary text-xs">Likes</div>
           </div>
-
-          {/* Comments */}
-          <div className="flex flex-col items-center bg-black bg-opacity-50 backdrop-blur-sm p-3 rounded-full">
-            <MessageCircle className="w-6 h-6 text-blue-400 mb-1" />
-            <span className="text-white font-bold text-lg">{stats.comments}</span>
-            <span className="text-gray-300 text-xs">Comments</span>
+          <div>
+            <div className="flex items-center justify-center gap-1 text-blue-400 mb-1">
+              <MessageCircle className="w-4 h-4" />
+            </div>
+            <div className="text-primary font-bold">{stats.comments}</div>
+            <div className="text-secondary text-xs">Comments</div>
           </div>
-
-          {/* Earnings */}
-          <div className="flex flex-col items-center bg-black bg-opacity-50 backdrop-blur-sm p-3 rounded-full">
-            <Gift className="w-6 h-6 text-green-400 mb-1" />
-            <span className="text-white font-bold text-lg">{stats.earnings.toFixed(1)}</span>
-            <span className="text-gray-300 text-xs">SOL</span>
+          <div>
+            <div className="flex items-center justify-center gap-1 text-green-400 mb-1">
+              <Gift className="w-4 h-4" />
+            </div>
+            <div className="text-primary font-bold">{stats.earnings.toFixed(1)}</div>
+            <div className="text-secondary text-xs">SOL</div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Camera Controls */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
+      {/* Camera View */}
+      <div className="relative mb-4">
+        <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden">
+          {isCameraOn ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center">
+                <VideoOff className="w-12 h-12 text-gray-500 mx-auto mb-2" />
+                <p className="text-gray-500">Camera Off</p>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Stream Controls */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-3">
           <button
             onClick={toggleCamera}
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-lg ${
-              isCameraOn ? 'bg-white bg-opacity-20 text-white' : 'bg-red-600 text-white'
+            className={`p-3 rounded-full transition-colors ${
+              isCameraOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'
             }`}
           >
-            {isCameraOn ? <Video className="w-8 h-8" /> : <VideoOff className="w-8 h-8" />}
+            {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
           </button>
           <button
             onClick={toggleMic}
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all transform hover:scale-110 shadow-lg ${
-              isMicOn ? 'bg-white bg-opacity-20 text-white' : 'bg-red-600 text-white'
+            className={`p-3 rounded-full transition-colors ${
+              isMicOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'
             }`}
           >
-            {isMicOn ? <Mic className="w-8 h-8" /> : <MicOff className="w-8 h-8" />}
+            {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
           </button>
         </div>
+      </div>
 
-        {/* Left Side Chat Overlay */}
-        <div className="absolute bottom-20 left-4 w-80 max-h-96 bg-black bg-opacity-50 backdrop-blur-sm rounded-2xl p-4">
-          <h3 className="text-white font-bold mb-3 flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            Live Chat
-          </h3>
-
-          {/* Chat Messages */}
-          <div className="h-48 overflow-y-auto mb-3 space-y-2">
-            {comments.length > 0 ? (
-              comments.map(comment => (
-                <div key={comment.id} className="text-sm">
-                  {comment.isSuperchat && (
-                    <div className="bg-yellow-600 bg-opacity-30 border border-yellow-400 rounded p-2 mb-1">
-                      <div className="flex items-center gap-2">
-                        <Gift className="w-4 h-4 text-yellow-400" />
-                        <span className="text-yellow-300 font-bold text-xs">{comment.amount}</span>
-                      </div>
+      {/* Live Chat */}
+      <div className="card">
+        <h3 className="text-primary font-semibold mb-4 flex items-center gap-2">
+          <MessageCircle className="w-5 h-5" />
+          Live Chat
+        </h3>
+        
+        {/* Comments */}
+        <div className="bg-black bg-opacity-30 rounded-lg p-3 mb-4 h-48 overflow-y-auto">
+          <div className="space-y-3">
+            {comments.map(comment => (
+              <div key={comment.id} className="text-sm">
+                {comment.isSuperchat && (
+                  <div className="bg-yellow-600 bg-opacity-20 border border-yellow-600 rounded p-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Gift className="w-4 h-4 text-yellow-400" />
+                      <span className="text-yellow-400 font-bold">{comment.amount}</span>
                     </div>
-                  )}
-                  <div className="flex items-start gap-2">
-                    <span className="text-purple-300 font-medium text-xs">{comment.username}</span>
-                    <span className="text-gray-400 text-xs">{comment.timestamp}</span>
                   </div>
-                  <p className="text-white text-sm">{comment.message}</p>
+                )}
+                <div className="flex items-start gap-2">
+                  <span className="text-purple-400 font-medium">{comment.username}</span>
+                  <span className="text-secondary text-xs">{comment.timestamp}</span>
                 </div>
-              ))
-            ) : (
-              <div className="text-center text-gray-400 py-8">
-                <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No messages yet</p>
-                <p className="text-xs">Start the conversation!</p>
+                <p className="text-primary">{comment.message}</p>
               </div>
-            )}
-          </div>
-
-          {/* Chat Input */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Say something..."
-              className="flex-1 bg-white bg-opacity-10 text-white placeholder-gray-400 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              onKeyPress={(e) => e.key === 'Enter' && sendComment()}
-            />
-            <button
-              onClick={sendComment}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-              disabled={!newComment.trim()}
-            >
-              <Send className="w-4 h-4" />
-            </button>
+            ))}
           </div>
         </div>
+        
+        {/* Comment Input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Say something..."
+            className="input flex-1 text-sm"
+            onKeyPress={(e) => e.key === 'Enter' && sendComment()}
+          />
+          <button
+            onClick={sendComment}
+            className="btn-primary px-4"
+            disabled={!newComment.trim()}
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <button
+          onClick={sendSuperchat}
+          className="w-full mt-3 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        >
+          <Gift className="w-4 h-4" />
+          Send Superchat
+        </button>
       </div>
     </div>
   );
