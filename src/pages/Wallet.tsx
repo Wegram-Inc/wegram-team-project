@@ -30,7 +30,7 @@ export const Wallet: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tokens' | 'tickets' | 'activity'>('tokens');
   // const [walletBalance] = useState(0); // Reserved for future use
   const [earnings] = useState(0);
-  const [pendingRewards] = useState(156.78);
+  const [pendingRewards] = useState(0);
 
   const solanaWallet = new SolanaWallet();
 
@@ -81,23 +81,23 @@ export const Wallet: React.FC = () => {
   };
 
   const handleClaimRewards = () => {
-    alert(`🎉 Claimed ${pendingRewards} WGR tokens!`);
+    navigate('/rewards');
   };
 
-  // Mock tokens data
+  // Real tokens data (starting at 0)
   const tokens: Token[] = [
     {
       symbol: 'WGR',
       name: 'Wegram',
-      balance: 1247.89,
-      usdValue: 623.95,
+      balance: 0,
+      usdValue: 0,
       logo: 'https://i.ibb.co/TxdWc0kL/IMG-9101.jpg'
     },
     {
       symbol: 'SOL',
       name: 'Solana',
-      balance: 2.45,
-      usdValue: 367.50,
+      balance: 0,
+      usdValue: 0,
       logo: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png'
     }
   ];
