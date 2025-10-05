@@ -66,30 +66,40 @@ export const Livestream: React.FC = () => {
 
   const startCameraAccess = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user'
+        },
+        audio: true
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         setCameraAccessDenied(false);
-        
-        // Wait for video to load and then play
+        setIsCameraOn(true);
+        setIsMicOn(true);
+
+        // Ensure video plays and is visible
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(console.error);
+          videoRef.current?.play().then(() => {
+            console.log('Camera preview started successfully');
+          }).catch((error) => {
+            console.error('Error starting video preview:', error);
+          });
         };
       }
-      
+
       setIsSetupMode(true);
     } catch (error) {
       console.warn('Camera access denied:', error);
-      
+
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
         setCameraAccessDenied(true);
       }
-      
+
       // Fallback - show setup without actual camera
       setIsSetupMode(true);
     }
@@ -136,21 +146,23 @@ export const Livestream: React.FC = () => {
   };
 
   const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
+    const newCameraState = !isCameraOn;
+    setIsCameraOn(newCameraState);
     if (streamRef.current) {
       const videoTrack = streamRef.current.getVideoTracks()[0];
       if (videoTrack) {
-        videoTrack.enabled = !isCameraOn;
+        videoTrack.enabled = newCameraState;
       }
     }
   };
 
   const toggleMic = () => {
-    setIsMicOn(!isMicOn);
+    const newMicState = !isMicOn;
+    setIsMicOn(newMicState);
     if (streamRef.current) {
       const audioTrack = streamRef.current.getAudioTracks()[0];
       if (audioTrack) {
-        audioTrack.enabled = !isMicOn;
+        audioTrack.enabled = newMicState;
       }
     }
   };
