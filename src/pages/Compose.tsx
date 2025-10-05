@@ -7,30 +7,24 @@ export const Compose: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useNeonAuth();
 
-  const handlePost = async (content: string, files?: File[]) => {
+  const handlePost = async (content: string, imageUrl?: string) => {
     if (!profile?.id) {
       alert('Please sign in to post');
       return;
     }
 
     try {
-      // Create FormData to handle both text and files
-      const formData = new FormData();
-      formData.append('content', content);
-      formData.append('user_id', profile.id);
-      formData.append('username', profile.username);
-
-      // Add files if they exist
-      if (files && files.length > 0) {
-        files.forEach((file, index) => {
-          formData.append(`file_${index}`, file);
-        });
-        formData.append('file_count', files.length.toString());
-      }
-
       const response = await fetch('/api/posts', {
         method: 'POST',
-        body: formData // Don't set Content-Type, let browser set it for FormData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content,
+          user_id: profile.id,
+          username: profile.username,
+          image_url: imageUrl
+        })
       });
 
       const data = await response.json();

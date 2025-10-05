@@ -3,7 +3,7 @@ import { Image, Video, X, Upload } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 interface PostComposerProps {
-  onPost: (content: string, files?: File[]) => void;
+  onPost: (content: string, imageUrl?: string) => void;
   onCancel: () => void;
   placeholder?: string;
 }
@@ -16,35 +16,47 @@ export const PostComposer: React.FC<PostComposerProps> = ({
   const { isDark } = useTheme();
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
 
   const handlePost = () => {
-    if (content.trim() || selectedFiles.length > 0) {
-      onPost(content, selectedFiles.length > 0 ? selectedFiles : undefined);
+    if (content.trim() || uploadedImageUrl) {
+      onPost(content, uploadedImageUrl || undefined);
       setContent('');
       setSelectedFiles([]);
+      setUploadedImageUrl('');
     }
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    const validFiles = files.filter(file => 
-      file.type.startsWith('image/') || file.type.startsWith('video/')
-    );
-    
-    if (validFiles.length !== files.length) {
-      alert('Only image and video files are allowed');
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check if it's an image file
+      if (!file.type.startsWith('image/')) {
+        alert('Only image files are allowed');
+        return;
+      }
+
+      // Convert to base64 exactly like profile images
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setUploadedImageUrl(e.target.result as string);
+          setSelectedFiles([file]); // Keep for display purposes
+        }
+      };
+      reader.readAsDataURL(file);
     }
-    
-    setSelectedFiles(prev => [...prev, ...validFiles]);
   };
 
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setUploadedImageUrl(''); // Clear the uploaded image URL
   };
 
   const handleReset = () => {
     setContent('');
     setSelectedFiles([]);
+    setUploadedImageUrl('');
   };
   return (
     <div className="card mb-6">
@@ -141,7 +153,7 @@ export const PostComposer: React.FC<PostComposerProps> = ({
         <button
           onClick={handlePost}
           className="btn-primary flex-1"
-          disabled={!content.trim() && selectedFiles.length === 0}
+          disabled={!content.trim() && !uploadedImageUrl}
         >
           Post
         </button>

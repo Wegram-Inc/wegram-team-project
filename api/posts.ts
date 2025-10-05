@@ -1,9 +1,6 @@
 // Posts API for Neon Postgres
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import formidable from 'formidable';
-import fs from 'fs';
-import path from 'path';
 
 export default async function handler(
   req: VercelRequest,
@@ -122,47 +119,8 @@ export default async function handler(
         return res.status(200).json({ posts });
 
       case 'POST':
-        // Create a new post - handle both FormData (with files) and JSON
-        let content, user_id, imageUrl = null;
-
-        if (req.headers['content-type']?.includes('multipart/form-data')) {
-          // Handle FormData with potential file uploads
-          const form = formidable({
-            maxFileSize: 10 * 1024 * 1024, // 10MB limit
-            allowEmptyFiles: false,
-            multiples: true
-          });
-
-          const [fields, files] = await new Promise<[formidable.Fields, formidable.Files]>((resolve, reject) => {
-            form.parse(req, (err, fields, files) => {
-              if (err) reject(err);
-              else resolve([fields, files]);
-            });
-          });
-
-          content = Array.isArray(fields.content) ? fields.content[0] : fields.content;
-          user_id = Array.isArray(fields.user_id) ? fields.user_id[0] : fields.user_id;
-
-          // Handle file upload (for now, we'll store a placeholder URL)
-          // In production, you'd upload to a service like Cloudinary, AWS S3, etc.
-          if (files && Object.keys(files).length > 0) {
-            const fileKeys = Object.keys(files).filter(key => key.startsWith('file_'));
-            if (fileKeys.length > 0) {
-              const file = Array.isArray(files[fileKeys[0]]) ? files[fileKeys[0]][0] : files[fileKeys[0]];
-              if (file) {
-                // For now, we'll use a placeholder image URL
-                // In production, upload the file and get the real URL
-                imageUrl = `https://via.placeholder.com/400x300?text=Uploaded+Image+${Date.now()}`;
-                console.log('File uploaded:', file.originalFilename, 'Size:', file.size);
-              }
-            }
-          }
-        } else {
-          // Handle regular JSON request
-          const body = req.body;
-          content = body.content;
-          user_id = body.user_id;
-        }
+        // Create a new post - handle JSON with base64 images
+        const { content, user_id, image_url } = req.body;
 
         if (!content || !user_id) {
           return res.status(400).json({ error: 'Content and user_id are required' });
@@ -174,7 +132,7 @@ export default async function handler(
 
         const newPost = await sql`
           INSERT INTO posts (content, user_id, image_url, likes_count, comments_count, shares_count)
-          VALUES (${content}, ${user_id}, ${imageUrl}, 0, 0, 0)
+          VALUES (${content}, ${user_id}, ${image_url || null}, 0, 0, 0)
           RETURNING *
         `;
 
@@ -197,7 +155,7 @@ export default async function handler(
           WHERE p.id = ${newPost[0].id}
         `;
 
-        return res.status(201).json({ post: postWithProfile[0] });
+        return res.status(201).json({ success: true, post: postWithProfile[0] });
 
       case 'PUT':
         // Update post (like, gift, etc.)
