@@ -9,11 +9,11 @@ export const BuyWegram: React.FC = () => {
   const [copiedAddress, setCopiedAddress] = useState(false);
   
   // WEGRAM token details
-  const tokenAddress = "WGMTokenAddressHere123456789"; // Replace with actual token address
-  const currentPrice = 0.0234; // USD
-  const marketCap = 12500000; // USD
-  const volume24h = 850000; // USD
-  const priceChange24h = 15.7; // Percentage
+  const tokenAddress = "Coming Soon"; // Replace with actual token address
+  const currentPrice = 0.00; // USD
+  const marketCap = 0; // USD
+  const volume24h = 0; // USD
+  const priceChange24h = 0; // Percentage
   
   const handleBuyOnRaydium = () => {
     // Direct link to Raydium swap with WEGRAM token
@@ -83,11 +83,11 @@ export const BuyWegram: React.FC = () => {
           {/* Token Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="text-center p-3 bg-overlay-light rounded-lg">
-              <div className="text-lg font-bold text-primary">${(marketCap / 1000000).toFixed(1)}M</div>
+              <div className="text-lg font-bold text-primary">${marketCap.toFixed(2)}</div>
               <div className="text-secondary text-sm">Market Cap</div>
             </div>
             <div className="text-center p-3 bg-overlay-light rounded-lg">
-              <div className="text-lg font-bold text-primary">${(volume24h / 1000).toFixed(0)}K</div>
+              <div className="text-lg font-bold text-primary">${volume24h.toFixed(2)}</div>
               <div className="text-secondary text-sm">24h Volume</div>
             </div>
           </div>
