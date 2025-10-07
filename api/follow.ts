@@ -58,6 +58,19 @@ export default async function handler(
           WHERE id = ${following_id}
         `;
 
+        // Get follower's username for notification message
+        const followerProfile = await sql`
+          SELECT username FROM profiles WHERE id = ${follower_id}
+        `;
+
+        if (followerProfile.length > 0) {
+          // Create notification for the user being followed
+          await sql`
+            INSERT INTO notifications (user_id, from_user_id, type, message, read)
+            VALUES (${following_id}, ${follower_id}, 'follow', '${followerProfile[0].username} started following you', false)
+          `;
+        }
+
         return res.status(201).json({ success: true, message: 'User followed successfully' });
 
       case 'DELETE':
