@@ -195,36 +195,16 @@ export default async function handler(
 
       case 'PUT':
         // Update post (like, gift, etc.)
-        const { post_id, action, user_id: action_user_id } = req.body;
+        const { post_id, action } = req.body;
 
         if (!post_id || !action) {
           return res.status(400).json({ error: 'post_id and action are required' });
         }
 
-        // Get the post details first to know who owns it
-        const postDetails = await sql`
-          SELECT user_id, content FROM posts WHERE id = ${post_id}
-        `;
-
-        if (postDetails.length === 0) {
-          return res.status(404).json({ error: 'Post not found' });
-        }
-
-        const postOwnerId = postDetails[0].user_id;
-        const postContent = postDetails[0].content;
-
         let updateQuery;
         switch (action) {
           case 'like':
             updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
-
-            // Create notification for post owner (only if not liking own post)
-            if (action_user_id && action_user_id !== postOwnerId) {
-              await sql`
-                INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)
-                VALUES (${postOwnerId}, ${action_user_id}, 'like', 'liked your post', ${post_id}, false)
-              `;
-            }
             break;
           case 'gift':
             updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
