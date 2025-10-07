@@ -21,15 +21,15 @@ export default async function handler(
     // Drop existing table if it exists (to fix schema issues)
     await sql`DROP TABLE IF EXISTS notifications`;
 
-    // Create notifications table with correct schema matching your database
+    // Create notifications table with UUID types to match profiles table
     await sql`
       CREATE TABLE notifications (
-        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-        user_id TEXT NOT NULL,
-        from_user_id TEXT,
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL,
+        from_user_id UUID,
         type TEXT NOT NULL,
         message TEXT NOT NULL,
-        post_id TEXT,
+        post_id UUID,
         read BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
@@ -43,7 +43,7 @@ export default async function handler(
     // Test insert to verify table works
     const testResult = await sql`
       INSERT INTO notifications (user_id, from_user_id, type, message, read)
-      VALUES ('test_user', 'test_from', 'test', 'Table creation test', true)
+      VALUES (gen_random_uuid(), gen_random_uuid(), 'test', 'Table creation test', true)
       RETURNING id
     `;
 
