@@ -7,7 +7,6 @@ export const NotificationSettings: React.FC = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const [settings, setSettings] = useState({
-    pushNotifications: true,
     likes: true,
     comments: true,
     newFollowers: true,
@@ -73,34 +72,6 @@ export const NotificationSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Push Notifications Master Toggle */}
-      <div className="card mb-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-600 bg-opacity-20 flex items-center justify-center">
-              <Bell className="w-5 h-5 text-purple-400" />
-            </div>
-            <div>
-              <h3 className="text-primary font-semibold">Push Notifications</h3>
-              <p className="text-secondary text-sm">Enable all notifications</p>
-            </div>
-          </div>
-          <div
-            onClick={() => handleToggle('pushNotifications')}
-            className={`relative w-12 h-6 rounded-full cursor-pointer transition-all duration-300 ${
-              settings.pushNotifications
-                ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30'
-                : 'bg-gray-600'
-            }`}
-          >
-            <div
-              className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 transform ${
-                settings.pushNotifications ? 'translate-x-6' : 'translate-x-0.5'
-              }`}
-            />
-          </div>
-        </div>
-      </div>
 
       {/* Notification Types */}
       <div className="space-y-4">
@@ -119,18 +90,16 @@ export const NotificationSettings: React.FC = () => {
                   </div>
                 </div>
                 <div
-                  onClick={() => settings.pushNotifications && handleToggle(type.id)}
-                  className={`relative w-12 h-6 rounded-full transition-all duration-300 ${
-                    !settings.pushNotifications
-                      ? 'bg-gray-700 opacity-50 cursor-not-allowed'
-                      : settings[type.id]
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30 cursor-pointer'
-                      : 'bg-gray-600 cursor-pointer hover:bg-gray-500'
+                  onClick={() => handleToggle(type.id)}
+                  className={`relative w-12 h-6 rounded-full transition-all duration-300 cursor-pointer ${
+                    settings[type.id]
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg shadow-purple-500/30'
+                      : 'bg-gray-600 hover:bg-gray-500'
                   }`}
                 >
                   <div
                     className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 transform ${
-                      settings[type.id] && settings.pushNotifications ? 'translate-x-6' : 'translate-x-0.5'
+                      settings[type.id] ? 'translate-x-6' : 'translate-x-0.5'
                     }`}
                   />
                 </div>
