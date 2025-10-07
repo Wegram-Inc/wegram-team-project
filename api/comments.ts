@@ -67,23 +67,6 @@ export default async function handler(
           WHERE id = ${post_id}
         `;
 
-        // Get the post owner to create notification
-        const postDetails = await sql`
-          SELECT user_id, content FROM posts WHERE id = ${post_id}
-        `;
-
-        if (postDetails.length > 0) {
-          const postOwnerId = postDetails[0].user_id;
-
-          // Create notification for post owner (only if not commenting on own post)
-          if (user_id !== postOwnerId) {
-            await sql`
-              INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)
-              VALUES (${postOwnerId}, ${user_id}, 'comment', 'commented on your post', ${post_id}, false)
-            `;
-          }
-        }
-
         return res.status(201).json({ success: true, comment: newComment[0] });
 
       default:
