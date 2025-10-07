@@ -67,6 +67,22 @@ export default async function handler(
           WHERE id = ${post_id}
         `;
 
+        // Get post owner and commenter info for notification
+        const postDetails = await sql`
+          SELECT p.user_id as post_owner_id, pr.username as commenter_username
+          FROM posts p, profiles pr
+          WHERE p.id = ${post_id} AND pr.id = ${user_id}
+        `;
+
+        if (postDetails.length > 0 && postDetails[0].post_owner_id !== user_id) {
+          // Create notification for post owner (don't notify yourself)
+          const message = `${postDetails[0].commenter_username} commented on your post`;
+          await sql`
+            INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)
+            VALUES (${postDetails[0].post_owner_id}, ${user_id}, 'comment', ${message}, ${post_id}, false)
+          `;
+        }
+
         return res.status(201).json({ success: true, comment: newComment[0] });
 
       default:

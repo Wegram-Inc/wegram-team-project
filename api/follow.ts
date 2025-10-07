@@ -65,9 +65,10 @@ export default async function handler(
 
         if (followerProfile.length > 0) {
           // Create notification for the user being followed
+          const message = `${followerProfile[0].username} started following you`;
           await sql`
             INSERT INTO notifications (user_id, from_user_id, type, message, read)
-            VALUES (${following_id}, ${follower_id}, 'follow', '${followerProfile[0].username} started following you', false)
+            VALUES (${following_id}, ${follower_id}, 'follow', ${message}, false)
           `;
         }
 
