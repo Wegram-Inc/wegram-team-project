@@ -47,9 +47,9 @@ export const Home: React.FC = () => {
     }
   }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
 
-  const handlePost = async (content: string) => {
+  const handlePost = async (content: string, imageUrl?: string) => {
     if (!profile) return;
-    await createPost(content, profile.id, profile.username);
+    await createPost(content, profile.id, profile.username, imageUrl);
   };
 
   // Listen for quick composer posts from BottomNav modal

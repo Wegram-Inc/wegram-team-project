@@ -6,6 +6,7 @@ export interface Post {
   id: string;
   user_id: string;
   content: string;
+  image_url?: string | null;
   likes: number;
   replies: number;
   shares: number;
@@ -75,13 +76,13 @@ export const usePosts = () => {
     }
   };
 
-  const createPost = async (content: string, userId: string) => {
+  const createPost = async (content: string, userId: string, imageUrl?: string) => {
     if (!supabase) {
-      // Mock post creation
       const newPost = {
         id: Date.now().toString(),
         user_id: userId,
         content,
+        image_url: imageUrl || null,
         likes: 0,
         replies: 0,
         shares: 0,
@@ -103,6 +104,7 @@ export const usePosts = () => {
         .insert({
           content,
           user_id: userId,
+          image_url: imageUrl || null,
         })
         .select(`
           *,
