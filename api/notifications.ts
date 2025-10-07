@@ -59,7 +59,7 @@ export default async function handler(
 
         const newNotification = await sql`
           INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)
-          VALUES (${to_user_id}, ${from_user_id}, ${type}, ${message}, ${post_id || null}, false)
+          VALUES (${to_user_id}, ${from_user_id || null}, ${type}, ${message}, ${post_id || null}, false)
           RETURNING *
         `;
 

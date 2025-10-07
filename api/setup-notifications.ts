@@ -18,17 +18,20 @@ export default async function handler(
   const sql = neon(DATABASE_URL);
 
   try {
-    // Create notifications table
+    // Drop existing table if it exists (to fix schema issues)
+    await sql`DROP TABLE IF EXISTS notifications`;
+
+    // Create notifications table with correct schema matching your database
     await sql`
-      CREATE TABLE IF NOT EXISTS notifications (
-        id SERIAL PRIMARY KEY,
-        user_id VARCHAR(255) NOT NULL,
-        from_user_id VARCHAR(255),
-        type VARCHAR(50) NOT NULL,
+      CREATE TABLE notifications (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        user_id TEXT NOT NULL,
+        from_user_id TEXT,
+        type TEXT NOT NULL,
         message TEXT NOT NULL,
-        post_id VARCHAR(255),
+        post_id TEXT,
         read BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `;
 
