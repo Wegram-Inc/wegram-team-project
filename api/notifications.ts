@@ -23,6 +23,7 @@ export default async function handler(
           return res.status(400).json({ error: 'user_id is required' });
         }
 
+        // Cast user_id to UUID to ensure type compatibility
         const notifications = await sql`
           SELECT
             n.id,
@@ -37,7 +38,7 @@ export default async function handler(
           FROM notifications n
           LEFT JOIN profiles p_from ON n.from_user_id = p_from.id
           LEFT JOIN posts ON n.post_id = posts.id
-          WHERE n.user_id = ${user_id}
+          WHERE n.user_id = ${user_id}::uuid
           ORDER BY n.created_at DESC
           LIMIT 50
         `;
@@ -74,7 +75,7 @@ export default async function handler(
           await sql`
             UPDATE notifications
             SET read = true
-            WHERE user_id = ${mark_user_id} AND read = false
+            WHERE user_id = ${mark_user_id}::uuid AND read = false
           `;
           return res.status(200).json({ success: true, message: 'All notifications marked as read' });
         } else if (notification_ids && Array.isArray(notification_ids)) {
