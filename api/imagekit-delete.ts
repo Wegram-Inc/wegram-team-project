@@ -6,7 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
-  const publicKey = 'public_yU+oD6nXVd0qLDuuiQzBbmD37LY=';
+  const publicKey = process.env.IMAGEKIT_PUBLIC_KEY;
 
   if (!privateKey || !publicKey) {
     return res.status(500).json({ error: 'ImageKit keys not configured' });
