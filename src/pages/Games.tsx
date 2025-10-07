@@ -1,95 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Gamepad2, ArrowRight, X, ArrowLeft } from 'lucide-react';
+import React from 'react';
+import { Play, Gamepad2, ArrowRight } from 'lucide-react';
 
 export const Games: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-
   const handlePlayGame = () => {
-    setIsPlaying(true);
+    window.open('https://centricj20.github.io/We-Runner/', '_blank', 'noopener,noreferrer');
   };
 
-  const handleCloseGame = () => {
-    setIsPlaying(false);
-  };
-
-  // Prevent body scrolling when game is active
-  useEffect(() => {
-    if (isPlaying) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-    }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-    };
-  }, [isPlaying]);
-
-  // If playing, show the game player
-  if (isPlaying) {
-    return (
-      <div
-        className="fixed inset-0 z-50 bg-black"
-        style={{
-          height: '100vh',
-          height: '100dvh', // Dynamic viewport height for mobile
-          overflow: 'hidden'
-        }}
-      >
-        {/* Game Header with Close Button */}
-        <div className="absolute top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleCloseGame}
-                className="flex items-center gap-2 text-white hover:text-purple-400 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="font-medium">Back to Games</span>
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-white font-medium">WeRunner</span>
-              <button
-                onClick={handleCloseGame}
-                className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Game Iframe */}
-        <iframe
-          src="https://centricj20.github.io/We-Runner/"
-          className="w-full border-0"
-          title="WeRunner Game"
-          allow="fullscreen; gamepad; microphone; camera"
-          style={{
-            height: 'calc(100vh - 64px)', // Subtract header height
-            height: 'calc(100dvh - 64px)', // Dynamic viewport for mobile
-            touchAction: 'none', // Let game handle all touch events
-            pointerEvents: 'auto',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            WebkitTouchCallout: 'none',
-            WebkitTapHighlightColor: 'transparent'
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-md mx-auto px-4 pt-20 pb-24" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
