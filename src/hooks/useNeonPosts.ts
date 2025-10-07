@@ -72,12 +72,12 @@ export const useNeonPosts = () => {
     }
   };
 
-  const likePost = async (postId: string) => {
+  const likePost = async (postId: string, userId?: string) => {
     try {
       const response = await fetch('/api/posts', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ post_id: postId, action: 'like' })
+        body: JSON.stringify({ post_id: postId, action: 'like', user_id: userId })
       });
 
       const result = await response.json();

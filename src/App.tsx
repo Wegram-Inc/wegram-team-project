@@ -52,6 +52,7 @@ import { AuthCallback } from './pages/AuthCallback';
 import { TwitterCallback } from './pages/TwitterCallback';
 import { DirectMessage } from './pages/DirectMessage';
 import { PostComments } from './pages/PostComments';
+import { NotificationSettings } from './pages/NotificationSettings';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -175,6 +176,7 @@ function AppContent() {
           <Route path="/video" element={<Video />} />
           <Route path="/buy-wegram" element={<BuyWegram />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/notification-settings" element={<NotificationSettings />} />
           <Route path="/launch-token" element={<LaunchToken />} />
         </Routes>
       </main>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, MessageCircle, Gift, Bell, Moon, Sun, X, User } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
+import { useNeonAuth } from '../../hooks/useNeonAuth';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -12,13 +13,40 @@ interface TopBarProps {
 
 export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMessageClick, onNotificationClick }) => {
   const { isDark, toggleTheme } = useTheme();
+  const { profile } = useNeonAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch unread notifications count
+  const fetchUnreadCount = async () => {
+    if (!profile?.id) return;
+
+    try {
+      const response = await fetch(`/api/notifications?user_id=${profile.id}`);
+      const data = await response.json();
+
+      if (response.ok && data.notifications) {
+        const unread = data.notifications.filter((n: any) => !n.read).length;
+        setUnreadCount(unread);
+      }
+    } catch (error) {
+      console.error('Failed to fetch unread notifications:', error);
+    }
+  };
+
+  // Fetch unread count when profile loads
+  useEffect(() => {
+    fetchUnreadCount();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [profile?.id]);
 
   // Search functionality
   const handleSearch = async (query: string) => {
@@ -181,14 +209,18 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
           >
             {isDark ? <Sun className="w-5 h-5 text-gray-400" /> : <Moon className="w-5 h-5 text-gray-400" />}
           </button>
-          <button 
+          <button
             onClick={onNotificationClick}
             className={`p-2 rounded-lg transition-colors relative ${
               isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
             }`}
           >
             <Bell className="w-5 h-5 text-gray-400" />
-            <div className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            {unreadCount > 0 && (
+              <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </div>
+            )}
           </button>
           <button 
             onClick={onMessageClick}

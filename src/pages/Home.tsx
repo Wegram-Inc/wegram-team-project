@@ -63,7 +63,7 @@ export const Home: React.FC = () => {
   }, [profile]);
 
   const handleLike = async (postId: string) => {
-    await likePost(postId);
+    await likePost(postId, profile?.id);
   };
 
   const handleGift = async (postId: string) => {
