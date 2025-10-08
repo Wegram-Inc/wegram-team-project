@@ -1001,15 +1001,16 @@ export const UserProfile: React.FC = () => {
         <div className="px-4 py-6">
           {/* Avatar and Name */}
           <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full overflow-hidden">
+            <div className="w-16 h-16 rounded-full overflow-hidden" style={{ aspectRatio: '1' }}>
               {user.avatar_url ? (
-                <img 
-                  src={user.avatar_url} 
+                <img
+                  src={user.avatar_url}
                   alt={user.username}
                   className="w-full h-full object-cover"
+                  style={{ aspectRatio: '1' }}
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg" style={{ aspectRatio: '1' }}>
                   {user.username?.charAt(1)?.toUpperCase() || '👤'}
                 </div>
               )}
