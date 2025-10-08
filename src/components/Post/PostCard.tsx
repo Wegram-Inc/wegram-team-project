@@ -150,11 +150,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
             className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl"
           >
             {post.avatar_url ? (
-              <img
-                src={post.avatar_url}
+              <img 
+                src={post.avatar_url} 
                 alt={post.username}
-                className="w-10 h-10 object-cover"
-                style={{ aspectRatio: '1', width: '40px', height: '40px' }}
+                className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full gradient-bg flex items-center justify-center">
