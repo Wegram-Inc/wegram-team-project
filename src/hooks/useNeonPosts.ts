@@ -4,7 +4,6 @@ export interface Post {
   id: string;
   user_id: string;
   content: string;
-  image_url?: string | null;
   likes: number;
   replies: number;
   shares: number;
@@ -52,12 +51,12 @@ export const useNeonPosts = () => {
     }
   };
 
-  const createPost = async (content: string, userId: string, username?: string, imageUrl?: string) => {
+  const createPost = async (content: string, userId: string, username?: string) => {
     try {
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, user_id: userId, image_url: imageUrl })
+        body: JSON.stringify({ content, user_id: userId })
       });
 
       const result = await response.json();
