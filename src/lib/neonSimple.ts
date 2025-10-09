@@ -1,15 +1,17 @@
-// Simple Neon Postgres Service (No Prisma)
 import { neon } from '@neondatabase/serverless';
 
-// Get database connection from environment variable
-// Handle both Vite (VITE_) and Node.js environment variables
-const DATABASE_URL = import.meta.env?.DATABASE_URL || 
-                     import.meta.env?.VITE_DATABASE_URL || 
-                     process.env.DATABASE_URL;
-
-// For frontend, we'll use API endpoints instead of direct database access
 const isServerSide = typeof window === 'undefined';
-const sql = (DATABASE_URL && isServerSide) ? neon(DATABASE_URL) : null;
+
+// Safely detect database URL from Vite or Node environments
+const DATABASE_URL =
+  (typeof import.meta !== 'undefined' &&
+    import.meta.env &&
+    (import.meta.env.DATABASE_URL || import.meta.env.VITE_DATABASE_URL)) ||
+  (typeof process !== 'undefined' && process.env && process.env.DATABASE_URL) ||
+  null;
+
+// Initialize Neon SQL client only on the server
+const sql = DATABASE_URL && isServerSide ? neon(DATABASE_URL) : null;
 
 if (!DATABASE_URL && isServerSide) {
   console.warn('⚠️ No DATABASE_URL found. Database features will be disabled.');
@@ -48,14 +50,12 @@ export interface Post {
 }
 
 export class NeonSimpleService {
-  
-  // 🚀 Create or update user from Twitter data (UPSERT)
+  // Create or update user from Twitter data (UPSERT)
   async createUserFromTwitter(twitterData: any): Promise<Profile> {
     if (!sql) {
       throw new Error('Database connection not available. Cannot create user.');
     }
 
-    // Use UPSERT to handle both new and existing users
     const result = await sql`
       INSERT INTO profiles (
         username, avatar_url, bio, verified, 
@@ -77,26 +77,25 @@ export class NeonSimpleService {
         updated_at = NOW()
       RETURNING *
     `;
-    
+
     return result[0] as Profile;
   }
 
-  // 🚀 Get user by Twitter ID
+  // Get user by Twitter ID
   async getUserByTwitterId(twitterId: string): Promise<Profile | null> {
-    if (!sql) {
-      return null;
-    }
+    if (!sql) return null;
 
     const result = await sql`
       SELECT * FROM profiles WHERE twitter_id = ${twitterId}
     `;
-    
-    return result[0] as Profile || null;
+
+    return (result[0] as Profile) || null;
   }
 
-
-  // 🚀 Get user feed - Single fast query
+  // Get user feed
   async getFeedPosts(userId: string, limit = 20): Promise<Post[]> {
+    if (!sql) return [];
+
     const result = await sql`
       SELECT 
         p.*,
@@ -110,32 +109,38 @@ export class NeonSimpleService {
       ORDER BY p.created_at DESC
       LIMIT ${limit}
     `;
-    
+
     return result as Post[];
   }
 
-  // 🚀 Create post
-  async createPost(userId: string, content: string, imageUrl?: string): Promise<Post> {
+  // Create post
+  async createPost(
+    userId: string,
+    content: string,
+    imageUrl?: string
+  ): Promise<Post> {
+    if (!sql) throw new Error('Database connection not available.');
+
     const result = await sql`
       INSERT INTO posts (user_id, content, image_url)
       VALUES (${userId}, ${content}, ${imageUrl || null})
       RETURNING *
     `;
-    
+
     return result[0] as Post;
   }
 
-  // 🚀 Like post
+  // 🧩 Like post
   async likePost(userId: string, postId: string): Promise<boolean> {
+    if (!sql) return false;
+
     try {
-      // Insert like (ignore if already exists)
       await sql`
         INSERT INTO likes (user_id, post_id)
         VALUES (${userId}, ${postId})
         ON CONFLICT (user_id, post_id) DO NOTHING
       `;
-      
-      // Update likes count
+
       await sql`
         UPDATE posts 
         SET likes_count = (
@@ -143,7 +148,7 @@ export class NeonSimpleService {
         )
         WHERE id = ${postId}
       `;
-      
+
       return true;
     } catch (error) {
       console.error('Like error:', error);
@@ -151,16 +156,17 @@ export class NeonSimpleService {
     }
   }
 
-  // 🚀 Follow user
+  // Follow user
   async followUser(followerId: string, followingId: string): Promise<boolean> {
+    if (!sql) return false;
+
     try {
-      // Insert follow relationship
       await sql`
         INSERT INTO follows (follower_id, following_id)
         VALUES (${followerId}, ${followingId})
         ON CONFLICT (follower_id, following_id) DO NOTHING
       `;
-      
+
       return true;
     } catch (error) {
       console.error('Follow error:', error);
@@ -168,8 +174,10 @@ export class NeonSimpleService {
     }
   }
 
-  // 🚀 Get trending posts
+  // 🧩 Get trending posts
   async getTrendingPosts(limit = 20): Promise<Post[]> {
+    if (!sql) return [];
+
     const result = await sql`
       SELECT
         p.*,
@@ -186,11 +194,9 @@ export class NeonSimpleService {
     return result as Post[];
   }
 
-  // 🚀 Bookmark post
+  // Bookmark post
   async bookmarkPost(userId: string, postId: string): Promise<boolean> {
-    if (!sql) {
-      return false;
-    }
+    if (!sql) return false;
 
     try {
       await sql`
@@ -205,11 +211,9 @@ export class NeonSimpleService {
     }
   }
 
-  // 🚀 Remove bookmark
+  // Remove bookmark
   async removeBookmark(userId: string, postId: string): Promise<boolean> {
-    if (!sql) {
-      return false;
-    }
+    if (!sql) return false;
 
     try {
       await sql`
@@ -223,11 +227,9 @@ export class NeonSimpleService {
     }
   }
 
-  // 🚀 Get user bookmarks
+  // Get user bookmarks
   async getUserBookmarks(userId: string, limit = 20): Promise<Post[]> {
-    if (!sql) {
-      return [];
-    }
+    if (!sql) return [];
 
     try {
       const result = await sql`
@@ -252,11 +254,9 @@ export class NeonSimpleService {
     }
   }
 
-  // 🚀 Check if post is bookmarked
+  // Check if post is bookmarked
   async isPostBookmarked(userId: string, postId: string): Promise<boolean> {
-    if (!sql) {
-      return false;
-    }
+    if (!sql) return false;
 
     try {
       const result = await sql`
