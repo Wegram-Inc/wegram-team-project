@@ -4,7 +4,9 @@ const publicKey = import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY;
 const urlEndpoint = import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT;
 
 if (!publicKey || !urlEndpoint) {
-  throw new Error('ImageKit configuration is missing. Please check your .env file.');
+  throw new Error(
+    'ImageKit configuration is missing. Please check your .env file.'
+  );
 }
 
 const imagekit = new ImageKit({
@@ -95,14 +97,19 @@ export function getImageUrl(
   const transformArray = [];
 
   if (transformations) {
-    if (transformations.width) transformArray.push(`w-${transformations.width}`);
-    if (transformations.height) transformArray.push(`h-${transformations.height}`);
-    if (transformations.quality) transformArray.push(`q-${transformations.quality}`);
-    if (transformations.format) transformArray.push(`f-${transformations.format}`);
+    if (transformations.width)
+      transformArray.push(`w-${transformations.width}`);
+    if (transformations.height)
+      transformArray.push(`h-${transformations.height}`);
+    if (transformations.quality)
+      transformArray.push(`q-${transformations.quality}`);
+    if (transformations.format)
+      transformArray.push(`f-${transformations.format}`);
     if (transformations.crop) transformArray.push(`c-${transformations.crop}`);
   }
 
-  const transformString = transformArray.length > 0 ? `tr:${transformArray.join(',')}` : '';
+  const transformString =
+    transformArray.length > 0 ? `tr:${transformArray.join(',')}` : '';
 
   return `${urlEndpoint}/${transformString}${path}`;
 }
