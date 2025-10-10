@@ -9,36 +9,34 @@ export const Verification: React.FC = () => {
 
   const verificationPriceUSD = 2.00; // $2 USD
   const [freeSpots, setFreeSpots] = useState<number>(200);
-  const [spotsLeft, setSpotsLeft] = useState<number>(147); // Example: 147 spots remaining
+  const [spotsLeft, setSpotsLeft] = useState<number>(200); // All 200 spots available
 
-  // Mock countdown for free spots - in real implementation, fetch from database
+  // In real implementation, fetch from database
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      if (spotsLeft > 0) {
-        // Simulate spots being taken (random decrease)
-        if (Math.random() < 0.1) { // 10% chance every 5 seconds
-          setSpotsLeft(prev => Math.max(0, prev - 1));
-        }
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [spotsLeft]);
+    // Real implementation would fetch actual count from database
+    // setSpotsLeft(actualCountFromDatabase);
+  }, []);
 
   const handleStartVerification = () => {
-    setPaymentStep('payment');
-    // Automatically start monitoring for payment
-    startPaymentMonitoring();
+    if (spotsLeft > 0) {
+      // Free verification
+      setPaymentStep('processing');
+      // In real app, would immediately grant verification badge
+      setTimeout(() => {
+        setPaymentStep('success');
+      }, 2000);
+    } else {
+      // Paid verification
+      setPaymentStep('payment');
+    }
   };
 
-  const startPaymentMonitoring = () => {
+  const handleRewardPointsPayment = () => {
     setPaymentStep('processing');
-    
-    // In a real app, this would monitor the blockchain for incoming transactions
-    // For demo purposes, simulating automatic detection after 5 seconds
+    // In real app, would deduct reward points and grant badge
     setTimeout(() => {
       setPaymentStep('success');
-    }, 5000);
+    }, 3000);
   };
 
   const handleCopyAddress = () => {
@@ -85,7 +83,7 @@ export const Verification: React.FC = () => {
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 flex items-center justify-center shadow-xl border-4 border-gray-300">
                 <CheckCircle className="w-10 h-10 text-gray-600" />
               </div>
-              <h3 className="text-xl font-bold text-primary mb-2">Platinum Verification Badge</h3>
+              <h3 className="text-xl font-bold text-primary mb-2">Verification Badge</h3>
               <div className="text-3xl font-bold gradient-text mb-1">
                 {spotsLeft > 0 ? 'FREE' : '$2.00 USD'}
               </div>
@@ -97,7 +95,7 @@ export const Verification: React.FC = () => {
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                <span className="text-secondary text-sm">Platinum verification badge</span>
+                <span className="text-secondary text-sm">Verification badge</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -113,13 +111,23 @@ export const Verification: React.FC = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleStartVerification}
-              className="w-full btn-primary py-3 font-semibold inline-flex items-center justify-center gap-2"
-            >
-              Get Verified
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            {spotsLeft > 0 ? (
+              <button
+                onClick={handleStartVerification}
+                className="w-full btn-primary py-3 font-semibold inline-flex items-center justify-center gap-2"
+              >
+                Get Verified FREE
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            ) : (
+              <button
+                onClick={handleStartVerification}
+                className="w-full btn-primary py-3 font-semibold inline-flex items-center justify-center gap-2"
+              >
+                Pay with Reward Points
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -128,61 +136,46 @@ export const Verification: React.FC = () => {
         <div className="card">
           <div className="text-center mb-6">
             <Shield className="w-12 h-12 mx-auto mb-4 text-green-400" />
-            <h3 className="text-xl font-semibold text-primary mb-2">Send Payment</h3>
+            <h3 className="text-xl font-semibold text-primary mb-2">Pay with Reward Points</h3>
             <p className="text-secondary text-sm">
-              Send exactly $2.00 USD worth of $WEGRAM to the address below. We'll automatically detect your payment and complete verification.
+              Use your earned reward points to get verified. You need 200 reward points ($2.00 value).
             </p>
           </div>
 
           {/* Payment Details */}
           <div className="space-y-4 mb-6">
             <div>
-              <label className="block text-secondary text-sm mb-2">Amount to Send</label>
+              <label className="block text-secondary text-sm mb-2">Cost</label>
               <div className="p-3 bg-overlay-light rounded-lg">
-                <div className="text-xl font-bold text-primary">$2.00 USD worth of $WEGRAM</div>
+                <div className="text-xl font-bold text-primary">200 Reward Points</div>
+                <div className="text-secondary text-sm">($2.00 USD value)</div>
               </div>
             </div>
 
             <div>
-              <label className="block text-secondary text-sm mb-2">Payment Address</label>
-              <div className="p-3 bg-overlay-light rounded-lg flex items-center justify-between">
-                <code className="text-primary text-sm">WEGRAM7xK4pJh2mR8qN5vL9cX3tY6wE1oP4qR9mL3v</code>
-                <button
-                  onClick={handleCopyAddress}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isDark ? 'hover:bg-gray-600' : 'hover:bg-gray-300'
-                  }`}
-                >
-                  {copiedAddress ? (
-                    <Check className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-gray-400" />
-                  )}
-                </button>
+              <label className="block text-secondary text-sm mb-2">Your Balance</label>
+              <div className="p-3 bg-overlay-light rounded-lg">
+                <div className="text-lg font-semibold text-primary">0 Reward Points</div>
+                <div className="text-secondary text-sm">Earn points by posting, liking, and engaging</div>
               </div>
             </div>
           </div>
 
-          {/* Warning */}
-          <div className="p-4 bg-yellow-500 bg-opacity-10 border border-yellow-500 border-opacity-30 rounded-lg mb-6">
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <div className="font-medium text-yellow-400 mb-1">Important</div>
-                <div className="text-secondary text-sm">
-                  Only send $WEGRAM tokens to this address. Sending other tokens will result in permanent loss.
-                </div>
-              </div>
-            </div>
-          </div>
+          <button
+            onClick={handleRewardPointsPayment}
+            disabled={true}
+            className="w-full btn-primary py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+          >
+            Insufficient Points - Earn More
+          </button>
 
           <div className="text-center">
-            <div className="animate-pulse text-secondary text-sm mb-2">
-              Monitoring blockchain for your payment...
-            </div>
-            <div className="text-xs text-secondary opacity-75">
-              This usually takes 1-2 minutes
-            </div>
+            <button
+              onClick={() => window.location.href = '/home'}
+              className="text-secondary text-sm hover:text-primary transition-colors"
+            >
+              ← Go back and earn reward points
+            </button>
           </div>
         </div>
       )}
