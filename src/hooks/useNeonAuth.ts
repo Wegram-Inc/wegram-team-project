@@ -72,35 +72,49 @@ export const useNeonAuth = () => {
   const handleXCallback = async (code: string, state: string) => {
     try {
       const result = await twitterAuth.handleCallback(code, state);
-      
+
       if (result.success && result.user) {
         console.log('🔍 Twitter user data received:', result.user);
-        
-        // Check if user exists in database
-        let user = await neonSimple.getUserByTwitterId(result.user.id);
-        
-        if (!user) {
-          // Create new user from Twitter data
-          console.log('🔍 Creating new user from Twitter data:', result.user);
-          user = await neonSimple.createUserFromTwitter(result.user);
-          console.log('✅ New user created from real X auth:', user);
+
+        // Save user via API endpoint
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            twitter_id: result.user.id,
+            twitter_username: result.user.username,
+            username: `@${result.user.username}`,
+            avatar_url: result.user.profile_image_url,
+            bio: result.user.description || `Twitter user ${result.user.name}`,
+            verified: result.user.verified || false,
+            followers_count: result.user.followers_count || 0,
+            following_count: result.user.following_count || 0,
+            posts_count: result.user.tweet_count || 0
+          })
+        });
+
+        const apiResult = await response.json();
+
+        if (response.ok && apiResult.success) {
+          const user = apiResult.user;
+          console.log('✅ User saved to database:', user);
+
+          // Store in localStorage
+          localStorage.setItem('wegram_user', JSON.stringify(user));
+          setProfile(user);
+
+          return { success: true, user };
         } else {
-          console.log('✅ Existing user authenticated with real X:', user);
+          throw new Error(apiResult.error || 'Failed to save user');
         }
-        
-        // Store in localStorage
-        localStorage.setItem('wegram_user', JSON.stringify(user));
-        setProfile(user);
-        
-        return { success: true, user };
       } else {
         throw new Error(result.error || 'X authentication failed');
       }
     } catch (error) {
       console.error('X callback error:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Authentication failed' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Authentication failed'
       };
     }
   };
