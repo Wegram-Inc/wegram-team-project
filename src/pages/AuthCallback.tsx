@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { twitterAuth } from '../lib/twitterAuth';
-import { useAuth } from '../hooks/useAuth';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signInWithTwitter } = useAuth();
+  const { handleXCallback } = useNeonAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [error, setError] = useState<string>('');
 
@@ -25,24 +24,13 @@ export const AuthCallback: React.FC = () => {
           throw new Error('Missing authorization code or state parameter');
         }
 
-        // Handle the OAuth callback
-        const result = await twitterAuth.handleCallback(code, state);
-        
-        if (result.success && result.user) {
-          // Create profile from Twitter user data
-          const twitterProfile = {
-            id: result.user.id,
-            username: `@${result.user.username}`,
-            email: null,
-            avatar_url: result.user.profile_image_url || null,
-            bio: `Twitter user ${result.user.name}`,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
+        // Handle the OAuth callback using the Neon auth hook
+        const result = await handleXCallback(code, state);
 
+        if (result.success && result.user) {
           // Set the user as authenticated
           setStatus('success');
-          
+
           // Navigate to home page after a short delay
           setTimeout(() => {
             navigate('/home');
