@@ -7,22 +7,23 @@ export const Verification: React.FC = () => {
   const [paymentStep, setPaymentStep] = useState<'info' | 'payment' | 'processing' | 'success'>('info');
   const [copiedAddress, setCopiedAddress] = useState(false);
 
-  const verificationPriceUSD = 2.00; // $2 worth of $WEGRAM tokens
-  const [wegramAmount, setWegramAmount] = useState<string>('Loading...');
-  const [wegramPrice, setWegramPrice] = useState<number | null>(null);
+  const verificationPriceUSD = 2.00; // $2 USD
+  const [freeSpots, setFreeSpots] = useState<number>(200);
+  const [spotsLeft, setSpotsLeft] = useState<number>(147); // Example: 147 spots remaining
 
-  // Mock price calculation - in real implementation, fetch from price API
+  // Mock countdown for free spots - in real implementation, fetch from database
   React.useEffect(() => {
-    // Simulate fetching $WEGRAM price (in real app, use CoinGecko, CoinMarketCap, etc.)
-    const fetchPrice = async () => {
-      const mockWegramPriceUSD = 0.33; // Example: $0.33 per $WEGRAM
-      setWegramPrice(mockWegramPriceUSD);
-      const tokensNeeded = (verificationPriceUSD / mockWegramPriceUSD).toFixed(2);
-      setWegramAmount(tokensNeeded);
-    };
-    
-    setTimeout(fetchPrice, 1000);
-  }, [verificationPriceUSD]);
+    const interval = setInterval(() => {
+      if (spotsLeft > 0) {
+        // Simulate spots being taken (random decrease)
+        if (Math.random() < 0.1) { // 10% chance every 5 seconds
+          setSpotsLeft(prev => Math.max(0, prev - 1));
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [spotsLeft]);
 
   const handleStartVerification = () => {
     setPaymentStep('payment');
@@ -58,11 +59,19 @@ export const Verification: React.FC = () => {
           Get your verification badge on WEGRAM for just $2 worth of $WEGRAM tokens.
         </p>
         
-        {/* Free verification notice */}
-        <div className="mt-4 p-4 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg border-2 border-green-400 shadow-lg">
-          <div className="text-white font-bold text-sm mb-1 drop-shadow-lg">🎉 Early Bird Special</div>
-          <div className="text-white text-xs font-medium drop-shadow-md">
-            First 1,000 members get verified for FREE! Limited time offer.
+        {/* Free verification notice with live counter */}
+        <div className="mt-4 p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg border-2 border-purple-400 shadow-lg">
+          <div className="text-white font-bold text-sm mb-1 drop-shadow-lg">🚀 Genesis Launch Special</div>
+          <div className="text-white text-xs font-medium drop-shadow-md mb-2">
+            First 200 members get verified for FREE!
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="text-white text-xs font-bold">
+              {spotsLeft > 0 ? `${spotsLeft} spots left` : 'All free spots claimed'}
+            </div>
+            <div className="text-white text-xs">
+              {spotsLeft > 0 ? '⏰ Limited time' : '💎 Now $2.00'}
+            </div>
           </div>
         </div>
       </div>
@@ -72,20 +81,23 @@ export const Verification: React.FC = () => {
           {/* Verification Info */}
           <div className="card">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-blue-400" />
+              {/* Platinum Badge Preview */}
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 flex items-center justify-center shadow-xl border-4 border-gray-300">
+                <CheckCircle className="w-10 h-10 text-gray-600" />
               </div>
-              <h3 className="text-xl font-bold text-primary mb-2">Verified Badge</h3>
+              <h3 className="text-xl font-bold text-primary mb-2">Platinum Verification Badge</h3>
               <div className="text-3xl font-bold gradient-text mb-1">
-                {wegramAmount === 'Loading...' ? 'Loading...' : `${wegramAmount} $WEGRAM`}
+                {spotsLeft > 0 ? 'FREE' : '$2.00 USD'}
               </div>
-              <div className="text-secondary text-sm">One-time payment ($2.00 USD worth)</div>
+              <div className="text-secondary text-sm">
+                {spotsLeft > 0 ? `${spotsLeft} free spots remaining` : 'One-time payment'}
+              </div>
             </div>
             
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                <span className="text-secondary text-sm">Blue verification badge</span>
+                <span className="text-secondary text-sm">Platinum verification badge</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -94,6 +106,10 @@ export const Verification: React.FC = () => {
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
                 <span className="text-secondary text-sm">Priority support</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                <span className="text-secondary text-sm">Exclusive verified features</span>
               </div>
             </div>
 
@@ -114,7 +130,7 @@ export const Verification: React.FC = () => {
             <Shield className="w-12 h-12 mx-auto mb-4 text-green-400" />
             <h3 className="text-xl font-semibold text-primary mb-2">Send Payment</h3>
             <p className="text-secondary text-sm">
-              Send exactly {wegramAmount} $WEGRAM ($2.00 worth) to the address below. We'll automatically detect your payment and complete verification.
+              Send exactly $2.00 USD worth of $WEGRAM to the address below. We'll automatically detect your payment and complete verification.
             </p>
           </div>
 
@@ -123,7 +139,7 @@ export const Verification: React.FC = () => {
             <div>
               <label className="block text-secondary text-sm mb-2">Amount to Send</label>
               <div className="p-3 bg-overlay-light rounded-lg">
-                <div className="text-xl font-bold text-primary">{wegramAmount} $WEGRAM</div>
+                <div className="text-xl font-bold text-primary">$2.00 USD worth of $WEGRAM</div>
               </div>
             </div>
 
