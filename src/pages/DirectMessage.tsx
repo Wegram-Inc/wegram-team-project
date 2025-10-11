@@ -222,7 +222,7 @@ export const DirectMessage: React.FC = () => {
             <div className="flex items-center gap-2 mb-4">
               <h2 className="text-2xl font-bold gradient-text">{user.username?.replace('@', '') || user.displayName}</h2>
               {user.verified && (
-                <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
                   <CheckCircle className="w-4 h-4 text-white" />
                 </div>
               )}
