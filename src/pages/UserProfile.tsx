@@ -878,7 +878,8 @@ export const UserProfile: React.FC = () => {
                       shares: post.shares,
                       gifts: 0,
                       avatar_url: post.avatar_url,
-                      image_url: post.image_url
+                      image_url: post.image_url,
+                      verified: post.verified
                     }}
                     onLike={handleLike}
                     onReply={handleReply}
