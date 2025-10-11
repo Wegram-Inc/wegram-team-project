@@ -81,7 +81,7 @@ export default async function handler(
 
         // Get user's posts
         const posts = await sql`
-          SELECT 
+          SELECT
             p.id,
             p.user_id,
             p.content,
@@ -92,7 +92,8 @@ export default async function handler(
             p.created_at,
             p.updated_at,
             pr.username,
-            pr.avatar_url
+            pr.avatar_url,
+            pr.verified
           FROM posts p
           JOIN profiles pr ON p.user_id = pr.id
           WHERE p.user_id = ${user.id}
