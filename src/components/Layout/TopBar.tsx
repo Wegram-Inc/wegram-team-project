@@ -169,7 +169,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
                             {user.username?.replace('@', '')}
                           </p>
                           {user.verified && (
-                            <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center flex-shrink-0 shadow-lg">
                               <div className="w-2 h-2 bg-white rounded-full"></div>
                             </div>
                           )}

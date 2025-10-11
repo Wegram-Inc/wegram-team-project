@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, MessageCircle, User, Heart, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, MessageCircle, User, Heart, MoreHorizontal, CheckCircle } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { CommentComposer } from '../components/Comments/CommentComposer';
@@ -13,6 +13,7 @@ interface Comment {
   image_url?: string;
   created_at: string;
   likes_count: number;
+  verified?: boolean;
 }
 
 interface PostData {
@@ -25,6 +26,7 @@ interface PostData {
   likes_count: number;
   comments_count: number;
   shares_count: number;
+  verified?: boolean;
 }
 
 export const PostComments: React.FC = () => {
@@ -166,7 +168,14 @@ export const PostComments: React.FC = () => {
               onClick={() => handleUserClick(post.username)}
               className="text-left hover:opacity-80 transition-opacity"
             >
-              <h3 className="text-primary font-semibold">{post.username}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-primary font-semibold">{post.username}</h3>
+                {post.verified && (
+                  <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                    <CheckCircle className="w-2.5 h-2.5 text-white" />
+                  </div>
+                )}
+              </div>
               <p className="text-secondary text-sm">{formatTimestamp(post.created_at)}</p>
             </button>
           </div>
@@ -229,12 +238,19 @@ export const PostComments: React.FC = () => {
                 </button>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <button
-                      onClick={() => handleUserClick(comment.username)}
-                      className="text-primary font-medium text-sm hover:opacity-80 transition-opacity"
-                    >
-                      {comment.username}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleUserClick(comment.username)}
+                        className="text-primary font-medium text-sm hover:opacity-80 transition-opacity"
+                      >
+                        {comment.username}
+                      </button>
+                      {comment.verified && (
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                          <CheckCircle className="w-2 h-2 text-white" />
+                        </div>
+                      )}
+                    </div>
                     <span className="text-secondary text-xs">{formatTimestamp(comment.created_at)}</span>
                   </div>
                   <p className="text-primary text-sm leading-relaxed">{comment.content}</p>

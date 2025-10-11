@@ -185,7 +185,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                       </div>
                     )}
                     {user.verified && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
@@ -267,7 +267,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                     </div>
                   )}
                   {selectedUser.verified && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
                       <span className="text-white text-xs">✓</span>
                     </div>
                   )}

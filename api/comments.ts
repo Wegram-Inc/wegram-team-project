@@ -32,7 +32,8 @@ export default async function handler(
             c.likes_count,
             c.created_at,
             pr.username,
-            pr.avatar_url
+            pr.avatar_url,
+            pr.verified
           FROM comments c
           JOIN profiles pr ON c.user_id = pr.id
           WHERE c.post_id = ${postId}
