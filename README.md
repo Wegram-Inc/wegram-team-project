@@ -130,4 +130,4 @@ This is an active development project. The core social features and Web3 integra
 
 ## License
 
-Proprietary software. All rights reserved.
+Proprietary software. All rights reserved.# Trigger deployment
