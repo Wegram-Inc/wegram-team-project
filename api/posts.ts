@@ -33,7 +33,8 @@ export default async function handler(
               p.shares_count,
               p.created_at,
               pr.username,
-              pr.avatar_url
+              pr.avatar_url,
+              pr.verified
             FROM posts p
             JOIN profiles pr ON p.user_id = pr.id
             WHERE p.id = ${postId}
@@ -73,7 +74,8 @@ export default async function handler(
               p.created_at,
               p.updated_at,
               pr.username,
-              pr.avatar_url
+              pr.avatar_url,
+              pr.verified
             FROM posts p
             JOIN profiles pr ON p.user_id = pr.id
             WHERE p.user_id = ${user_posts}
@@ -83,7 +85,7 @@ export default async function handler(
         } else if (feed_type === 'following' && current_user_id) {
           // Following feed - posts from users the current user follows
           posts = await sql`
-            SELECT 
+            SELECT
               p.id,
               p.user_id,
               p.content,
@@ -94,7 +96,8 @@ export default async function handler(
               p.created_at,
               p.updated_at,
               pr.username,
-              pr.avatar_url
+              pr.avatar_url,
+              pr.verified
             FROM posts p
             JOIN profiles pr ON p.user_id = pr.id
             JOIN follows f ON f.following_id = p.user_id
@@ -105,7 +108,7 @@ export default async function handler(
         } else if (feed_type === 'trending') {
           // Trending feed - most liked posts
           posts = await sql`
-            SELECT 
+            SELECT
               p.id,
               p.user_id,
               p.content,
@@ -116,7 +119,8 @@ export default async function handler(
               p.created_at,
               p.updated_at,
               pr.username,
-              pr.avatar_url
+              pr.avatar_url,
+              pr.verified
             FROM posts p
             JOIN profiles pr ON p.user_id = pr.id
             ORDER BY p.likes_count DESC, p.created_at DESC
@@ -137,7 +141,8 @@ export default async function handler(
               p.created_at,
               p.updated_at,
               pr.username,
-              pr.avatar_url
+              pr.avatar_url,
+              pr.verified
             FROM posts p
             JOIN profiles pr ON p.user_id = pr.id
             ORDER BY p.created_at DESC
@@ -174,7 +179,7 @@ export default async function handler(
 
         // Get the post with user profile
         const postWithProfile = await sql`
-          SELECT 
+          SELECT
             p.id,
             p.user_id,
             p.content,
@@ -185,7 +190,8 @@ export default async function handler(
             p.created_at,
             p.updated_at,
             pr.username,
-            pr.avatar_url
+            pr.avatar_url,
+            pr.verified
           FROM posts p
           JOIN profiles pr ON p.user_id = pr.id
           WHERE p.id = ${newPost[0].id}
