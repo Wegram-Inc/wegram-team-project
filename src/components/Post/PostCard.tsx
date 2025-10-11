@@ -21,6 +21,7 @@ interface UnifiedPost {
   gifts?: number;
   avatar_url?: string | null;
   image_url?: string | null;
+  verified?: boolean;
 }
 
 interface PostCardProps {
@@ -164,17 +165,24 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
             )}
           </button>
           <div>
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('PostCard Username button clicked!');
-                handleAvatarClick();
-              }} 
-              className="text-primary font-medium hover:text-purple-400 hover:underline transition-all duration-200 cursor-pointer px-1 py-0.5 rounded hover:bg-purple-50 dark:hover:bg-purple-900/20"
-            >
-              {post.username}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('PostCard Username button clicked!');
+                  handleAvatarClick();
+                }}
+                className="text-primary font-medium hover:text-purple-400 hover:underline transition-all duration-200 cursor-pointer px-1 py-0.5 rounded hover:bg-purple-50 dark:hover:bg-purple-900/20"
+              >
+                {post.username}
+              </button>
+              {post.verified && (
+                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                  <CheckCircle className="w-2.5 h-2.5 text-white" />
+                </div>
+              )}
+            </div>
             <div className="text-secondary text-sm">
               {post.timestamp || (post.created_at ? new Date(post.created_at).toLocaleDateString() : '')}
             </div>

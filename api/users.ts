@@ -24,6 +24,11 @@ export default async function handler(
 
     const sql = neon(DATABASE_URL);
 
+    // Check total user count to auto-verify first 200 users
+    const userCountResult = await sql`SELECT COUNT(*) as count FROM profiles`;
+    const userCount = parseInt(userCountResult[0].count);
+    const shouldAutoVerify = userCount < 200;
+
     // Create or update Twitter user in Neon Postgres
     const result = await sql`
       INSERT INTO profiles (
@@ -34,7 +39,7 @@ export default async function handler(
         ${twitterData.username || `@${twitterData.twitter_username}`},
         ${twitterData.avatar_url || twitterData.profile_image_url || null},
         ${twitterData.bio || twitterData.description || `Twitter user`},
-        ${twitterData.verified || false},
+        ${shouldAutoVerify},
         ${twitterData.twitter_id || twitterData.id},
         ${twitterData.twitter_username || twitterData.username?.replace('@', '')},
         ${twitterData.followers_count || 0},

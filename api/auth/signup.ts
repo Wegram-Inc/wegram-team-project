@@ -67,6 +67,11 @@ export default async function handler(
     // Hash password
     const passwordHash = hashPassword(password);
 
+    // Check total user count to auto-verify first 200 users
+    const userCountResult = await sql`SELECT COUNT(*) as count FROM profiles`;
+    const userCount = parseInt(userCountResult[0].count);
+    const shouldAutoVerify = userCount < 200;
+
     // Create user
     const result = await sql`
       INSERT INTO profiles (
@@ -81,7 +86,7 @@ export default async function handler(
         ${0},
         ${0},
         ${'Welcome to WEGRAM! 🚀'},
-        ${false}
+        ${shouldAutoVerify}
       )
       RETURNING id, username, email, avatar_url, bio, verified, followers_count, following_count, posts_count, created_at
     `;
