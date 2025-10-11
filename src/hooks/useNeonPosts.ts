@@ -12,6 +12,7 @@ export interface Post {
   updated_at: string;
   username: string;
   avatar_url: string | null;
+  verified?: boolean;
 }
 
 export const useNeonPosts = () => {

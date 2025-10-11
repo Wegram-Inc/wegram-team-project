@@ -180,7 +180,8 @@ export const Bookmarks: React.FC = () => {
                   shares: post.shares_count,
                   gifts: 0, // Not implemented yet
                   avatar_url: post.avatar_url,
-                  image_url: post.image_url
+                  image_url: post.image_url,
+                  verified: post.verified
                 }}
                 onLike={handleLike}
               />
