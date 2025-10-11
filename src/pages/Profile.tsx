@@ -159,7 +159,8 @@ export const Profile: React.FC = () => {
       replies: post.replies,
       shares: post.shares,
       gifts: post.gifts || 0,
-      avatar_url: post.avatar_url
+      avatar_url: post.avatar_url,
+      verified: post.verified
     }));
 
     return formattedPosts;
