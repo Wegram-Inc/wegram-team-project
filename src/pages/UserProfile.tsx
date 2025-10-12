@@ -1094,7 +1094,10 @@ export const UserProfile: React.FC = () => {
               <div className="text-secondary text-xs">FOLLOWING</div>
             </button>
             {(user.twitter_username || user.twitter_id) && (
-              <div className="text-center p-2 rounded-lg">
+              <button
+                onClick={() => window.open(`https://twitter.com/${user.twitter_username}`, '_blank')}
+                className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
                 <div className="text-lg font-bold text-primary">{(user.twitter_followers_count || 0).toLocaleString()}</div>
                 <div className="text-secondary text-xs flex items-center justify-center gap-1">
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
@@ -1102,7 +1105,7 @@ export const UserProfile: React.FC = () => {
                   </svg>
                   X
                 </div>
-              </div>
+              </button>
             )}
           </div>
 
