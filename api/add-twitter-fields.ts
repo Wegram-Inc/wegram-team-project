@@ -6,6 +6,11 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ) {
+  // Accept both GET and POST
+  if (req.method !== 'POST' && req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const DATABASE_URL = process.env.POSTGRES_URL;
 
   if (!DATABASE_URL) {
