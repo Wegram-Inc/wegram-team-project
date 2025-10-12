@@ -1,22 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Share, Smartphone } from 'lucide-react';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const { profile, loading } = useNeonAuth();
 
   useEffect(() => {
+    // Redirect logged-in users to home feed
+    if (!loading && profile) {
+      navigate('/home');
+      return;
+    }
+
     // Show install prompt immediately on mobile devices
     if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
       setShowInstallPrompt(true);
     }
-  }, []);
+  }, [profile, loading, navigate]);
 
   const handleGuestEntry = () => {
     // Navigate directly to main app as guest
     navigate('/home');
   };
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-pulse text-2xl font-bold">WEGRAM</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col justify-center">
