@@ -35,9 +35,23 @@ export default async function handler(
           RETURNING *
         `;
 
-        return res.status(201).json({ 
-          success: true, 
-          message: newMessage[0] 
+        // Get sender username for notification
+        const senderProfile = await sql`
+          SELECT username FROM profiles WHERE id = ${sender_id}
+        `;
+
+        if (senderProfile.length > 0) {
+          // Create notification for the message receiver
+          const message = `${senderProfile[0].username} sent you a message`;
+          await sql`
+            INSERT INTO notifications (user_id, from_user_id, type, message, read)
+            VALUES (${receiver_id}, ${sender_id}, 'message', ${message}, false)
+          `;
+        }
+
+        return res.status(201).json({
+          success: true,
+          message: newMessage[0]
         });
 
       case 'GET':

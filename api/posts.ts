@@ -201,22 +201,31 @@ export default async function handler(
 
       case 'PUT':
         // Update post (like, gift, etc.)
-        const { post_id, action } = req.body;
+        const { post_id, action, user_id: actionUserId } = req.body;
 
         if (!post_id || !action) {
           return res.status(400).json({ error: 'post_id and action are required' });
         }
 
         let updateQuery;
+        let notificationType;
+        let notificationMessage;
+
         switch (action) {
           case 'like':
             updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
+            notificationType = 'like';
+            notificationMessage = 'liked your post';
             break;
           case 'gift':
             updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
+            notificationType = 'like';
+            notificationMessage = 'gifted your post';
             break;
           case 'share':
             updateQuery = sql`UPDATE posts SET shares_count = shares_count + 1 WHERE id = ${post_id} RETURNING *`;
+            notificationType = 'share';
+            notificationMessage = 'shared your post';
             break;
           default:
             return res.status(400).json({ error: 'Invalid action' });
@@ -226,6 +235,19 @@ export default async function handler(
 
         if (updatedPost.length === 0) {
           return res.status(404).json({ error: 'Post not found' });
+        }
+
+        // Create notification for the post owner (if it's not their own action)
+        if (actionUserId && updatedPost[0].user_id !== actionUserId) {
+          try {
+            await sql`
+              INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)
+              VALUES (${updatedPost[0].user_id}, ${actionUserId}, ${notificationType}, ${notificationMessage}, ${post_id}, false)
+            `;
+          } catch (notificationError) {
+            console.error('Failed to create notification:', notificationError);
+            // Don't fail the whole request if notification fails
+          }
         }
 
         return res.status(200).json({ post: updatedPost[0] });
