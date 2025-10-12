@@ -23,6 +23,7 @@ export const Followers: React.FC = () => {
   const [followingBack, setFollowingBack] = useState<{ [key: string]: boolean }>({});
   const [actioningIds, setActioningIds] = useState<Set<string>>(new Set());
   const [targetUserId, setTargetUserId] = useState<string>('');
+  const [isOwnFollowersList, setIsOwnFollowersList] = useState(false);
 
   useEffect(() => {
     if (profile?.username && username) {
@@ -31,14 +32,47 @@ export const Followers: React.FC = () => {
 
       if (cleanUsername === profileUsername) {
         // Viewing own followers list
+        setIsOwnFollowersList(true);
         setTargetUserId(profile.id);
         fetchFollowers(profile.id);
       } else {
         // Viewing someone else's followers list
+        setIsOwnFollowersList(false);
         fetchUserIdByUsername(cleanUsername);
       }
     }
   }, [profile, username]);
+
+  // Auto-refresh followers list when page becomes visible (for real-time updates)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && targetUserId) {
+        fetchFollowers(targetUserId);
+      }
+    };
+
+    const handleFocus = () => {
+      if (targetUserId) {
+        fetchFollowers(targetUserId);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // Set up periodic refresh every 10 seconds for real-time updates
+    const interval = setInterval(() => {
+      if (targetUserId && !document.hidden) {
+        fetchFollowers(targetUserId);
+      }
+    }, 10000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+  }, [targetUserId]);
 
   const fetchUserIdByUsername = async (cleanUsername: string) => {
     try {
@@ -73,6 +107,7 @@ export const Followers: React.FC = () => {
 
           for (const follower of data.followers) {
             try {
+              // Check if current user (profile.id) is following this follower
               const followResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${follower.id}`);
               const followData = await followResponse.json();
               followingStatus[follower.id] = followData.isFollowing || false;
@@ -252,7 +287,7 @@ export const Followers: React.FC = () => {
                           )}
                           {actioningIds.has(user.id)
                             ? (followingBack[user.id] ? 'Unfollowing...' : 'Following...')
-                            : (followingBack[user.id] ? 'Unfollow' : 'Follow Back')
+                            : (followingBack[user.id] ? 'Unfollow' : (isOwnFollowersList ? 'Follow Back' : 'Follow'))
                           }
                         </button>
                       )}
