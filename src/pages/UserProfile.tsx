@@ -1108,8 +1108,8 @@ export const UserProfile: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* X (Twitter) */}
-              {user.twitter_link ? (
+              {/* X (Twitter) - Show for all X users */}
+              {(user.twitter_username || user.twitter_id || user.twitter_link) ? (
                 <a
                   href={user.twitter_link}
                   target="_blank"
@@ -1120,7 +1120,12 @@ export const UserProfile: React.FC = () => {
                     <svg className="w-4 h-4 text-white dark:text-black flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
-                    <span className="text-xs font-medium text-white dark:text-black truncate">X</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-white dark:text-black truncate">@{user.twitter_username}</div>
+                      {user.twitter_followers_count > 0 && (
+                        <div className="text-xs text-white dark:text-black opacity-70">{user.twitter_followers_count.toLocaleString()} followers</div>
+                      )}
+                    </div>
                     <svg className="w-3 h-3 text-white dark:text-black opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="m7 7 10 10-5 5-5-5Z"/>
                       <path d="m15 7 5 5-5 5"/>
