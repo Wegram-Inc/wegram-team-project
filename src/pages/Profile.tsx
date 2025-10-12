@@ -664,16 +664,22 @@ export const Profile: React.FC = () => {
           {/* Stats */}
           <div className={`grid gap-4 mb-6 ${profile.twitter_username ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {/* WEGRAM Followers */}
-            <div className="text-center">
+            <button
+              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
+              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            >
               <div className="text-lg font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWERS</div>
-            </div>
+            </button>
 
             {/* WEGRAM Following */}
-            <div className="text-center">
+            <button
+              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/following`)}
+              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            >
               <div className="text-lg font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWING</div>
-            </div>
+            </button>
 
             {/* Twitter Followers - Only show if user actually signed up with Twitter */}
             {profile.twitter_username && (

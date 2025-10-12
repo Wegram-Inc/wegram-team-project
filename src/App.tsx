@@ -53,6 +53,8 @@ import { TwitterCallback } from './pages/TwitterCallback';
 import { DirectMessage } from './pages/DirectMessage';
 import { PostComments } from './pages/PostComments';
 import { NotificationSettings } from './pages/NotificationSettings';
+import { Following } from './pages/Following';
+import { Followers } from './pages/Followers';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -155,6 +157,8 @@ function AppContent() {
           
           {/* User Profile */}
           <Route path="/user/:username" element={<UserProfile />} />
+          <Route path="/user/:username/following" element={<Following />} />
+          <Route path="/user/:username/followers" element={<Followers />} />
 
           {/* Post Comments */}
           <Route path="/post/:postId/comments" element={<PostComments />} />

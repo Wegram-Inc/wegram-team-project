@@ -1078,15 +1078,21 @@ export const UserProfile: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="text-center">
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button
+              onClick={() => navigate(`/user/${username}/followers`)}
+              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            >
               <div className="text-lg font-bold text-primary">{(user.followers_count || 0).toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWERS</div>
-            </div>
-            <div className="text-center">
+            </button>
+            <button
+              onClick={() => navigate(`/user/${username}/following`)}
+              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            >
               <div className="text-lg font-bold text-primary">{(user.following_count || 0).toLocaleString()}</div>
               <div className="text-secondary text-xs">FOLLOWING</div>
-            </div>
+            </button>
           </div>
 
 
