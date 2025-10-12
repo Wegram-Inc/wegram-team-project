@@ -34,7 +34,8 @@ export default async function handler(
       INSERT INTO profiles (
         username, avatar_url, bio, verified,
         twitter_id, twitter_username,
-        followers_count, following_count, posts_count
+        followers_count, following_count, posts_count,
+        twitter_followers_count, twitter_following_count
       ) VALUES (
         ${twitterData.username || `@${twitterData.twitter_username}`},
         ${twitterData.avatar_url || twitterData.profile_image_url || null},
@@ -42,15 +43,18 @@ export default async function handler(
         ${shouldAutoVerify},
         ${twitterData.twitter_id || twitterData.id},
         ${twitterData.twitter_username || twitterData.username?.replace('@', '')},
+        0,
+        0,
+        ${twitterData.posts_count || 0},
         ${twitterData.followers_count || 0},
-        ${twitterData.following_count || 0},
-        ${twitterData.posts_count || 0}
+        ${twitterData.following_count || 0}
       )
       ON CONFLICT (twitter_id)
       DO UPDATE SET
         avatar_url = EXCLUDED.avatar_url,
-        followers_count = EXCLUDED.followers_count,
         bio = EXCLUDED.bio,
+        twitter_followers_count = EXCLUDED.twitter_followers_count,
+        twitter_following_count = EXCLUDED.twitter_following_count,
         updated_at = NOW()
       RETURNING *
     `;
