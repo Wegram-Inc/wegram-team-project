@@ -27,6 +27,8 @@ export interface Profile {
   posts_count: number;
   twitter_id?: string;
   twitter_username?: string;
+  twitter_followers_count?: number;
+  twitter_following_count?: number;
   created_at: string;
   updated_at: string;
 }

@@ -129,7 +129,7 @@ export const Profile: React.FC = () => {
     wegramFollowers: profile.followers_count || 0,
     wegramFollowing: profile.following_count || 0,
     // Twitter followers (from Twitter API)
-    twitterFollowers: profile.followers_count || 0,
+    twitterFollowers: profile.twitter_followers_count || 0,
     twitterUsername: profile.twitter_username || profile.username.replace('@', ''),
     posts: profile.posts_count || 0,
     isFollowing: false,
