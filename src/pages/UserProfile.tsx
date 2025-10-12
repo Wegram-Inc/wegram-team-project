@@ -1095,7 +1095,7 @@ export const UserProfile: React.FC = () => {
             </button>
             {(user.twitter_username || user.twitter_id) && (
               <button
-                onClick={() => window.open(`https://twitter.com/${user.twitter_username}`, '_blank')}
+                onClick={() => window.open(`https://x.com/${user.twitter_username}`, '_blank')}
                 className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <div className="text-lg font-bold text-primary">{(user.twitter_followers_count || 0).toLocaleString()}</div>

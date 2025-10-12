@@ -685,7 +685,7 @@ export const Profile: React.FC = () => {
             {profile.twitter_username && (
               <div className="text-center">
                 <button
-                  onClick={() => window.open(`https://twitter.com/${user.twitterUsername}`, '_blank')}
+                  onClick={() => window.open(`https://x.com/${user.twitterUsername}`, '_blank')}
                   className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
                 >
                   <div className="flex items-center gap-1">
