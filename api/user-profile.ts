@@ -43,6 +43,8 @@ export default async function handler(
               posts_count,
               twitter_id,
               twitter_username,
+              twitter_followers_count,
+              twitter_following_count,
               twitter_link,
               discord_link,
               telegram_link,
@@ -66,6 +68,8 @@ export default async function handler(
               posts_count,
               twitter_id,
               twitter_username,
+              twitter_followers_count,
+              twitter_following_count,
               created_at,
               updated_at
             FROM profiles
@@ -114,6 +118,8 @@ export default async function handler(
             posts_count: user.posts_count,
             twitter_id: user.twitter_id,
             twitter_username: user.twitter_username,
+            twitter_followers_count: user.twitter_followers_count,
+            twitter_following_count: user.twitter_following_count,
             twitter_link: user.twitter_link || null,
             discord_link: user.discord_link || null,
             telegram_link: user.telegram_link || null,
