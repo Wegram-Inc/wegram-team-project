@@ -42,12 +42,12 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({ isOpen, onClose }) => {
     try {
       await signOut();
       onClose();
-      navigate('/home');
+      navigate('/logout');
     } catch (error) {
       console.error('Logout failed:', error);
       // Still close the drawer and navigate on error
       onClose();
-      navigate('/home');
+      navigate('/logout');
     }
   };
 

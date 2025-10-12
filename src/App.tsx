@@ -55,6 +55,7 @@ import { PostComments } from './pages/PostComments';
 import { NotificationSettings } from './pages/NotificationSettings';
 import { Following } from './pages/Following';
 import { Followers } from './pages/Followers';
+import { Logout } from './pages/Logout';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -131,6 +132,7 @@ function AppContent() {
       <main className="min-h-screen">
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/x-auth" element={<XAuthPage />} />
           <Route path="/email-auth" element={<EmailAuthPage />} />
