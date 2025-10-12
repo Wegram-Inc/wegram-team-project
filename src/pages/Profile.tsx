@@ -154,6 +154,7 @@ export const Profile: React.FC = () => {
       userId: post.user_id,
       username: `@${post.username}`,
       content: post.content,
+      image_url: post.image_url,
       timestamp: new Date(post.created_at).toLocaleDateString(),
       likes: post.likes,
       replies: post.replies,
