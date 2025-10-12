@@ -616,17 +616,19 @@ export const Profile: React.FC = () => {
         <div className="px-4 py-6">
           {/* Avatar and Name */}
           <div className="flex items-start gap-4 mb-6">
-            {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
-              <img 
-                src={user.avatar} 
-                alt={user.displayName}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
-                {user.avatarInitial || user.avatar}
-              </div>
-            )}
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+              {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
+                <img
+                  src={user.avatar}
+                  alt={user.displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                  {user.avatarInitial || user.avatar}
+                </div>
+              )}
+            </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>
