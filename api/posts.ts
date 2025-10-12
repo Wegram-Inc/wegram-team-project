@@ -230,6 +230,39 @@ export default async function handler(
 
         return res.status(200).json({ post: updatedPost[0] });
 
+      case 'DELETE':
+        // Delete a post
+        const { post_id: deletePostId, user_id: deleteUserId } = req.body;
+
+        if (!deletePostId || !deleteUserId) {
+          return res.status(400).json({ error: 'post_id and user_id are required' });
+        }
+
+        // Check if the post exists and belongs to the user
+        const postToDelete = await sql`
+          SELECT user_id FROM posts WHERE id = ${deletePostId}
+        `;
+
+        if (postToDelete.length === 0) {
+          return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (postToDelete[0].user_id !== deleteUserId) {
+          return res.status(403).json({ error: 'You can only delete your own posts' });
+        }
+
+        // Delete the post (this will cascade delete likes and comments due to FK constraints)
+        await sql`DELETE FROM posts WHERE id = ${deletePostId}`;
+
+        // Update user's post count
+        await sql`
+          UPDATE profiles
+          SET posts_count = posts_count - 1
+          WHERE id = ${deleteUserId}
+        `;
+
+        return res.status(200).json({ success: true, message: 'Post deleted successfully' });
+
       default:
         return res.status(405).json({ error: 'Method not allowed' });
     }

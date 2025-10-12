@@ -110,7 +110,7 @@ export const Profile: React.FC = () => {
   const [editTelegramLink, setEditTelegramLink] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
-  const { posts: userPosts, loading: postsLoading, fetchUserPosts } = useNeonPosts();
+  const { posts: userPosts, loading: postsLoading, fetchUserPosts, deletePost } = useNeonPosts();
 
   // Use real user data only - NO MOCK FALLBACKS
   const user = profile ? {
@@ -281,6 +281,18 @@ export const Profile: React.FC = () => {
     alert('📖 Post bookmarked!');
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!profile?.id) {
+      alert('Please sign in to delete posts');
+      return;
+    }
+
+    const result = await deletePost(postId, profile.id);
+    if (result.error) {
+      alert(`Failed to delete post: ${result.error}`);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'posts':
@@ -310,6 +322,7 @@ export const Profile: React.FC = () => {
                 onLike={handleLike}
                 onGift={handleGift}
                 onBookmark={handleBookmark}
+                onDelete={handleDelete}
               />
             ))}
           </div>

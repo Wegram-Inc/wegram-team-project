@@ -4,6 +4,7 @@ import { ArrowLeft, MoreHorizontal, Gift, CheckCircle, XCircle, Flag, Share, Mai
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { useNeonPosts } from '../hooks/useNeonPosts';
 
 interface UserProfileData {
   username: string;
@@ -641,6 +642,7 @@ export const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { profile: currentUser } = useNeonAuth();
+  const { deletePost } = useNeonPosts();
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'posts' | 'nft'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
@@ -830,6 +832,18 @@ export const UserProfile: React.FC = () => {
     // Add share functionality here
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!currentUser?.id) {
+      alert('Please sign in to delete posts');
+      return;
+    }
+
+    const result = await deletePost(postId, currentUser.id);
+    if (result.error) {
+      alert(`Failed to delete post: ${result.error}`);
+    }
+  };
+
   const handleProfileMenu = () => {
     setShowActionMenu(!showActionMenu);
   };
@@ -886,6 +900,7 @@ export const UserProfile: React.FC = () => {
                     onShare={handleShare}
                     onGift={handleGift}
                     onBookmark={handleBookmark}
+                    onDelete={handleDelete}
                   />
                 </div>
               ))

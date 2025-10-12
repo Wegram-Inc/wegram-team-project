@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
@@ -31,9 +31,10 @@ interface PostCardProps {
   onShare?: (postId: string) => void;
   onGift?: (postId: string) => void;
   onBookmark?: (postId: string) => void;
+  onDelete?: (postId: string) => void;
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onShare, onGift, onBookmark }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onShare, onGift, onBookmark, onDelete }) => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { profile } = useNeonAuth();
@@ -47,6 +48,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
@@ -119,6 +121,20 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const handleReportPost = () => {
     setShowMenu(false);
     alert('Post reported. Thank you for keeping WEGRAM safe! 🛡️');
+  };
+
+  const handleDeletePost = () => {
+    setShowMenu(false);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeletePost = () => {
+    onDelete?.(post.id);
+    setShowDeleteConfirm(false);
+  };
+
+  const cancelDeletePost = () => {
+    setShowDeleteConfirm(false);
   };
 
   const handleCommentClick = (e: React.MouseEvent) => {
@@ -245,7 +261,20 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                 <div className={`border-t my-1 ${
                   isDark ? 'border-gray-700' : 'border-gray-200'
                 }`}></div>
-                
+
+                {/* Show delete button only for current user's posts */}
+                {profile && (post.user_id === profile.id || post.userId === profile.id) && (
+                  <button
+                    onClick={handleDeletePost}
+                    className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-red-400 ${
+                      isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete post</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleReportPost}
                   className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-red-400 ${
@@ -358,6 +387,41 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         postId={post.id}
         onCommentAdded={handleCommentAdded}
       />
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className={`rounded-lg p-6 max-w-sm w-full mx-4 ${
+              isDark ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <h3 className="text-lg font-semibold text-primary mb-4">Delete Post</h3>
+              <p className="text-secondary mb-6">
+                Are you sure you want to delete this post? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={cancelDeletePost}
+                  className={`px-4 py-2 rounded transition-colors ${
+                    isDark
+                      ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeletePost}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

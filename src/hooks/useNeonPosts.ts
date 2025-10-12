@@ -145,6 +145,30 @@ export const useNeonPosts = () => {
     }
   };
 
+  const deletePost = async (postId: string, userId: string) => {
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId, user_id: userId })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Remove the post from local state
+        setPosts(posts.filter(p => p.id !== postId));
+        return { success: true };
+      } else {
+        console.error('Error deleting post:', result.error);
+        return { error: result.error };
+      }
+    } catch (error) {
+      console.error('Error in deletePost:', error);
+      return { error: 'Failed to delete post' };
+    }
+  };
+
   const fetchUserPosts = async (userId: string) => {
     console.log('🚀 fetchUserPosts called with userId:', userId);
     setLoading(true);
@@ -185,6 +209,7 @@ export const useNeonPosts = () => {
     createPost,
     likePost,
     giftPost,
-    sharePost
+    sharePost,
+    deletePost
   };
 };

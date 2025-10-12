@@ -8,7 +8,7 @@ import { TrendingUp, Users, Zap } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isDark } = useTheme();
-  const { posts, loading, createPost, likePost, giftPost, fetchPosts } = useNeonPosts();
+  const { posts, loading, createPost, likePost, giftPost, fetchPosts, deletePost } = useNeonPosts();
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -117,6 +117,18 @@ export const Home: React.FC = () => {
     } catch (error) {
       console.error('Bookmark error:', error);
       alert('Failed to bookmark post');
+    }
+  };
+
+  const handleDelete = async (postId: string) => {
+    if (!profile?.id) {
+      alert('Please sign in to delete posts');
+      return;
+    }
+
+    const result = await deletePost(postId, profile.id);
+    if (result.error) {
+      alert(`Failed to delete post: ${result.error}`);
     }
   };
 
@@ -236,6 +248,7 @@ export const Home: React.FC = () => {
               onShare={handleShare}
               onGift={handleGift}
               onBookmark={handleBookmark}
+              onDelete={handleDelete}
             />
           ))
         ) : (
