@@ -57,8 +57,12 @@ export const uploadImage = async (
   folder?: string
 ): Promise<ImageKitUploadResponse> => {
   try {
-    if (!publicKey || !urlEndpoint) {
-      throw new Error('ImageKit is not properly configured');
+    // More detailed configuration checking
+    console.log('Upload Debug - publicKey:', publicKey ? 'Set' : 'Missing');
+    console.log('Upload Debug - urlEndpoint:', urlEndpoint ? 'Set' : 'Missing');
+
+    if (!publicKey || !urlEndpoint || publicKey.trim() === '' || urlEndpoint.trim() === '') {
+      throw new Error(`ImageKit configuration error - publicKey: ${publicKey ? 'Set' : 'Missing'}, urlEndpoint: ${urlEndpoint ? 'Set' : 'Missing'}`);
     }
 
     const uploadOptions = {
@@ -70,11 +74,19 @@ export const uploadImage = async (
       responseFields: ['fileId', 'name', 'url', 'thumbnailUrl', 'height', 'width', 'size', 'filePath', 'tags', 'isPrivateFile', 'customCoordinates', 'fileType']
     };
 
+    console.log('Starting ImageKit upload...');
     const result = await imagekit.upload(uploadOptions);
+    console.log('ImageKit upload successful:', result);
     return result as ImageKitUploadResponse;
   } catch (error) {
     console.error('ImageKit upload error:', error);
-    throw error;
+
+    // Provide more detailed error message
+    if (error instanceof Error) {
+      throw new Error(`ImageKit upload failed: ${error.message}`);
+    } else {
+      throw new Error(`ImageKit upload failed: ${JSON.stringify(error)}`);
+    }
   }
 };
 

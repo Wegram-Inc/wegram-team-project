@@ -4,6 +4,8 @@ A decentralized social media platform built on Solana that combines traditional 
 
 **Live Site:** [https://www.wegram.social](https://www.wegram.social)
 
+<!-- Force rebuild with VITE environment variables -->
+
 ## Tech Stack
 
 ### Frontend
