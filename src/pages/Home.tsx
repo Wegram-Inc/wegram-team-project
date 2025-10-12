@@ -47,16 +47,17 @@ export const Home: React.FC = () => {
     }
   }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
 
-  const handlePost = async (content: string) => {
+  const handlePost = async (content: string, imageUrl?: string) => {
     if (!profile) return;
-    await createPost(content, profile.id, profile.username);
+    await createPost(content, profile.id, profile.username, imageUrl);
   };
 
   // Listen for quick composer posts from BottomNav modal
   useEffect(() => {
     const handler = (e: any) => {
       const content = e.detail?.content as string;
-      if (content) handlePost(content);
+      const imageUrl = e.detail?.imageUrl as string;
+      if (content || imageUrl) handlePost(content, imageUrl);
     };
     window.addEventListener('wegram:new-post', handler as any);
     return () => window.removeEventListener('wegram:new-post', handler as any);

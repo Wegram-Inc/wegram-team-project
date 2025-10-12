@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { BarChart3, Plus, Wallet, HelpCircle, Play, Type, Image, Video, X, User } from 'lucide-react';
+import { BarChart3, Plus, Wallet, HelpCircle, Play, Type, Image, Video, X, User, Loader2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { mockUser } from '../../data/mockData';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
+import { uploadImage, type ImageKitUploadResponse } from '../../lib/imagekitService';
 
 export const BottomNav: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ export const BottomNav: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [textContent, setTextContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<ImageKitUploadResponse | null>(null);
   const imageInputRef = React.useRef<HTMLInputElement>(null);
   const videoInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -37,6 +41,9 @@ export const BottomNav: React.FC = () => {
                   onClick={() => {
                     setTextContent('');
                     setSelectedFiles([]);
+                    setUploadedImageUrl('');
+                    setUploadedImage(null);
+                    setIsUploading(false);
                     setShowCreateModal(true);
                   }}
                   className="fab"
@@ -132,8 +139,51 @@ export const BottomNav: React.FC = () => {
               />
             </div>
 
-            {selectedFiles.length > 0 && (
-              <div className="mb-3 text-sm text-secondary">{selectedFiles.length} file(s) selected</div>
+            {/* Media Upload Section */}
+            {(selectedFiles.length > 0 || uploadedImageUrl || isUploading) && (
+              <div className="mb-3">
+                {isUploading ? (
+                  <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--border)' }}>
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+                      <span className="text-primary text-sm">Uploading image...</span>
+                    </div>
+                  </div>
+                ) : uploadedImageUrl ? (
+                  <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--border)' }}>
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={uploadedImageUrl}
+                        alt="Uploaded preview"
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Image className="w-3 h-3 text-green-400" />
+                          <span className="text-green-400 text-xs font-medium">Image uploaded</span>
+                          <button
+                            onClick={() => {
+                              setUploadedImageUrl('');
+                              setUploadedImage(null);
+                              setSelectedFiles([]);
+                            }}
+                            className="p-0.5 rounded transition-colors hover:opacity-70"
+                          >
+                            <X className="w-3 h-3 text-red-400" />
+                          </button>
+                        </div>
+                        {uploadedImage && (
+                          <div className="text-xs text-secondary mt-1">
+                            {uploadedImage.width} × {uploadedImage.height}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-secondary">{selectedFiles.length} file(s) selected</div>
+                )}
+              </div>
             )}
 
             <div className="h-px mb-3" style={{ backgroundColor: 'var(--border)' }} />
@@ -171,28 +221,92 @@ export const BottomNav: React.FC = () => {
 
             <button
               onClick={() => {
-                const content = textContent.trim() || (selectedFiles.length > 0 ? 'Shared media' : '');
-                if (!content) return; 
-                window.dispatchEvent(new CustomEvent('wegram:new-post', { detail: { content } }));
+                const content = textContent.trim() || (uploadedImageUrl ? 'Shared media' : '');
+                if (!content && !uploadedImageUrl) return;
+                window.dispatchEvent(new CustomEvent('wegram:new-post', {
+                  detail: {
+                    content,
+                    imageUrl: uploadedImageUrl || undefined
+                  }
+                }));
                 setShowCreateModal(false);
                 setTextContent('');
                 setSelectedFiles([]);
+                setUploadedImageUrl('');
+                setUploadedImage(null);
+                setIsUploading(false);
               }}
               className="w-full py-3 rounded-full font-semibold text-white hover:opacity-90 transition-opacity disabled:opacity-50"
               style={{ background: 'linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%)' }}
-              disabled={!textContent.trim() && selectedFiles.length === 0}
+              disabled={(!textContent.trim() && !uploadedImageUrl) || isUploading}
             >
-              Post Now
+              {isUploading ? 'Uploading...' : 'Post Now'}
             </button>
 
             {/* Hidden inputs for media selection */}
-            <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              setSelectedFiles(files);
+            <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              // Check file type and size
+              if (!file.type.startsWith('image/')) {
+                alert('Only image files are allowed');
+                return;
+              }
+
+              if (file.size > 10 * 1024 * 1024) {
+                alert('File size must be less than 10MB');
+                return;
+              }
+
+              setSelectedFiles([file]);
+              setIsUploading(true);
+
+              try {
+                // Upload to ImageKit
+                const uploadResult = await uploadImage(file, undefined, '/wegram-posts');
+                setUploadedImage(uploadResult);
+                setUploadedImageUrl(uploadResult.url);
+                console.log('Image uploaded successfully:', uploadResult);
+              } catch (error) {
+                console.error('Upload failed:', error);
+                alert('Failed to upload image. Please try again.');
+                setSelectedFiles([]);
+              } finally {
+                setIsUploading(false);
+              }
             }} />
-            <input ref={videoInputRef} type="file" accept="video/*" multiple className="hidden" onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              setSelectedFiles(files);
+            <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              // For now, treat videos as images (ImageKit supports videos)
+              if (!file.type.startsWith('video/')) {
+                alert('Only video files are allowed');
+                return;
+              }
+
+              if (file.size > 50 * 1024 * 1024) {
+                alert('File size must be less than 50MB');
+                return;
+              }
+
+              setSelectedFiles([file]);
+              setIsUploading(true);
+
+              try {
+                // Upload to ImageKit (supports videos too)
+                const uploadResult = await uploadImage(file, undefined, '/wegram-videos');
+                setUploadedImage(uploadResult);
+                setUploadedImageUrl(uploadResult.url);
+                console.log('Video uploaded successfully:', uploadResult);
+              } catch (error) {
+                console.error('Upload failed:', error);
+                alert('Failed to upload video. Please try again.');
+                setSelectedFiles([]);
+              } finally {
+                setIsUploading(false);
+              }
             }} />
           </div>
         </div>
