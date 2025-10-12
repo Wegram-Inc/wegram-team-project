@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Image, Video, X, Upload } from 'lucide-react';
+import { Image, Video, X, Upload, Loader2 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
+import { uploadImage, type ImageKitUploadResponse } from '../../lib/imagekitService';
 
 interface PostComposerProps {
   onPost: (content: string, imageUrl?: string) => void;
@@ -17,6 +18,8 @@ export const PostComposer: React.FC<PostComposerProps> = ({
   const [content, setContent] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<ImageKitUploadResponse | null>(null);
 
   const handlePost = () => {
     if (content.trim() || uploadedImageUrl) {
@@ -27,36 +30,54 @@ export const PostComposer: React.FC<PostComposerProps> = ({
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Check if it's an image file
-      if (!file.type.startsWith('image/')) {
-        alert('Only image files are allowed');
-        return;
-      }
+    if (!file) return;
 
-      // Convert to base64 exactly like profile images
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setUploadedImageUrl(e.target.result as string);
-          setSelectedFiles([file]); // Keep for display purposes
-        }
-      };
-      reader.readAsDataURL(file);
+    // Check file type
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      alert('Only image and video files are allowed');
+      return;
+    }
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    setSelectedFiles([file]);
+    setIsUploading(true);
+
+    try {
+      // Upload to ImageKit
+      const uploadResult = await uploadImage(file, undefined, '/wegram-posts');
+
+      setUploadedImage(uploadResult);
+      setUploadedImageUrl(uploadResult.url);
+
+      console.log('Image uploaded successfully:', uploadResult);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Failed to upload image. Please try again.');
+      setSelectedFiles([]);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setUploadedImageUrl(''); // Clear the uploaded image URL
+    setUploadedImageUrl('');
+    setUploadedImage(null);
   };
 
   const handleReset = () => {
     setContent('');
     setSelectedFiles([]);
     setUploadedImageUrl('');
+    setUploadedImage(null);
+    setIsUploading(false);
   };
   return (
     <div className="card mb-6">
@@ -113,10 +134,46 @@ export const PostComposer: React.FC<PostComposerProps> = ({
       />
       
       {/* Media Upload Section */}
-      {selectedFiles.length > 0 && (
+      {(selectedFiles.length > 0 || uploadedImageUrl) && (
         <div className="mb-4">
-          <div className="grid grid-cols-2 gap-2">
-            {selectedFiles.map((file, index) => (
+          {isUploading ? (
+            <div className={`rounded-lg p-4 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+              <div className="flex items-center gap-3">
+                <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+                <span className="text-primary">Uploading image...</span>
+              </div>
+            </div>
+          ) : uploadedImageUrl ? (
+            <div className={`rounded-lg p-3 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}>
+              <div className="flex items-start gap-3">
+                <img
+                  src={uploadedImageUrl}
+                  alt="Uploaded preview"
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Image className="w-4 h-4 text-green-400" />
+                    <span className="text-green-400 text-sm font-medium">Image uploaded successfully</span>
+                    <button
+                      onClick={() => removeFile(0)}
+                      className={`p-1 rounded transition-colors ${
+                        isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-300'
+                      }`}
+                    >
+                      <X className="w-3 h-3 text-red-400" />
+                    </button>
+                  </div>
+                  {uploadedImage && (
+                    <div className="text-xs text-secondary mt-1">
+                      {uploadedImage.width} × {uploadedImage.height} • {(uploadedImage.size / (1024 * 1024)).toFixed(1)} MB
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            selectedFiles.map((file, index) => (
               <div key={index} className={`relative rounded-lg p-3 ${
                 isDark ? 'bg-gray-800' : 'bg-gray-200'
               }`}>
@@ -142,8 +199,8 @@ export const PostComposer: React.FC<PostComposerProps> = ({
                   {(file.size / (1024 * 1024)).toFixed(1)} MB
                 </div>
               </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
       )}
 
@@ -153,9 +210,9 @@ export const PostComposer: React.FC<PostComposerProps> = ({
         <button
           onClick={handlePost}
           className="btn-primary flex-1"
-          disabled={!content.trim() && !uploadedImageUrl}
+          disabled={(!content.trim() && !uploadedImageUrl) || isUploading}
         >
-          Post
+          {isUploading ? 'Uploading...' : 'Post'}
         </button>
         <button
           onClick={() => {
