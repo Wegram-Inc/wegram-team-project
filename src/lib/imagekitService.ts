@@ -74,8 +74,20 @@ export const uploadImage = async (
       responseFields: ['fileId', 'name', 'url', 'thumbnailUrl', 'height', 'width', 'size', 'filePath', 'tags', 'isPrivateFile', 'customCoordinates', 'fileType']
     };
 
-    console.log('Starting ImageKit upload...');
-    const result = await imagekit.upload(uploadOptions);
+    console.log('Getting authentication parameters...');
+    const authParams = await getAuthenticationParameters();
+    console.log('Auth params received:', authParams);
+
+    // Add authentication parameters to upload options
+    const uploadOptionsWithAuth = {
+      ...uploadOptions,
+      token: authParams.token,
+      signature: authParams.signature,
+      expire: authParams.expire
+    };
+
+    console.log('Starting ImageKit upload with auth...');
+    const result = await imagekit.upload(uploadOptionsWithAuth);
     console.log('ImageKit upload successful:', result);
     return result as ImageKitUploadResponse;
   } catch (error) {
