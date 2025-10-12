@@ -307,9 +307,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
            post.image_url.match(/\.(mp4|mov|avi|webm|mkv)$/i) ? (
             <video
               src={post.image_url}
+              poster={`${post.image_url}?tr=f-jpg,q-70`}
               className="w-full rounded-lg max-h-96 border border-gray-200 dark:border-gray-700"
               controls
-              preload="metadata"
+              preload="none"
               onError={(e) => {
                 // Hide video if it fails to load
                 e.currentTarget.style.display = 'none';
