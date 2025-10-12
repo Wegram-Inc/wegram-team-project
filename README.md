@@ -128,7 +128,7 @@ The platform uses Neon Postgres with tables for:
 
 This is an active development project. The core social features and Web3 integration are functional. Authentication works with both X/Twitter OAuth and email signup.
 
-**Note:** X/Twitter signup is temporarily limited due to API rate limits. Email signup is fully functional.
+**Note:** Both X/Twitter OAuth and email signup are fully functional.
 
 ## License
 
