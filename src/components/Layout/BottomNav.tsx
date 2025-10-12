@@ -270,7 +270,7 @@ export const BottomNav: React.FC = () => {
                 console.log('Image uploaded successfully:', uploadResult);
               } catch (error) {
                 console.error('Upload failed:', error);
-                alert('Failed to upload image. Please try again.');
+                alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 setSelectedFiles([]);
               } finally {
                 setIsUploading(false);
@@ -302,7 +302,7 @@ export const BottomNav: React.FC = () => {
                 console.log('Video uploaded successfully:', uploadResult);
               } catch (error) {
                 console.error('Upload failed:', error);
-                alert('Failed to upload video. Please try again.');
+                alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
                 setSelectedFiles([]);
               } finally {
                 setIsUploading(false);
