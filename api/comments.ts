@@ -28,6 +28,7 @@ export default async function handler(
           SELECT
             c.id,
             c.content,
+            c.image_url,
             c.user_id,
             c.likes_count,
             c.created_at,
@@ -56,8 +57,8 @@ export default async function handler(
 
         // Insert the comment
         const newComment = await sql`
-          INSERT INTO comments (content, post_id, user_id, likes_count)
-          VALUES (${content}, ${post_id}, ${user_id}, 0)
+          INSERT INTO comments (content, post_id, user_id, image_url, likes_count)
+          VALUES (${content}, ${post_id}, ${user_id}, ${image_url || null}, 0)
           RETURNING *
         `;
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Image, Video, Send, User } from 'lucide-react';
+import { X, Image, Video, Send, User, Loader2 } from 'lucide-react';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
+import { uploadImage } from '../../lib/imagekitService';
 
 interface CommentComposerProps {
   isOpen: boolean;
@@ -19,21 +20,38 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
   const [content, setContent] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
+    if (!file) return;
 
-      // Convert to base64 for preview and storage
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setUploadedImageUrl(e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+    // Check file type and size
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      alert('Only image and video files are allowed');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    setSelectedImage(file);
+    setIsUploading(true);
+
+    try {
+      // Upload to ImageKit
+      const uploadResult = await uploadImage(file, undefined, '/wegram-comments');
+      setUploadedImageUrl(uploadResult.url);
+      console.log('Image uploaded successfully:', uploadResult);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Failed to upload image. Please try again.');
+      setSelectedImage(null);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -41,6 +59,11 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
     if (!content.trim() && !uploadedImageUrl) return;
     if (!profile?.id) {
       alert('Please sign in to comment');
+      return;
+    }
+
+    if (isUploading) {
+      alert('Please wait for image upload to complete');
       return;
     }
 
@@ -140,8 +163,17 @@ export const CommentComposer: React.FC<CommentComposerProps> = ({
           />
         </div>
 
-        {/* Image Preview */}
-        {uploadedImageUrl && (
+        {/* Image Upload/Preview */}
+        {isUploading && (
+          <div className="mb-4 p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <div className="flex items-center justify-center gap-3">
+              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <span className="text-primary">Uploading image...</span>
+            </div>
+          </div>
+        )}
+
+        {uploadedImageUrl && !isUploading && (
           <div className="mb-4 relative">
             <img
               src={uploadedImageUrl}
