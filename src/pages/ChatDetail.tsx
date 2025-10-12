@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, MoreHorizontal, Phone, Video, Search, Send, Image, Gift, Coins, Diamond, Plus, Loader2 } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Phone, Video, Search, Send, Loader2 } from 'lucide-react';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 
 interface Message {
@@ -30,7 +30,6 @@ export const ChatDetail: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messageText, setMessageText] = useState('');
-  const [showActionButtons, setShowActionButtons] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
@@ -180,12 +179,6 @@ export const ChatDetail: React.FC = () => {
     return date.toLocaleDateString();
   };
 
-  const actionButtons = [
-    { icon: Diamond, label: 'NFT', color: 'text-purple-400' },
-    { icon: Gift, label: 'Gift', color: 'text-cyan-400' },
-    { icon: Image, label: 'Image', color: 'text-green-400' },
-    { icon: Coins, label: 'Token', color: 'text-yellow-400' }
-  ];
 
   return (
     <div className="max-w-md mx-auto" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -268,35 +261,10 @@ export const ChatDetail: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Action Buttons - Only show when + button is clicked */}
-      {showActionButtons && (
-        <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto px-4">
-          <div className="bg-overlay-light rounded-lg p-3 mb-3">
-            <div className="flex justify-around">
-              {actionButtons.map((button, index) => (
-                <button
-                  key={index}
-                  className="flex flex-col items-center gap-1 p-2 hover:bg-overlay-medium rounded-lg transition-colors"
-                >
-                  <button.icon className={`w-6 h-6 ${button.color}`} />
-                  <span className="text-xs text-secondary">{button.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Message Input */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 py-4" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="flex items-center gap-3" style={{ backgroundColor: 'var(--card)' }}>
-          <button
-            onClick={() => setShowActionButtons(!showActionButtons)}
-            className="p-3 rounded-lg transition-colors hover:bg-overlay-light"
-            style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
-          >
-            <Plus className="w-5 h-5 text-primary" />
-          </button>
           <div className="flex-1 relative">
             <input
               type="text"
