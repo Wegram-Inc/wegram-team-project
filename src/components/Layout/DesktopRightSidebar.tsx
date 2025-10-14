@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play } from 'lucide-react';
+import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, MessageCircle, Share, Gift } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../hooks/useNeonPosts';
@@ -75,10 +75,24 @@ export const DesktopRightSidebar: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-secondary">
-                  <span>❤️ {post.likes}</span>
-                  <span>💬 {post.replies}</span>
-                  <span>🔄 {post.shares}</span>
-                  {post.gifts > 0 && <span>🎁 {post.gifts}</span>}
+                  <span className="flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    {post.likes}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3" />
+                    {post.replies}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Share className="w-3 h-3" />
+                    {post.shares}
+                  </span>
+                  {post.gifts > 0 && (
+                    <span className="flex items-center gap-1">
+                      <Gift className="w-3 h-3" />
+                      {post.gifts}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
