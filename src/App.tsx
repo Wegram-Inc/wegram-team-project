@@ -58,6 +58,7 @@ import { Followers } from './pages/Followers';
 import { Logout } from './pages/Logout';
 import { DesktopSidebar } from './components/Layout/DesktopSidebar';
 import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
+import { DesktopFloatingComposer } from './components/Layout/DesktopFloatingComposer';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -132,7 +133,7 @@ function AppContent() {
         </div>
 
         {/* Center Content */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
           {!hideTopNav && (
             <TopBar
               onMenuClick={() => setIsDrawerOpen(true)}
@@ -199,6 +200,9 @@ function AppContent() {
               <Route path="/launch-token" element={<LaunchToken />} />
             </Routes>
           </main>
+
+          {/* Desktop Floating Composer - Only shows on desktop */}
+          <DesktopFloatingComposer />
 
           <div className="lg:hidden">
             {!hideBottomNav && <BottomNav />}
