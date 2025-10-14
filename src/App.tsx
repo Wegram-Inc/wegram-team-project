@@ -108,8 +108,8 @@ function AppContent() {
     location.pathname === '/x-auth' ||
     location.pathname === '/email-auth';
 
-  // Hide desktop sidebars when not logged in or on landing/auth pages
-  const hideDesktopSidebars = !profile || hideNavigation;
+  // Hide desktop sidebars only on landing/auth pages, not when loading or logged in
+  const hideDesktopSidebars = hideNavigation;
 
   // Hide top navigation (TopBar) on chat-style pages (custom headers)
   const hideTopNav = hideNavigation ||
