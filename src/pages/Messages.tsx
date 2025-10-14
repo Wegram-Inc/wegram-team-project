@@ -241,7 +241,11 @@ export const Messages: React.FC = () => {
                       </div>
                     )}
                     {user.verified && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
+                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
+                          ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                          : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                      }`}>
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
@@ -306,7 +310,11 @@ export const Messages: React.FC = () => {
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full border-2" style={{ borderColor: 'var(--bg)' }}></div>
                       )}
                       {chat.verified && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
+                          ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(chat.username)
+                            ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                            : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                        }`}>
                           <span className="text-white text-xs">✓</span>
                         </div>
                       )}

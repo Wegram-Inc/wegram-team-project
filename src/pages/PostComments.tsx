@@ -171,7 +171,11 @@ export const PostComments: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h3 className="text-primary font-semibold">{post.username}</h3>
                 {post.verified && (
-                  <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shadow-lg ${
+                    ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
+                      ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                      : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                  }`}>
                     <CheckCircle className="w-2.5 h-2.5 text-white" />
                   </div>
                 )}
@@ -246,7 +250,11 @@ export const PostComments: React.FC = () => {
                         {comment.username}
                       </button>
                       {comment.verified && (
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                        <div className={`w-3 h-3 rounded-full flex items-center justify-center shadow-lg ${
+                          ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username)
+                            ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                            : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                        }`}>
                           <CheckCircle className="w-2 h-2 text-white" />
                         </div>
                       )}

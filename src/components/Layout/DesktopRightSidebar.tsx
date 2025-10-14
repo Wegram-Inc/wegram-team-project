@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, MessageCircle, Share, Gift } from 'lucide-react';
+import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, MessageCircle, Share, Gift, CheckCircle } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../hooks/useNeonPosts';
@@ -68,7 +68,15 @@ export const DesktopRightSidebar: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-medium text-primary">{post.username.startsWith('@') ? post.username : `@${post.username}`}</span>
-                      {post.verified && <span className="text-blue-400">✓</span>}
+                      {post.verified && (
+                        <div className={`w-3 h-3 rounded-full flex items-center justify-center shadow-sm ${
+                          ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
+                            ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                            : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                        }`}>
+                          <CheckCircle className="w-2 h-2 text-white" />
+                        </div>
+                      )}
                     </div>
                     <p className="text-sm text-primary line-clamp-2 mt-1">{post.content}</p>
                   </div>
