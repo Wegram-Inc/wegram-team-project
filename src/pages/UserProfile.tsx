@@ -986,7 +986,7 @@ export const UserProfile: React.FC = () => {
         </div>
       )}
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-opacity-95 backdrop-blur-sm px-4 py-3 flex items-center gap-3" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="lg:hidden sticky top-0 z-50 bg-opacity-95 backdrop-blur-sm px-4 py-3 flex items-center gap-3" style={{ backgroundColor: 'var(--bg)' }}>
         <button
           onClick={() => {
             if (canGoBack) {
@@ -996,7 +996,7 @@ export const UserProfile: React.FC = () => {
           }}
           disabled={!canGoBack}
           className={`p-2 rounded-lg transition-colors ${
-            canGoBack 
+            canGoBack
               ? 'hover:bg-overlay-light'
               : 'opacity-50 cursor-not-allowed'
           }`}
@@ -1010,6 +1010,27 @@ export const UserProfile: React.FC = () => {
         <div className="ml-auto flex items-center gap-2">
           {/* Empty space - 3 dots are in profile section, not header */}
         </div>
+      </div>
+
+      {/* Desktop floating back button */}
+      <div className="hidden lg:block absolute top-4 left-4 z-40">
+        <button
+          onClick={() => {
+            if (canGoBack) {
+              const destination = getBackDestination();
+              navigate(destination.path, destination.state ? { state: destination.state } : {});
+            }
+          }}
+          disabled={!canGoBack}
+          className={`p-2 rounded-lg transition-colors bg-opacity-80 backdrop-blur-sm ${
+            canGoBack
+              ? 'hover:bg-overlay-light'
+              : 'opacity-50 cursor-not-allowed'
+          }`}
+          style={{ backgroundColor: 'var(--bg)' }}
+        >
+          <ArrowLeft className="w-5 h-5 text-primary" />
+        </button>
       </div>
 
       <div className="max-w-md mx-auto animate-in slide-in-from-top-4 duration-300">
