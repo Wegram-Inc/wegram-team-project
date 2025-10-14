@@ -142,7 +142,7 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 pt-20 pb-24">
+    <div className="max-w-md mx-auto px-4 pt-20 pb-24 lg:max-w-none lg:pt-4 lg:pb-4">
       
       {/* Crypto Performance Notification */}
       <div 

@@ -105,8 +105,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-opacity-95 backdrop-blur-sm" style={{ backgroundColor: 'var(--bg)' }}>
-      <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+    <div className="lg:static lg:bg-opacity-100 lg:backdrop-blur-none fixed top-0 left-0 right-0 z-50 bg-opacity-95 backdrop-blur-sm" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="lg:max-w-none lg:mx-0 lg:px-6 lg:py-4 max-w-md mx-auto px-4 py-3 flex items-center gap-3">
         {/* Menu Button */}
         <button
           onClick={onMenuClick}

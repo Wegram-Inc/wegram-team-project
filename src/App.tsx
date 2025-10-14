@@ -126,7 +126,7 @@ function AppContent() {
       <div className="hidden lg:flex min-h-screen">
         {/* Left Sidebar */}
         <div className="w-64 flex-shrink-0">
-          <div className="h-screen sticky top-0">
+          <div className="h-screen sticky top-0 overflow-hidden">
             <DesktopSidebar />
           </div>
         </div>
@@ -200,7 +200,9 @@ function AppContent() {
             </Routes>
           </main>
 
-          {!hideBottomNav && <BottomNav />}
+          <div className="lg:hidden">
+            {!hideBottomNav && <BottomNav />}
+          </div>
         </div>
 
         {/* Right Sidebar */}
