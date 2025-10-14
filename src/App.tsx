@@ -103,10 +103,13 @@ function AppContent() {
   };
 
   // Don't show TopBar and BottomNav on landing and auth pages
-  const hideNavigation = location.pathname === '/' || 
-    location.pathname === '/auth' || 
-    location.pathname === '/x-auth' || 
+  const hideNavigation = location.pathname === '/' ||
+    location.pathname === '/auth' ||
+    location.pathname === '/x-auth' ||
     location.pathname === '/email-auth';
+
+  // Hide desktop sidebars when not logged in or on landing/auth pages
+  const hideDesktopSidebars = !profile || hideNavigation;
 
   // Hide top navigation (TopBar) on chat-style pages (custom headers)
   const hideTopNav = hideNavigation ||
@@ -125,12 +128,14 @@ function AppContent() {
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       {/* Desktop Three-Column Layout - Only shows on lg+ screens */}
       <div className="hidden lg:flex min-h-screen">
-        {/* Left Sidebar */}
-        <div className="w-64 flex-shrink-0">
-          <div className="h-screen sticky top-0 overflow-hidden">
-            <DesktopSidebar />
+        {/* Left Sidebar - Only show when logged in */}
+        {!hideDesktopSidebars && (
+          <div className="w-64 flex-shrink-0">
+            <div className="h-screen sticky top-0 overflow-hidden">
+              <DesktopSidebar />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Center Content */}
         <div className="flex-1 relative">
@@ -209,12 +214,14 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="w-80 flex-shrink-0">
-          <div className="h-screen sticky top-0">
-            <DesktopRightSidebar />
+        {/* Right Sidebar - Only show when logged in */}
+        {!hideDesktopSidebars && (
+          <div className="w-80 flex-shrink-0">
+            <div className="h-screen sticky top-0">
+              <DesktopRightSidebar />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Mobile Layout - Completely Unchanged - Only shows on screens smaller than lg */}
