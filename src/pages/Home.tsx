@@ -234,7 +234,7 @@ export const Home: React.FC = () => {
               post={{
                 id: post.id,
                 userId: post.user_id,
-                username: `@${post.username}`,
+                username: post.username.startsWith('@') ? post.username : `@${post.username}`,
                 content: post.content,
                 timestamp: post.created_at ? new Date(post.created_at).toLocaleDateString() : (post as any).timestamp || '2h',
                 likes: post.likes,

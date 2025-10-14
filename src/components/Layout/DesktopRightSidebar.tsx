@@ -67,7 +67,7 @@ export const DesktopRightSidebar: React.FC = () => {
                   )}
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-medium text-primary">@{post.username}</span>
+                      <span className="text-sm font-medium text-primary">{post.username.startsWith('@') ? post.username : `@${post.username}`}</span>
                       {post.verified && <span className="text-blue-400">✓</span>}
                     </div>
                     <p className="text-sm text-primary line-clamp-2 mt-1">{post.content}</p>
