@@ -1035,7 +1035,7 @@ export const UserProfile: React.FC = () => {
                 <h2 className="text-xl font-bold gradient-text">{user.username?.replace('@', '') || 'User'}</h2>
                 {user.verified && (
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-lg ${
-                    ['puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
+                    ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
                       ? 'bg-gradient-to-br from-gray-300 to-gray-500'
                       : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
                   }`}>

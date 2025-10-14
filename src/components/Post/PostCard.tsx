@@ -195,7 +195,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
               </button>
               {post.verified && (
                 <div className={`w-4 h-4 rounded-full flex items-center justify-center shadow-lg ${
-                  ['puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
+                  ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
                     ? 'bg-gradient-to-br from-gray-300 to-gray-500'
                     : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
                 }`}>
