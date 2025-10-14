@@ -194,7 +194,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                 {post.username}
               </button>
               {post.verified && (
-                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center shadow-lg ${
+                  ['puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
+                    ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                    : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                }`}>
                   <CheckCircle className="w-2.5 h-2.5 text-white" />
                 </div>
               )}
