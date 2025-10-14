@@ -185,7 +185,11 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                       </div>
                     )}
                     {user.verified && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
+                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
+                          ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                          : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                      }`}>
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
@@ -267,7 +271,11 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                     </div>
                   )}
                   {selectedUser.verified && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg rounded-full flex items-center justify-center">
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
+                      ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username)
+                        ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                        : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                    }`}>
                       <span className="text-white text-xs">✓</span>
                     </div>
                   )}
