@@ -28,8 +28,11 @@ export const DesktopFloatingComposer: React.FC = () => {
           setIsUploading(false);
           setShowCreateModal(true);
         }}
-        className="hidden lg:flex fixed bottom-8 right-8 w-14 h-14 rounded-full items-center justify-center shadow-lg hover:scale-105 transition-transform z-40"
-        style={{ background: 'linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%)' }}
+        className="hidden lg:flex fixed bottom-8 w-14 h-14 rounded-full items-center justify-center shadow-lg hover:scale-105 transition-transform z-40"
+        style={{
+          right: 'calc(320px + 2rem)',
+          background: 'linear-gradient(135deg, var(--gradA) 0%, var(--gradB) 100%)'
+        }}
         aria-label="Create new post"
       >
         <Plus className="w-6 h-6 text-white" />
