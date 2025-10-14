@@ -56,6 +56,8 @@ import { NotificationSettings } from './pages/NotificationSettings';
 import { Following } from './pages/Following';
 import { Followers } from './pages/Followers';
 import { Logout } from './pages/Logout';
+import { DesktopSidebar } from './components/Layout/DesktopSidebar';
+import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
 // import { ProductKeyFooter } from './components/Layout/ProductKeyFooter'; // Commented out - see PRODUCT_KEY_BACKUP.md
 
 function AppContent() {
@@ -120,7 +122,98 @@ function AppContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
-      {!hideTopNav && (
+      {/* Desktop Three-Column Layout - Only shows on lg+ screens */}
+      <div className="hidden lg:flex min-h-screen">
+        {/* Left Sidebar */}
+        <div className="w-64 flex-shrink-0">
+          <div className="h-screen sticky top-0">
+            <DesktopSidebar />
+          </div>
+        </div>
+
+        {/* Center Content */}
+        <div className="flex-1">
+          {!hideTopNav && (
+            <TopBar
+              onMenuClick={() => setIsDrawerOpen(true)}
+              onGiftClick={handleGiftClick}
+              onMessageClick={handleMessageClick}
+              onNotificationClick={handleNotificationClick}
+            />
+          )}
+
+          <main className="min-h-screen">
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/logout" element={<Logout />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/x-auth" element={<XAuthPage />} />
+              <Route path="/email-auth" element={<EmailAuthPage />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/twitter/callback" element={<TwitterCallback />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/compose" element={<Compose />} />
+              <Route path="/wallet" element={<Wallet />} />
+              <Route path="/wallet/settings" element={<WalletSettings />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/rewards" element={<Rewards />} />
+              <Route path="/livestream" element={<Livestream />} />
+              <Route path="/ai" element={<WegramAI />} />
+
+              {/* Full functionality pages */}
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/verification" element={<Verification />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/games" element={<Games />} />
+              <Route path="/messages" element={<Messages />} />
+
+              {/* User Profile */}
+              <Route path="/user/:username" element={<UserProfile />} />
+              <Route path="/user/:username/following" element={<Following />} />
+              <Route path="/user/:username/followers" element={<Followers />} />
+
+              {/* Post Comments */}
+              <Route path="/post/:postId/comments" element={<PostComments />} />
+
+              {/* Chat Routes */}
+              <Route path="/chat/:username" element={<ChatDetail />} />
+              <Route path="/dm/:username" element={<DirectMessage />} />
+
+              {/* Settings and Creation Routes */}
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/create-new" element={<CreateNew />} />
+              <Route path="/create-group" element={<CreateGroup />} />
+
+              {/* Game Routes */}
+              <Route path="/werunner" element={<WeRunner />} />
+
+              {/* Pages that need to be built */}
+              <Route path="/staking" element={<Staking />} />
+              <Route path="/video" element={<Video />} />
+              <Route path="/buy-wegram" element={<BuyWegram />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/notification-settings" element={<NotificationSettings />} />
+              <Route path="/launch-token" element={<LaunchToken />} />
+            </Routes>
+          </main>
+
+          {!hideBottomNav && <BottomNav />}
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="w-80 flex-shrink-0">
+          <div className="h-screen sticky top-0">
+            <DesktopRightSidebar />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Layout - Completely Unchanged - Only shows on screens smaller than lg */}
+      <div className="lg:hidden">
+        {!hideTopNav && (
         <TopBar 
           onMenuClick={() => setIsDrawerOpen(true)}
           onGiftClick={handleGiftClick}
@@ -187,12 +280,13 @@ function AppContent() {
         </Routes>
       </main>
 
-      {!hideBottomNav && <BottomNav />}
-      
+        {!hideBottomNav && <BottomNav />}
+      </div>
+
       {/* Product Key Footer - Commented out - see PRODUCT_KEY_BACKUP.md */}
       {/* {!hideTopNav && <ProductKeyFooter />} */}
-      
-      <SideDrawer 
+
+      <SideDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
       />
