@@ -32,9 +32,9 @@ export const DesktopRightSidebar: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 space-y-6" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="w-full h-full overflow-y-auto p-4 space-y-6 border-l-4" style={{ backgroundColor: 'var(--bg)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
       {/* Trending Section - Real content from home feed trending tab */}
-      <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--card)' }}>
+      <div className="rounded-xl p-4 border-2" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-orange-400" />
           <h3 className="font-bold text-primary">Trending</h3>
@@ -45,8 +45,11 @@ export const DesktopRightSidebar: React.FC = () => {
             {trendingPosts.map((post, index) => (
               <div
                 key={post.id}
-                className="p-3 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer"
-                style={{ backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)' }}
+                className="p-3 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer border-2"
+                style={{
+                  backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)',
+                  borderColor: isDark ? '#6b7280' : '#9ca3af'
+                }}
                 onClick={() => navigate(`/post/${post.id}/comments`)}
               >
                 <div className="flex items-center gap-2 mb-2">
@@ -97,15 +100,18 @@ export const DesktopRightSidebar: React.FC = () => {
       </div>
 
       {/* WeRunner Game Section - Real content */}
-      <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--card)' }}>
+      <div className="rounded-xl p-4 border-2" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
         <div className="flex items-center gap-2 mb-4">
           <Gamepad2 className="w-5 h-5 text-green-400" />
           <h3 className="font-bold text-primary">Game</h3>
         </div>
 
         <div
-          className="p-4 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer"
-          style={{ backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)' }}
+          className="p-4 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer border-2"
+          style={{
+            backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)',
+            borderColor: isDark ? '#6b7280' : '#9ca3af'
+          }}
           onClick={() => navigate('/werunner')}
         >
           <div className="flex items-center gap-3 mb-3">
@@ -134,15 +140,18 @@ export const DesktopRightSidebar: React.FC = () => {
       </div>
 
       {/* Livestream Section - Real content */}
-      <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--card)' }}>
+      <div className="rounded-xl p-4 border-2" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
         <div className="flex items-center gap-2 mb-4">
           <Video className="w-5 h-5 text-red-400" />
           <h3 className="font-bold text-primary">Go Live</h3>
         </div>
 
         <div
-          className="p-4 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer"
-          style={{ backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)' }}
+          className="p-4 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer border-2"
+          style={{
+            backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)',
+            borderColor: isDark ? '#6b7280' : '#9ca3af'
+          }}
           onClick={() => navigate('/livestream')}
         >
           <div className="text-center">

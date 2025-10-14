@@ -48,7 +48,7 @@ export const DesktopSidebar: React.FC = () => {
 
   return (
     <>
-      <div className="w-full h-full overflow-y-auto flex flex-col border-r" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#4b5563' : '#d1d5db' }}>
+      <div className="w-full h-full overflow-y-auto flex flex-col border-r-4" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
         <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3 p-2">
