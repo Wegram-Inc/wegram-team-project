@@ -107,10 +107,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
   return (
     <div className="lg:static lg:bg-opacity-100 lg:backdrop-blur-none fixed top-0 left-0 right-0 z-50 bg-opacity-95 backdrop-blur-sm" style={{ backgroundColor: 'var(--bg)' }}>
       <div className="lg:max-w-none lg:mx-0 lg:px-6 lg:py-4 max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-        {/* Menu Button */}
+        {/* Menu Button - Hidden on desktop since sidebar is always visible */}
         <button
           onClick={onMenuClick}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`lg:hidden p-2 rounded-lg transition-colors ${
             isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-200'
           }`}
           aria-label="Menu"
