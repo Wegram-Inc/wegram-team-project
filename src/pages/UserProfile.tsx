@@ -884,7 +884,7 @@ export const UserProfile: React.FC = () => {
                     post={{
                       id: post.id,
                       userId: post.user_id,
-                      username: `@${post.username}`,
+                      username: post.username.startsWith('@') ? post.username : `@${post.username}`,
                       content: post.content,
                       timestamp: new Date(post.created_at).toLocaleDateString(),
                       likes: post.likes,

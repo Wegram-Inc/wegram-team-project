@@ -152,7 +152,7 @@ export const Profile: React.FC = () => {
     const formattedPosts = userPosts.map(post => ({
       id: post.id,
       userId: post.user_id,
-      username: `@${post.username}`,
+      username: post.username.startsWith('@') ? post.username : `@${post.username}`,
       content: post.content,
       image_url: post.image_url,
       timestamp: new Date(post.created_at).toLocaleDateString(),
