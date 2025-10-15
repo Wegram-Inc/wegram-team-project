@@ -203,7 +203,9 @@ export const Notifications: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     {/* Notification Message */}
                     <p className="text-primary text-sm">
-                      <span className="font-semibold">@{notification.from_username}</span>{' '}
+                      <span className="font-semibold">
+                        {notification.from_username?.startsWith('@') ? notification.from_username : `@${notification.from_username}`}
+                      </span>{' '}
                       {notification.message}
                     </p>
 
