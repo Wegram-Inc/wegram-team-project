@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
 import { CommentComposer } from '../Comments/CommentComposer';
+import blueVerificationIcon from '../../assets/blue-verification.png';
 
 // Unified post interface that works with both mock and database posts
 interface UnifiedPost {
@@ -200,7 +201,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                   </div>
                 ) : (
                   <img
-                    src="/blue-verification.png"
+                    src={blueVerificationIcon}
                     alt="Verified"
                     className="w-4 h-4 shadow-lg"
                   />
