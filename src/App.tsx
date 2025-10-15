@@ -185,64 +185,62 @@ function AppContent() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
-      {/* Desktop Three-Column Layout - Only shows on lg+ screens */}
-      <div className="hidden lg:flex min-h-screen">
-        {/* Left Sidebar - Only show when logged in */}
-        {!hideDesktopSidebars && (
-          <div className="w-64 flex-shrink-0">
-            <div className="h-screen sticky top-0 overflow-hidden">
+      {/* Desktop Sidebars - Only show on lg+ screens when logged in */}
+      {!hideDesktopSidebars && (
+        <>
+          {/* Left Sidebar */}
+          <div className="hidden lg:block fixed left-0 top-0 w-64 h-screen z-30">
+            <div className="h-full overflow-hidden">
               <DesktopSidebar />
             </div>
           </div>
-        )}
 
-        {/* Center Content - Desktop */}
-        <div className="flex-1 relative">
-          {!hideTopNav && (
-            <TopBar
-              onMenuClick={() => setIsDrawerOpen(true)}
-              onGiftClick={handleGiftClick}
-              onMessageClick={handleMessageClick}
-              onNotificationClick={handleNotificationClick}
-            />
-          )}
-
-          <main className="min-h-screen">
-            <AppRoutes />
-          </main>
-
-          {/* Desktop Floating Composer - Only shows on desktop */}
-          <div className="hidden lg:block">
-            <DesktopFloatingComposer />
-          </div>
-        </div>
-
-        {/* Right Sidebar - Only show when logged in */}
-        {!hideDesktopSidebars && (
-          <div className="w-80 flex-shrink-0">
-            <div className="h-screen sticky top-0">
+          {/* Right Sidebar */}
+          <div className="hidden lg:block fixed right-0 top-0 w-80 h-screen z-30">
+            <div className="h-full">
               <DesktopRightSidebar />
             </div>
           </div>
-        )}
+        </>
+      )}
+
+      {/* TopBar - Shows on both desktop and mobile */}
+      {!hideTopNav && (
+        <TopBar
+          onMenuClick={() => setIsDrawerOpen(true)}
+          onGiftClick={handleGiftClick}
+          onMessageClick={handleMessageClick}
+          onNotificationClick={handleNotificationClick}
+        />
+      )}
+
+      {/* Main Content - Responsive margins for desktop sidebars */}
+      <main
+        className="min-h-screen"
+        style={{
+          marginLeft: !hideDesktopSidebars ? '0' : '0',
+          marginRight: !hideDesktopSidebars ? '0' : '0',
+        }}
+      >
+        <div
+          className={`${
+            !hideDesktopSidebars
+              ? 'lg:ml-64 lg:mr-80'
+              : ''
+          }`}
+        >
+          <AppRoutes />
+        </div>
+      </main>
+
+      {/* Bottom Navigation - Only show on mobile */}
+      <div className="lg:hidden">
+        {!hideBottomNav && <BottomNav />}
       </div>
 
-      {/* Mobile Layout - Only shows on screens smaller than lg */}
-      <div className="lg:hidden">
-        {!hideTopNav && (
-          <TopBar
-            onMenuClick={() => setIsDrawerOpen(true)}
-            onGiftClick={handleGiftClick}
-            onMessageClick={handleMessageClick}
-            onNotificationClick={handleNotificationClick}
-          />
-        )}
-
-        <main className="min-h-screen">
-          <AppRoutes />
-        </main>
-
-        {!hideBottomNav && <BottomNav />}
+      {/* Desktop Floating Composer - Only shows on desktop */}
+      <div className="hidden lg:block">
+        <DesktopFloatingComposer />
       </div>
 
       {/* Product Key Footer - Commented out - see PRODUCT_KEY_BACKUP.md */}
