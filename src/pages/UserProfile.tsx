@@ -984,7 +984,7 @@ export const UserProfile: React.FC = () => {
     <div className="min-h-screen relative" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Action Menu Popup */}
       {showActionMenu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black bg-opacity-50" 
@@ -1017,14 +1017,17 @@ export const UserProfile: React.FC = () => {
               </button>
 
               <button
-                onClick={handleBlockUser}
+                onClick={() => {
+                  console.log('Block button clicked!', { currentUser, user, isBlocked });
+                  handleBlockUser();
+                }}
                 className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                style={{ backgroundColor: 'transparent' }}
+                style={{ backgroundColor: 'red', border: '2px solid yellow' }} // Debug styling
                 disabled={isLoading}
               >
                 <UserX className={`w-5 h-5 ${isBlocked ? 'text-green-500' : 'text-red-500'}`} />
                 <span className="text-gray-900 dark:text-white font-medium">
-                  {isBlocked ? 'Unblock User' : 'Block User'}
+                  {isBlocked ? 'Unblock User' : 'Block User'} [DEBUG]
                 </span>
               </button>
 
@@ -1127,20 +1130,23 @@ export const UserProfile: React.FC = () => {
               </div>
               <p className="text-secondary text-sm mb-3">{user.username}</p>
               
-              {/* Action Icons - Gift and 3 dots */}
+              {/* Action Icons - Gift and 3 dots (only for other users) */}
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={() => navigate('/rewards')}
                   className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
                 >
                   <Gift className="w-4 h-4 text-accent" />
                 </button>
-                <button 
-                  onClick={handleProfileMenu}
-                  className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
-                >
-                  <MoreHorizontal className="w-4 h-4 text-secondary" />
-                </button>
+                {/* Only show action menu for other users, not your own profile */}
+                {currentUser && user && currentUser.username !== user.username && (
+                  <button
+                    onClick={handleProfileMenu}
+                    className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
+                  >
+                    <MoreHorizontal className="w-4 h-4 text-secondary" />
+                  </button>
+                )}
               </div>
             </div>
             
