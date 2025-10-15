@@ -296,7 +296,6 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                         />
                       )}
                     </div>
-                    </div>
                   )}
                 </div>
                 <p className="text-xs text-secondary mt-1">{selectedUser.displayName}</p>
