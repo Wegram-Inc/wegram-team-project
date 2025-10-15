@@ -1017,17 +1017,14 @@ export const UserProfile: React.FC = () => {
               </button>
 
               <button
-                onClick={() => {
-                  console.log('Block button clicked!', { currentUser, user, isBlocked });
-                  handleBlockUser();
-                }}
+                onClick={handleBlockUser}
                 className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                style={{ backgroundColor: 'red', border: '2px solid yellow' }} // Debug styling
+                style={{ backgroundColor: 'transparent' }}
                 disabled={isLoading}
               >
                 <UserX className={`w-5 h-5 ${isBlocked ? 'text-green-500' : 'text-red-500'}`} />
                 <span className="text-gray-900 dark:text-white font-medium">
-                  {isBlocked ? 'Unblock User' : 'Block User'} [DEBUG]
+                  {isBlocked ? 'Unblock User' : 'Block User'}
                 </span>
               </button>
 
