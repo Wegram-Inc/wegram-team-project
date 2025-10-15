@@ -36,7 +36,6 @@ export const Notifications: React.FC = () => {
         const data = await response.json();
 
         if (response.ok) {
-          console.log('Notifications data:', data.notifications); // Debug log
           setNotifications(data.notifications || []);
         }
       } catch (error) {
@@ -210,29 +209,21 @@ export const Notifications: React.FC = () => {
                       <span className="font-semibold">
                         {notification.from_username?.startsWith('@') ? notification.from_username : `@${notification.from_username}`}
                       </span>
-                      {/* Debug: Show verification status */}
+                      {/* Verification Badge */}
                       {notification.verified && (
                         ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? (
                           <img
                             src={platinumVerificationIcon}
                             alt="Platinum Verified"
                             className="w-4 h-4 shadow-sm flex-shrink-0"
-                            style={{ backgroundColor: 'red', border: '1px solid yellow' }} // Debug styling
                           />
                         ) : (
                           <img
                             src={goldVerificationIcon}
                             alt="Verified"
                             className="w-4 h-4 shadow-sm flex-shrink-0"
-                            style={{ backgroundColor: 'blue', border: '1px solid yellow' }} // Debug styling
                           />
                         )
-                      )}
-                      {/* Debug info */}
-                      {notification.from_username && (
-                        <span className="text-xs text-red-500">
-                          [verified: {String(notification.verified)}]
-                        </span>
                       )}
                       <span>{notification.message}</span>
                     </p>

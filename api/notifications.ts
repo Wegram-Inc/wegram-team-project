@@ -34,6 +34,7 @@ export default async function handler(
             n.post_id,
             p_from.username as from_username,
             p_from.avatar_url as from_avatar_url,
+            p_from.verified as verified,
             posts.content as post_content
           FROM notifications n
           LEFT JOIN profiles p_from ON n.from_user_id = p_from.id
