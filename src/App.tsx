@@ -204,31 +204,8 @@ function AppContent() {
         </>
       )}
 
-      {/* TopBar - Full width on mobile, constrained to middle column on desktop */}
-      {!hideTopNav && (
-        <div
-          className={`fixed top-0 z-50 w-full ${
-            !hideDesktopSidebars ? 'lg:left-64 lg:right-80' : ''
-          }`}
-        >
-          <TopBar
-            onMenuClick={() => setIsDrawerOpen(true)}
-            onGiftClick={handleGiftClick}
-            onMessageClick={handleMessageClick}
-            onNotificationClick={handleNotificationClick}
-          />
-        </div>
-      )}
-
       {/* Main Content - Responsive margins for desktop sidebars */}
-      <main
-        className="min-h-screen"
-        style={{
-          marginLeft: !hideDesktopSidebars ? '0' : '0',
-          marginRight: !hideDesktopSidebars ? '0' : '0',
-          paddingTop: !hideTopNav ? '64px' : '0', // Add space for fixed TopBar
-        }}
-      >
+      <main className="min-h-screen">
         <div
           className={`${
             !hideDesktopSidebars
@@ -236,6 +213,16 @@ function AppContent() {
               : ''
           }`}
         >
+          {/* TopBar - Part of document flow, not fixed */}
+          {!hideTopNav && (
+            <TopBar
+              onMenuClick={() => setIsDrawerOpen(true)}
+              onGiftClick={handleGiftClick}
+              onMessageClick={handleMessageClick}
+              onNotificationClick={handleNotificationClick}
+            />
+          )}
+
           <AppRoutes />
         </div>
       </main>
