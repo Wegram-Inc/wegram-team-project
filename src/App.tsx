@@ -207,7 +207,9 @@ function AppContent() {
           </main>
 
           {/* Desktop Floating Composer - Only shows on desktop */}
-          <DesktopFloatingComposer />
+          <div className="hidden lg:block">
+            <DesktopFloatingComposer />
+          </div>
 
           <div className="lg:hidden">
             {!hideBottomNav && <BottomNav />}
