@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, MoreHorizontal, Gift, CheckCircle, XCircle, Flag, Share, Mail } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Gift, CheckCircle, XCircle, Flag, Share, Mail, UserX } from 'lucide-react';
 import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonAuth } from '../hooks/useNeonAuth';
@@ -650,6 +650,7 @@ export const UserProfile: React.FC = () => {
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -872,7 +873,47 @@ export const UserProfile: React.FC = () => {
     console.log('Share this profile');
   };
 
+  const handleBlockUser = async () => {
+    if (!currentUser || !user?.id) {
+      alert('Please log in to block users');
+      return;
+    }
 
+    setShowActionMenu(false);
+    setIsLoading(true);
+
+    try {
+      const method = isBlocked ? 'DELETE' : 'POST';
+      const response = await fetch('/api/block-user', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          blocker_id: currentUser.id,
+          blocked_id: user.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setIsBlocked(!isBlocked);
+        if (!isBlocked) {
+          // If we just blocked them, also unfollow
+          setIsFollowing(false);
+          alert(`🚫 Blocked @${user.username}. You will no longer see their posts or receive messages from them.`);
+        } else {
+          alert(`✅ Unblocked @${user.username}.`);
+        }
+      } else {
+        alert(result.error || 'Failed to update block status');
+      }
+    } catch (error) {
+      console.error('Error blocking/unblocking user:', error);
+      alert('Failed to update block status. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -974,7 +1015,19 @@ export const UserProfile: React.FC = () => {
                 <Flag className="w-5 h-5 text-orange-500" />
                 <span className="text-gray-900 dark:text-white font-medium">Report</span>
               </button>
-              
+
+              <button
+                onClick={handleBlockUser}
+                className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                style={{ backgroundColor: 'transparent' }}
+                disabled={isLoading}
+              >
+                <UserX className={`w-5 h-5 ${isBlocked ? 'text-green-500' : 'text-red-500'}`} />
+                <span className="text-gray-900 dark:text-white font-medium">
+                  {isBlocked ? 'Unblock User' : 'Block User'}
+                </span>
+              </button>
+
               <button
                 onClick={handleShareProfile}
                 className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

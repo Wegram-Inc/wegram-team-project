@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2, UserX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
@@ -51,6 +51,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
+  const [isBlocked, setIsBlocked] = React.useState(false);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
@@ -123,6 +124,43 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const handleReportPost = () => {
     setShowMenu(false);
     alert('Post reported. Thank you for keeping WEGRAM safe! 🛡️');
+  };
+
+  const handleBlockUser = async () => {
+    if (!profile || !post.user_id) {
+      alert('Please log in to block users');
+      return;
+    }
+
+    setShowMenu(false);
+
+    try {
+      const method = isBlocked ? 'DELETE' : 'POST';
+      const response = await fetch('/api/block-user', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          blocker_id: profile.id,
+          blocked_id: post.user_id
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setIsBlocked(!isBlocked);
+        if (!isBlocked) {
+          alert(`🚫 Blocked @${post.username}. You will no longer see their posts.`);
+        } else {
+          alert(`✅ Unblocked @${post.username}.`);
+        }
+      } else {
+        alert(result.error || 'Failed to update block status');
+      }
+    } catch (error) {
+      console.error('Error blocking/unblocking user:', error);
+      alert('Failed to update block status. Please try again.');
+    }
   };
 
   const handleDeletePost = () => {
@@ -284,6 +322,19 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                   >
                     <Trash2 className="w-4 h-4" />
                     <span>Delete post</span>
+                  </button>
+                )}
+
+                {/* Show block button only for other users' posts */}
+                {profile && (post.user_id !== profile.id && post.userId !== profile.id) && (
+                  <button
+                    onClick={handleBlockUser}
+                    className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${
+                      isBlocked ? 'text-green-400' : 'text-red-400'
+                    } ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                  >
+                    <UserX className="w-4 h-4" />
+                    <span>{isBlocked ? 'Unblock user' : 'Block user'}</span>
                   </button>
                 )}
 
