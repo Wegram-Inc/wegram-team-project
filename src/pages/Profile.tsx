@@ -6,6 +6,7 @@ import { PostCard } from '../components/Post/PostCard';
 import { mockPosts } from '../data/mockData';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useNeonPosts } from '../hooks/useNeonPosts';
+import blueVerificationIcon from '../assets/blue-verification.png';
 
 // Mock user data for the logged-in user
 const mockLoggedInUser = {
@@ -634,13 +635,17 @@ export const Profile: React.FC = () => {
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>
                 {user.verified && (
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shadow-lg ${
-                    ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
-                      ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                      : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                  }`}>
-                    <CheckCircle className="w-3 h-3 text-white" />
-                  </div>
+                  ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-gray-300 to-gray-500">
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    </div>
+                  ) : (
+                    <img
+                      src={blueVerificationIcon}
+                      alt="Verified"
+                      className="w-5 h-5 shadow-lg"
+                    />
+                  )
                 )}
               </div>
               <p className="text-secondary text-sm mb-3">{user.username}</p>

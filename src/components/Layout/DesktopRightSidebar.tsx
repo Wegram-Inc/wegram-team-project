@@ -3,6 +3,7 @@ import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, Me
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../hooks/useNeonPosts';
+import blueVerificationIcon from '../../assets/blue-verification.png';
 
 export const DesktopRightSidebar: React.FC = () => {
   const { isDark } = useTheme();
@@ -69,13 +70,17 @@ export const DesktopRightSidebar: React.FC = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-medium text-primary">{post.username.startsWith('@') ? post.username : `@${post.username}`}</span>
                       {post.verified && (
-                        <div className={`w-3 h-3 rounded-full flex items-center justify-center shadow-sm ${
-                          ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
-                            ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                            : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                        }`}>
-                          <CheckCircle className="w-2 h-2 text-white" />
-                        </div>
+                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
+                          <div className="w-3 h-3 rounded-full flex items-center justify-center shadow-sm bg-gradient-to-br from-gray-300 to-gray-500">
+                            <CheckCircle className="w-2 h-2 text-white" />
+                          </div>
+                        ) : (
+                          <img
+                            src={blueVerificationIcon}
+                            alt="Verified"
+                            className="w-3 h-3 shadow-sm"
+                          />
+                        )
                       )}
                     </div>
                     <p className="text-sm text-primary line-clamp-2 mt-1">{post.content}</p>
