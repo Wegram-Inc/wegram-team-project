@@ -3,6 +3,8 @@ import { ArrowLeft, Bell, Heart, MessageCircle, UserPlus, Settings, MoreHorizont
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
+import goldVerificationIcon from '../assets/gold-verification.png';
+import platinumVerificationIcon from '../assets/platinum-verification.png';
 
 interface Notification {
   id: string;
@@ -14,6 +16,7 @@ interface Notification {
   from_username?: string;
   from_avatar_url?: string;
   post_content?: string;
+  verified?: boolean;
 }
 
 export const Notifications: React.FC = () => {
@@ -202,11 +205,26 @@ export const Notifications: React.FC = () => {
 
                   <div className="flex-1 min-w-0">
                     {/* Notification Message */}
-                    <p className="text-primary text-sm">
+                    <p className="text-primary text-sm flex items-center gap-1 flex-wrap">
                       <span className="font-semibold">
                         {notification.from_username?.startsWith('@') ? notification.from_username : `@${notification.from_username}`}
-                      </span>{' '}
-                      {notification.message}
+                      </span>
+                      {notification.verified && (
+                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? (
+                          <img
+                            src={platinumVerificationIcon}
+                            alt="Platinum Verified"
+                            className="w-3 h-3 shadow-sm flex-shrink-0"
+                          />
+                        ) : (
+                          <img
+                            src={goldVerificationIcon}
+                            alt="Verified"
+                            className="w-3 h-3 shadow-sm flex-shrink-0"
+                          />
+                        )
+                      )}
+                      <span>{notification.message}</span>
                     </p>
 
                     {/* Post Content Preview */}
