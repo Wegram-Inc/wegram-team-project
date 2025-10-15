@@ -206,12 +206,14 @@ function AppContent() {
 
       {/* TopBar - Shows on both desktop and mobile */}
       {!hideTopNav && (
-        <TopBar
-          onMenuClick={() => setIsDrawerOpen(true)}
-          onGiftClick={handleGiftClick}
-          onMessageClick={handleMessageClick}
-          onNotificationClick={handleNotificationClick}
-        />
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <TopBar
+            onMenuClick={() => setIsDrawerOpen(true)}
+            onGiftClick={handleGiftClick}
+            onMessageClick={handleMessageClick}
+            onNotificationClick={handleNotificationClick}
+          />
+        </div>
       )}
 
       {/* Main Content - Responsive margins for desktop sidebars */}
@@ -220,6 +222,7 @@ function AppContent() {
         style={{
           marginLeft: !hideDesktopSidebars ? '0' : '0',
           marginRight: !hideDesktopSidebars ? '0' : '0',
+          paddingTop: !hideTopNav ? '64px' : '0', // Add space for fixed TopBar
         }}
       >
         <div
