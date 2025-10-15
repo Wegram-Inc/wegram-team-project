@@ -295,7 +295,6 @@ function AppContent() {
         </Routes>
       </main>
 
-        {!hideBottomNav && <BottomNav />}
       </div>
 
       {/* Product Key Footer - Commented out - see PRODUCT_KEY_BACKUP.md */}
