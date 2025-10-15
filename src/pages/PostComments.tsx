@@ -3,6 +3,8 @@ import { ArrowLeft, MessageCircle, User, Heart, MoreHorizontal, CheckCircle } fr
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { CommentComposer } from '../components/Comments/CommentComposer';
+import goldVerificationIcon from '../assets/gold-verification.png';
+import platinumVerificationIcon from '../assets/platinum-verification.png';
 
 interface Comment {
   id: string;
@@ -171,13 +173,19 @@ export const PostComments: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h3 className="text-primary font-semibold">{post.username}</h3>
                 {post.verified && (
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shadow-lg ${
-                    ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username)
-                      ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                      : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                  }`}>
-                    <CheckCircle className="w-2.5 h-2.5 text-white" />
-                  </div>
+                  ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
+                    <img
+                      src={platinumVerificationIcon}
+                      alt="Platinum Verified"
+                      className="w-4 h-4 shadow-lg"
+                    />
+                  ) : (
+                    <img
+                      src={goldVerificationIcon}
+                      alt="Verified"
+                      className="w-4 h-4 shadow-lg"
+                    />
+                  )
                 )}
               </div>
               <p className="text-secondary text-sm">{formatTimestamp(post.created_at)}</p>
@@ -250,13 +258,19 @@ export const PostComments: React.FC = () => {
                         {comment.username}
                       </button>
                       {comment.verified && (
-                        <div className={`w-3 h-3 rounded-full flex items-center justify-center shadow-lg ${
-                          ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username)
-                            ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                            : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                        }`}>
-                          <CheckCircle className="w-2 h-2 text-white" />
-                        </div>
+                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username) ? (
+                          <img
+                            src={platinumVerificationIcon}
+                            alt="Platinum Verified"
+                            className="w-3 h-3 shadow-sm"
+                          />
+                        ) : (
+                          <img
+                            src={goldVerificationIcon}
+                            alt="Verified"
+                            className="w-3 h-3 shadow-sm"
+                          />
+                        )
                       )}
                     </div>
                     <span className="text-secondary text-xs">{formatTimestamp(comment.created_at)}</span>

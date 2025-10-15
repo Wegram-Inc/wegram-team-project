@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, Search, Users, Loader2 } from 'lucide-react';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
+import goldVerificationIcon from '../../assets/gold-verification.png';
+import platinumVerificationIcon from '../../assets/platinum-verification.png';
 
 interface MessageModalProps {
   isOpen: boolean;
@@ -185,12 +187,20 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                       </div>
                     )}
                     {user.verified && (
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
-                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username)
-                          ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                          : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                      }`}>
-                        <span className="text-white text-xs">✓</span>
+                      <div className="absolute -bottom-0.5 -right-0.5">
+                        {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
+                          <img
+                            src={platinumVerificationIcon}
+                            alt="Platinum Verified"
+                            className="w-4 h-4 shadow-lg"
+                          />
+                        ) : (
+                          <img
+                            src={goldVerificationIcon}
+                            alt="Verified"
+                            className="w-4 h-4 shadow-lg"
+                          />
+                        )}
                       </div>
                     )}
                   </div>
@@ -271,12 +281,21 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                     </div>
                   )}
                   {selectedUser.verified && (
-                    <div className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 shadow-lg rounded-full flex items-center justify-center ${
-                      ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username)
-                        ? 'bg-gradient-to-br from-gray-300 to-gray-500'
-                        : 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-                    }`}>
-                      <span className="text-white text-xs">✓</span>
+                    <div className="absolute -bottom-0.5 -right-0.5">
+                      {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username) ? (
+                        <img
+                          src={platinumVerificationIcon}
+                          alt="Platinum Verified"
+                          className="w-4 h-4 shadow-lg"
+                        />
+                      ) : (
+                        <img
+                          src={goldVerificationIcon}
+                          alt="Verified"
+                          className="w-4 h-4 shadow-lg"
+                        />
+                      )}
+                    </div>
                     </div>
                   )}
                 </div>

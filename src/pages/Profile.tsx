@@ -6,7 +6,8 @@ import { PostCard } from '../components/Post/PostCard';
 import { mockPosts } from '../data/mockData';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useNeonPosts } from '../hooks/useNeonPosts';
-import blueVerificationIcon from '../assets/blue-verification.png';
+import goldVerificationIcon from '../assets/gold-verification.png';
+import platinumVerificationIcon from '../assets/platinum-verification.png';
 
 // Mock user data for the logged-in user
 const mockLoggedInUser = {
@@ -636,12 +637,14 @@ export const Profile: React.FC = () => {
                 <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>
                 {user.verified && (
                   ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-gray-300 to-gray-500">
-                      <CheckCircle className="w-3 h-3 text-white" />
-                    </div>
+                    <img
+                      src={platinumVerificationIcon}
+                      alt="Platinum Verified"
+                      className="w-5 h-5 shadow-lg"
+                    />
                   ) : (
                     <img
-                      src={blueVerificationIcon}
+                      src={goldVerificationIcon}
                       alt="Verified"
                       className="w-5 h-5 shadow-lg"
                     />

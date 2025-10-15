@@ -3,7 +3,8 @@ import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, Me
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../hooks/useNeonPosts';
-import blueVerificationIcon from '../../assets/blue-verification.png';
+import goldVerificationIcon from '../../assets/gold-verification.png';
+import platinumVerificationIcon from '../../assets/platinum-verification.png';
 
 export const DesktopRightSidebar: React.FC = () => {
   const { isDark } = useTheme();
@@ -71,12 +72,14 @@ export const DesktopRightSidebar: React.FC = () => {
                       <span className="text-sm font-medium text-primary">{post.username.startsWith('@') ? post.username : `@${post.username}`}</span>
                       {post.verified && (
                         ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
-                          <div className="w-3 h-3 rounded-full flex items-center justify-center shadow-sm bg-gradient-to-br from-gray-300 to-gray-500">
-                            <CheckCircle className="w-2 h-2 text-white" />
-                          </div>
+                          <img
+                            src={platinumVerificationIcon}
+                            alt="Platinum Verified"
+                            className="w-3 h-3 shadow-sm"
+                          />
                         ) : (
                           <img
-                            src={blueVerificationIcon}
+                            src={goldVerificationIcon}
                             alt="Verified"
                             className="w-3 h-3 shadow-sm"
                           />

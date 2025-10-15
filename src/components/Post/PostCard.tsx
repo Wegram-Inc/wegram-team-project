@@ -5,7 +5,8 @@ import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
 import { CommentComposer } from '../Comments/CommentComposer';
-import blueVerificationIcon from '../../assets/blue-verification.png';
+import goldVerificationIcon from '../../assets/gold-verification.png';
+import platinumVerificationIcon from '../../assets/platinum-verification.png';
 
 // Unified post interface that works with both mock and database posts
 interface UnifiedPost {
@@ -196,12 +197,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
               </button>
               {post.verified && (
                 ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-gray-300 to-gray-500">
-                    <CheckCircle className="w-2.5 h-2.5 text-white" />
-                  </div>
+                  <img
+                    src={platinumVerificationIcon}
+                    alt="Platinum Verified"
+                    className="w-4 h-4 shadow-lg"
+                  />
                 ) : (
                   <img
-                    src={blueVerificationIcon}
+                    src={goldVerificationIcon}
                     alt="Verified"
                     className="w-4 h-4 shadow-lg"
                   />
