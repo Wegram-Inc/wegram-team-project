@@ -3,6 +3,7 @@ import { Search, Compass, Users, Hash, TrendingUp, Filter, MapPin, Calendar, Sta
 import { PostCard } from '../components/Post/PostCard';
 import { mockPosts, Post } from '../data/mockData';
 import { useTheme } from '../hooks/useTheme';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface Community {
   id: string;
@@ -458,7 +459,10 @@ export const Explore: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-primary font-semibold">{creator.displayName}</h3>
                         {creator.verified && (
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <VerificationBadge
+                            type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(creator.username) ? 'platinum' : 'gold'}
+                            size="md"
+                          />
                         )}
                       </div>
                       <p className="text-secondary text-sm">{creator.username}</p>

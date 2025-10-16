@@ -3,6 +3,7 @@ import { Search, MessageCircle, Gift, Bell, Moon, Sun, X, User } from 'lucide-re
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
+import { VerificationBadge } from '../VerificationBadge';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -169,9 +170,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
                             {user.username?.replace('@', '')}
                           </p>
                           {user.verified && (
-                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            </div>
+                            <VerificationBadge
+                              type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                              size="md"
+                            />
                           )}
                         </div>
                         <p className="text-sm text-secondary truncate">
