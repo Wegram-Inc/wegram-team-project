@@ -104,6 +104,7 @@ export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'posts' | 'nft'>('posts');
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editUsername, setEditUsername] = useState('');
   const [editBio, setEditBio] = useState('');
   const [editAvatar, setEditAvatar] = useState('');
   const [editTwitterLink, setEditTwitterLink] = useState('');
@@ -175,6 +176,7 @@ export const Profile: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     // Initialize edit form with current data
+    setEditUsername(user.username.replace('@', '') || '');
     setEditBio(user.bio || '');
     setEditAvatar(user.avatar || '');
     setEditTwitterLink(user.twitterLink || '');
@@ -196,14 +198,22 @@ export const Profile: React.FC = () => {
         telegram_link: editTelegramLink
       });
 
-      // Update profile using the auth hook with social media links
-      const result = await updateProfile({
-        bio: editBio,
-        avatar_url: editAvatar,
-        twitter_link: editTwitterLink,
-        discord_link: editDiscordLink,
-        telegram_link: editTelegramLink
+      // Update profile using the user-profile API
+      const response = await fetch('/api/user-profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: profile.id,
+          username: editUsername,
+          bio: editBio,
+          avatar_url: editAvatar,
+          twitter_link: editTwitterLink,
+          discord_link: editDiscordLink,
+          telegram_link: editTelegramLink
+        })
       });
+
+      const result = await response.json();
 
       console.log('✅ Update result:', result);
 
@@ -508,6 +518,25 @@ export const Profile: React.FC = () => {
                   </label>
                 </div>
                 <p className="text-secondary text-sm mt-2">Click camera to change photo</p>
+              </div>
+
+              {/* Username Input */}
+              <div>
+                <label className="block text-primary font-medium mb-2">Username</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
+                    placeholder="your_username"
+                    className="w-full p-3 pl-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary placeholder-secondary focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+                    maxLength={30}
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    @
+                  </div>
+                </div>
+                <p className="text-secondary text-xs mt-1">Only letters, numbers, and underscores. {editUsername.length}/30 characters</p>
               </div>
 
               {/* Bio Input */}
