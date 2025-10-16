@@ -40,6 +40,8 @@ export const PostComments: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCommentComposer, setShowCommentComposer] = useState(false);
+  const [isLikingPost, setIsLikingPost] = useState(false);
+  const [likingComments, setLikingComments] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (postId) {
@@ -83,6 +85,66 @@ export const PostComments: React.FC = () => {
   const handleCommentAdded = () => {
     // Refresh comments and update post comment count
     fetchPostAndComments();
+  };
+
+  const handleLikePost = async () => {
+    if (!profile?.id || !post || isLikingPost) return;
+
+    setIsLikingPost(true);
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: post.id,
+          action: 'like',
+          user_id: profile.id
+        })
+      });
+
+      if (response.ok) {
+        // Update local post state
+        setPost(prev => prev ? { ...prev, likes_count: prev.likes_count + 1 } : null);
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+    } finally {
+      setIsLikingPost(false);
+    }
+  };
+
+  const handleLikeComment = async (commentId: string) => {
+    if (!profile?.id || likingComments.has(commentId)) return;
+
+    setLikingComments(prev => new Set([...prev, commentId]));
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          comment_id: commentId,
+          action: 'like',
+          user_id: profile.id
+        })
+      });
+
+      if (response.ok) {
+        // Update local comment state
+        setComments(prev => prev.map(comment =>
+          comment.id === commentId
+            ? { ...comment, likes_count: comment.likes_count + 1 }
+            : comment
+        ));
+      }
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    } finally {
+      setLikingComments(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(commentId);
+        return newSet;
+      });
+    }
   };
 
   const handleUserClick = (username: string) => {
@@ -198,10 +260,14 @@ export const PostComments: React.FC = () => {
 
         <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-secondary">
+            <button
+              onClick={handleLikePost}
+              disabled={isLikingPost || !profile}
+              className="flex items-center gap-2 text-secondary hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Heart className="w-4 h-4" />
               <span className="text-sm">{post.likes_count}</span>
-            </div>
+            </button>
             <div className="flex items-center gap-2 text-secondary">
               <MessageCircle className="w-4 h-4" />
               <span className="text-sm">{post.comments_count}</span>
@@ -267,7 +333,11 @@ export const PostComments: React.FC = () => {
                     </div>
                   )}
                   <div className="flex items-center gap-4 mt-2">
-                    <button className="flex items-center gap-1 text-secondary hover:text-red-400 transition-colors">
+                    <button
+                      onClick={() => handleLikeComment(comment.id)}
+                      disabled={likingComments.has(comment.id) || !profile}
+                      className="flex items-center gap-1 text-secondary hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <Heart className="w-3 h-3" />
                       <span className="text-xs">{comment.likes_count}</span>
                     </button>
