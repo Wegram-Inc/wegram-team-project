@@ -224,9 +224,33 @@ export const useNeonAuth = () => {
         return { success: false, error: result.error || 'Login failed' };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Login failed' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Login failed'
+      };
+    }
+  };
+
+  // 🚀 Refresh profile data
+  const refreshProfile = async () => {
+    if (!profile) return { success: false, error: 'No user logged in' };
+
+    try {
+      const response = await fetch(`/api/debug-user?user_id=${profile.id}`);
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const updatedProfile = result.user;
+        localStorage.setItem('wegram_user', JSON.stringify(updatedProfile));
+        setProfile(updatedProfile);
+        return { success: true, profile: updatedProfile };
+      } else {
+        return { success: false, error: result.error || 'Failed to refresh profile' };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to refresh profile'
       };
     }
   };
@@ -241,6 +265,7 @@ export const useNeonAuth = () => {
     handleXCallback,
     signOut,
     updateProfile,
+    refreshProfile,
     // Helper properties
     isAuthenticated: !!profile,
     userId: profile?.id || null,

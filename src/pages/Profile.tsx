@@ -114,7 +114,7 @@ export const Profile: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const { profile, updateProfile } = useNeonAuth();
+  const { profile, updateProfile, refreshProfile } = useNeonAuth();
   const { posts: userPosts, loading: postsLoading, fetchUserPosts, deletePost } = useNeonPosts();
 
   // Use real user data only - NO MOCK FALLBACKS
@@ -213,8 +213,9 @@ export const Profile: React.FC = () => {
       console.log('✅ Update result:', result);
 
       if (result.success) {
+        // Refresh profile data to show updated username
+        await refreshProfile();
         setShowEditModal(false);
-        // Profile state is automatically updated by the hook
         alert('✅ Profile updated successfully!');
       } else {
         alert(`❌ Failed to update profile:\n${result.error || 'Unknown error'}\n\nCheck browser console for details.`);
