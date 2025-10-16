@@ -132,12 +132,15 @@ export const PostComments: React.FC = () => {
       });
 
       if (response.ok) {
-        // Update local comment state
-        setComments(prev => prev.map(comment =>
-          comment.id === commentId
-            ? { ...comment, likes_count: comment.likes_count + 1 }
-            : comment
-        ));
+        const result = await response.json();
+        // Use the updated comment from API response (handles like/unlike toggle)
+        if (result.success && result.comment) {
+          setComments(prev => prev.map(comment =>
+            comment.id === commentId
+              ? { ...comment, likes_count: result.comment.likes_count }
+              : comment
+          ));
+        }
       }
     } catch (error) {
       console.error('Error liking comment:', error);
