@@ -4,6 +4,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { VerificationBadge } from '../VerificationBadge';
+import { LanguageSelector } from '../LanguageSelector';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -201,6 +202,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
 
         {/* Right Icons */}
         <div className="flex items-center gap-2">
+          <LanguageSelector />
           <button
             onClick={toggleTheme}
             className={`p-2 rounded-lg transition-colors ${
