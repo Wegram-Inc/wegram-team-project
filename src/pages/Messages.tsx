@@ -3,8 +3,7 @@ import { Search, Settings, Plus, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { MessageModal } from '../components/Layout/MessageModal';
-import goldVerificationIcon from '../assets/gold-verification.png';
-import platinumVerificationIcon from '../assets/platinum-verification.png';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface Chat {
   id: string;
@@ -244,19 +243,10 @@ export const Messages: React.FC = () => {
                     )}
                     {user.verified && (
                       <div className="absolute -bottom-0.5 -right-0.5">
-                        {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
-                          <img
-                            src={platinumVerificationIcon}
-                            alt="Platinum Verified"
-                            className="w-4 h-4 shadow-lg"
-                          />
-                        ) : (
-                          <img
-                            src={goldVerificationIcon}
-                            alt="Verified"
-                            className="w-4 h-4 shadow-lg"
-                          />
-                        )}
+                        <VerificationBadge
+                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                          size="md"
+                        />
                       </div>
                     )}
                   </div>
@@ -321,19 +311,10 @@ export const Messages: React.FC = () => {
                       )}
                       {chat.verified && (
                         <div className="absolute -bottom-0.5 -right-0.5">
-                          {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(chat.username) ? (
-                            <img
-                              src={platinumVerificationIcon}
-                              alt="Platinum Verified"
-                              className="w-4 h-4 shadow-lg"
-                            />
-                          ) : (
-                            <img
-                              src={goldVerificationIcon}
-                              alt="Verified"
-                              className="w-4 h-4 shadow-lg"
-                            />
-                          )}
+                          <VerificationBadge
+                            type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(chat.username) ? 'platinum' : 'gold'}
+                            size="md"
+                          />
                         </div>
                       )}
                     </div>

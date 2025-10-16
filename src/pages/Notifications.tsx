@@ -3,8 +3,7 @@ import { ArrowLeft, Bell, Heart, MessageCircle, UserPlus, Settings, MoreHorizont
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
-import goldVerificationIcon from '../assets/gold-verification.png';
-import platinumVerificationIcon from '../assets/platinum-verification.png';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface Notification {
   id: string;
@@ -211,19 +210,10 @@ export const Notifications: React.FC = () => {
                       </span>
                       {/* Verification Badge */}
                       {notification.verified && (
-                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? (
-                          <img
-                            src={platinumVerificationIcon}
-                            alt="Platinum Verified"
-                            className="w-4 h-4 shadow-sm flex-shrink-0"
-                          />
-                        ) : (
-                          <img
-                            src={goldVerificationIcon}
-                            alt="Verified"
-                            className="w-4 h-4 shadow-sm flex-shrink-0"
-                          />
-                        )
+                        <VerificationBadge
+                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? 'platinum' : 'gold'}
+                          size="md"
+                        />
                       )}
                       <span>{notification.message}</span>
                     </p>

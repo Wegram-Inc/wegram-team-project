@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, Loader2, UserMinus, User } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
-import goldVerificationIcon from '../assets/gold-verification.png';
-import platinumVerificationIcon from '../assets/platinum-verification.png';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface FollowingUser {
   id: string;
@@ -199,19 +198,10 @@ export const Following: React.FC = () => {
                             {user.username}
                           </span>
                           {user.verified && (
-                            ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
-                              <img
-                                src={platinumVerificationIcon}
-                                alt="Platinum Verified"
-                                className="w-4 h-4 shadow-lg flex-shrink-0"
-                              />
-                            ) : (
-                              <img
-                                src={goldVerificationIcon}
-                                alt="Verified"
-                                className="w-4 h-4 shadow-lg flex-shrink-0"
-                              />
-                            )
+                            <VerificationBadge
+                              type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                              size="md"
+                            />
                           )}
                         </button>
 
