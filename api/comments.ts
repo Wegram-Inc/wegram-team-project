@@ -86,6 +86,37 @@ export default async function handler(
 
         return res.status(201).json({ success: true, comment: newComment[0] });
 
+      case 'PUT':
+        // Like/Unlike a comment
+        const { comment_id, action, user_id: actionUserId } = req.body;
+
+        if (!comment_id || !action || !actionUserId) {
+          return res.status(400).json({ error: 'comment_id, action, and user_id are required' });
+        }
+
+        if (action === 'like') {
+          // Check if user already liked this comment
+          const existingLike = await sql`
+            SELECT id FROM comment_likes WHERE comment_id = ${comment_id} AND user_id = ${actionUserId}
+          `;
+
+          if (existingLike.length > 0) {
+            // Unlike - remove like and decrease count
+            await sql`DELETE FROM comment_likes WHERE comment_id = ${comment_id} AND user_id = ${actionUserId}`;
+            await sql`UPDATE comments SET likes_count = likes_count - 1 WHERE id = ${comment_id}`;
+          } else {
+            // Like - add like and increase count
+            await sql`INSERT INTO comment_likes (comment_id, user_id) VALUES (${comment_id}, ${actionUserId})`;
+            await sql`UPDATE comments SET likes_count = likes_count + 1 WHERE id = ${comment_id}`;
+          }
+
+          // Get updated comment
+          const updatedComment = await sql`SELECT * FROM comments WHERE id = ${comment_id}`;
+          return res.status(200).json({ success: true, comment: updatedComment[0] });
+        }
+
+        return res.status(400).json({ error: 'Invalid action' });
+
       default:
         return res.status(405).json({ error: 'Method not allowed' });
     }

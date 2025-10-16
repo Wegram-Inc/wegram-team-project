@@ -213,9 +213,24 @@ export default async function handler(
 
         switch (action) {
           case 'like':
-            updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
-            notificationType = 'like';
-            notificationMessage = 'liked your post';
+            // Check if user already liked this post
+            const existingLike = await sql`
+              SELECT id FROM likes WHERE post_id = ${post_id} AND user_id = ${actionUserId}
+            `;
+
+            if (existingLike.length > 0) {
+              // Unlike - remove like and decrease count
+              await sql`DELETE FROM likes WHERE post_id = ${post_id} AND user_id = ${actionUserId}`;
+              updateQuery = sql`UPDATE posts SET likes_count = likes_count - 1 WHERE id = ${post_id} RETURNING *`;
+              notificationType = null; // No notification for unlikes
+              notificationMessage = '';
+            } else {
+              // Like - add like and increase count
+              await sql`INSERT INTO likes (post_id, user_id) VALUES (${post_id}, ${actionUserId})`;
+              updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
+              notificationType = 'like';
+              notificationMessage = 'liked your post';
+            }
             break;
           case 'gift':
             updateQuery = sql`UPDATE posts SET likes_count = likes_count + 1 WHERE id = ${post_id} RETURNING *`;
@@ -237,8 +252,8 @@ export default async function handler(
           return res.status(404).json({ error: 'Post not found' });
         }
 
-        // Create notification for the post owner (if it's not their own action)
-        if (actionUserId && updatedPost[0].user_id !== actionUserId) {
+        // Create notification for the post owner (if it's not their own action and there's a notification type)
+        if (actionUserId && updatedPost[0].user_id !== actionUserId && notificationType) {
           try {
             await sql`
               INSERT INTO notifications (user_id, from_user_id, type, message, post_id, read)

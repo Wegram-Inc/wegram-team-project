@@ -103,8 +103,11 @@ export const PostComments: React.FC = () => {
       });
 
       if (response.ok) {
-        // Update local post state
-        setPost(prev => prev ? { ...prev, likes_count: prev.likes_count + 1 } : null);
+        const result = await response.json();
+        // The API should return the updated post with correct like count
+        if (result.post) {
+          setPost(prev => prev ? { ...prev, likes_count: result.post.likes_count } : null);
+        }
       }
     } catch (error) {
       console.error('Error liking post:', error);
