@@ -137,19 +137,22 @@ export default async function handler(
           return res.status(400).json({ error: 'User ID and username are required' });
         }
 
+        // Add @ symbol if not present
+        const formattedUsername = newUsername.startsWith('@') ? newUsername : `@${newUsername}`;
+
         // Check if username is unique
         const existingUser = await sql`
-          SELECT id FROM profiles WHERE username = ${newUsername} AND id != ${id}
+          SELECT id FROM profiles WHERE username = ${formattedUsername} AND id != ${id}
         `;
 
         if (existingUser.length > 0) {
           return res.status(400).json({ error: 'Username already taken' });
         }
 
-        // Update username
+        // Update username with @ symbol
         const updatedUser = await sql`
           UPDATE profiles
-          SET username = ${newUsername}, updated_at = NOW()
+          SET username = ${formattedUsername}, updated_at = NOW()
           WHERE id = ${id}
           RETURNING id, username, bio, avatar_url, verified
         `;
