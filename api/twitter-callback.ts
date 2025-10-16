@@ -91,6 +91,13 @@ export default async function handler(
 
     const userData = await userResponse.json();
 
+    // Convert Twitter profile image to higher resolution
+    // Twitter returns _normal (48x48) by default, we want _400x400 for better quality
+    let highResProfileImage = userData.data.profile_image_url;
+    if (highResProfileImage && highResProfileImage.includes('_normal')) {
+      highResProfileImage = highResProfileImage.replace('_normal', '_400x400');
+    }
+
     // Return user data including follower metrics
     return res.status(200).json({
       success: true,
@@ -98,7 +105,7 @@ export default async function handler(
         id: userData.data.id,
         username: userData.data.username,
         name: userData.data.name,
-        profile_image_url: userData.data.profile_image_url,
+        profile_image_url: highResProfileImage,
         description: userData.data.description,
         verified: userData.data.verified,
         followers_count: userData.data.public_metrics?.followers_count || 0,
