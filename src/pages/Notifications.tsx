@@ -120,6 +120,24 @@ export const Notifications: React.FC = () => {
     }
   };
 
+  // Navigate to the post when notification is clicked
+  const handleNotificationClick = (notification: Notification) => {
+    // Mark as read if unread
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
+
+    // Navigate to the post if it has a post_id
+    if (notification.post_id) {
+      navigate(`/post/${notification.post_id}/comments`, {
+        state: {
+          fromNotifications: true,
+          returnPath: '/notifications'
+        }
+      });
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
@@ -193,8 +211,8 @@ export const Notifications: React.FC = () => {
             return (
               <div
                 key={notification.id}
-                onClick={() => !notification.read && markAsRead(notification.id)}
-                className={`card transition-all cursor-pointer ${
+                onClick={() => handleNotificationClick(notification)}
+                className={`card transition-all cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/10 ${
                   !notification.read
                     ? 'bg-purple-600 bg-opacity-5 border-purple-500 border-opacity-30'
                     : ''
