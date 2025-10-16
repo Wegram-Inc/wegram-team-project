@@ -38,9 +38,84 @@ export const Verification: React.FC = () => {
           </span>
         </div>
 
-        {/* Verification Badge */}
-        <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center">
-          <VerificationBadge type="gold" size="lg" className="w-32 h-32" />
+        {/* Large Custom Verification Badge */}
+        <div className="w-40 h-40 mx-auto mb-6 relative animate-pulse">
+          <svg
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full drop-shadow-2xl"
+          >
+            <defs>
+              <linearGradient id="largeGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+                <stop offset="25%" style={{ stopColor: '#FFED4B', stopOpacity: 1 }} />
+                <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
+                <stop offset="75%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: '#FF6B00', stopOpacity: 1 }} />
+              </linearGradient>
+              <radialGradient id="innerGlow">
+                <stop offset="0%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.4 }} />
+                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0 }} />
+              </radialGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            {/* Outer ring */}
+            <circle
+              cx="60"
+              cy="60"
+              r="58"
+              fill="url(#largeGoldGradient)"
+              stroke="white"
+              strokeWidth="4"
+              filter="url(#glow)"
+            />
+
+            {/* Inner gradient circle for depth */}
+            <circle
+              cx="60"
+              cy="60"
+              r="52"
+              fill="url(#largeGoldGradient)"
+              opacity="0.9"
+            />
+
+            {/* Inner glow effect */}
+            <circle
+              cx="60"
+              cy="60"
+              r="48"
+              fill="url(#innerGlow)"
+            />
+
+            {/* Large checkmark */}
+            <path
+              d="M35 60l15 15 30-30"
+              stroke="white"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              filter="url(#glow)"
+            />
+
+            {/* Subtle inner checkmark for depth */}
+            <path
+              d="M35 60l15 15 30-30"
+              stroke="rgba(255,255,255,0.5)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </svg>
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
@@ -60,8 +135,42 @@ export const Verification: React.FC = () => {
       <div className="card">
         <div className="text-center mb-6">
           {/* Badge Preview */}
-          <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
-            <VerificationBadge type="gold" size="lg" className="w-24 h-24" />
+          <div className="w-24 h-24 mx-auto mb-4 relative">
+            <svg
+              viewBox="0 0 100 100"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-full drop-shadow-xl"
+            >
+              <defs>
+                <linearGradient id="cardGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+                  <stop offset="33%" style={{ stopColor: '#FFED4B', stopOpacity: 1 }} />
+                  <stop offset="66%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                </linearGradient>
+              </defs>
+
+              {/* Main circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="48"
+                fill="url(#cardGoldGradient)"
+                stroke="white"
+                strokeWidth="3"
+              />
+
+              {/* Checkmark */}
+              <path
+                d="M30 50l12 12 24-24"
+                stroke="white"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
           </div>
           <h3 className="text-xl font-bold text-primary mb-2">Verification Badge</h3>
           <div className="text-secondary text-sm">
