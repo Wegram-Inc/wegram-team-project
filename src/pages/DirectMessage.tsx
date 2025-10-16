@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Phone, Video, CheckCircle, MoreHorizontal } from 'lucide-react';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface UserProfileData {
   username: string;
@@ -222,9 +223,10 @@ export const DirectMessage: React.FC = () => {
             <div className="flex items-center gap-2 mb-4">
               <h2 className="text-2xl font-bold gradient-text">{user.username?.replace('@', '') || user.displayName}</h2>
               {user.verified && (
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg">
-                  <CheckCircle className="w-4 h-4 text-white" />
-                </div>
+                <VerificationBadge
+                  type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                  size="lg"
+                />
               )}
             </div>
             <p className="text-primary text-sm leading-relaxed text-center mb-2">{user.bio || 'Web3 enthusiast'}</p>
