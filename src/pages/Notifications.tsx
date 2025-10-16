@@ -106,6 +106,15 @@ export const Notifications: React.FC = () => {
     return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
+  // Navigate to user profile
+  const handleUserClick = (username: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent notification click
+    const cleanUsername = username?.replace('@', '') || '';
+    if (cleanUsername) {
+      navigate(`/user/${cleanUsername}`);
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
@@ -188,7 +197,10 @@ export const Notifications: React.FC = () => {
               >
                 <div className="flex items-start gap-3">
                   {/* Profile Avatar */}
-                  <div className="flex-shrink-0">
+                  <button
+                    onClick={(e) => handleUserClick(notification.from_username || '', e)}
+                    className="flex-shrink-0 hover:scale-105 transition-transform cursor-pointer"
+                  >
                     {notification.from_avatar_url ? (
                       <img
                         src={notification.from_avatar_url}
@@ -200,14 +212,17 @@ export const Notifications: React.FC = () => {
                         {notification.from_username?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
                     )}
-                  </div>
+                  </button>
 
                   <div className="flex-1 min-w-0">
                     {/* Notification Message */}
                     <p className="text-primary text-sm flex items-center gap-1 flex-wrap">
-                      <span className="font-semibold">
+                      <button
+                        onClick={(e) => handleUserClick(notification.from_username || '', e)}
+                        className="font-semibold hover:text-purple-400 hover:underline transition-colors cursor-pointer"
+                      >
                         {notification.from_username?.startsWith('@') ? notification.from_username : `@${notification.from_username}`}
-                      </span>
+                      </button>
                       {/* Verification Badge */}
                       {notification.verified && (
                         <VerificationBadge
