@@ -130,37 +130,28 @@ export default async function handler(
         });
 
       case 'PUT':
-        // Update user profile
-        const { id, username: newUsername, bio, avatar_url, twitter_link, discord_link, telegram_link } = req.body;
+        // Update username only
+        const { id, username: newUsername } = req.body;
 
-        if (!id) {
-          return res.status(400).json({ error: 'User ID is required' });
+        if (!id || !newUsername) {
+          return res.status(400).json({ error: 'User ID and username are required' });
         }
 
-        // Check if username is unique (if being updated)
-        if (newUsername !== undefined) {
-          const existingUser = await sql`
-            SELECT id FROM profiles WHERE username = ${newUsername} AND id != ${id}
-          `;
+        // Check if username is unique
+        const existingUser = await sql`
+          SELECT id FROM profiles WHERE username = ${newUsername} AND id != ${id}
+        `;
 
-          if (existingUser.length > 0) {
-            return res.status(400).json({ error: 'Username already taken' });
-          }
+        if (existingUser.length > 0) {
+          return res.status(400).json({ error: 'Username already taken' });
         }
 
-        // Execute update with all provided fields
+        // Update username
         const updatedUser = await sql`
           UPDATE profiles
-          SET
-            username = COALESCE(${newUsername}, username),
-            bio = COALESCE(${bio}, bio),
-            avatar_url = COALESCE(${avatar_url}, avatar_url),
-            twitter_link = COALESCE(${twitter_link}, twitter_link),
-            discord_link = COALESCE(${discord_link}, discord_link),
-            telegram_link = COALESCE(${telegram_link}, telegram_link),
-            updated_at = NOW()
+          SET username = ${newUsername}, updated_at = NOW()
           WHERE id = ${id}
-          RETURNING id, username, bio, avatar_url, verified, twitter_link, discord_link, telegram_link
+          RETURNING id, username, bio, avatar_url, verified
         `;
 
         if (updatedUser.length === 0) {

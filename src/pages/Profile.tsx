@@ -198,18 +198,13 @@ export const Profile: React.FC = () => {
         telegram_link: editTelegramLink
       });
 
-      // Update profile using the user-profile API
+      // Update username only
       const response = await fetch('/api/user-profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: profile.id,
-          username: editUsername,
-          bio: editBio,
-          avatar_url: editAvatar,
-          twitter_link: editTwitterLink,
-          discord_link: editDiscordLink,
-          telegram_link: editTelegramLink
+          username: editUsername
         })
       });
 
