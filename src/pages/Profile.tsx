@@ -110,6 +110,9 @@ export const Profile: React.FC = () => {
   const [editDiscordLink, setEditDiscordLink] = useState('');
   const [editTelegramLink, setEditTelegramLink] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const { profile, updateProfile } = useNeonAuth();
   const { posts: userPosts, loading: postsLoading, fetchUserPosts, deletePost } = useNeonPosts();
 
@@ -292,6 +295,42 @@ export const Profile: React.FC = () => {
     const result = await deletePost(postId, profile.id);
     if (result.error) {
       alert(`Failed to delete post: ${result.error}`);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'delete') {
+      alert('Please type "delete" to confirm account deletion');
+      return;
+    }
+
+    if (!profile?.id) {
+      alert('No user found to delete');
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/delete-account', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: profile.id })
+      });
+
+      if (response.ok) {
+        alert('Account deleted successfully');
+        // Clear local storage and redirect to home
+        localStorage.clear();
+        window.location.href = '/';
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete account: ${error.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      alert('Failed to delete account. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -653,14 +692,25 @@ export const Profile: React.FC = () => {
                 </button>
               </div>
             </div>
-            
-            {/* Edit Profile Button - positioned on the right */}
-            <button
-              onClick={handleEditProfile}
-              className="btn-primary px-6 py-2 rounded-full font-medium transition-colors"
-            >
-              Edit Profile
-            </button>
+
+            {/* Account Actions */}
+            <div className="flex flex-col gap-2">
+              {/* Delete Account Button */}
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="px-4 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-full font-medium transition-colors"
+              >
+                Delete Account
+              </button>
+
+              {/* Edit Profile Button */}
+              <button
+                onClick={handleEditProfile}
+                className="btn-primary px-6 py-2 rounded-full font-medium transition-colors"
+              >
+                Edit Profile
+              </button>
+            </div>
           </div>
 
           {/* Stats */}
@@ -876,6 +926,46 @@ export const Profile: React.FC = () => {
           console.log('Message sent successfully');
         }}
       />
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-red-600 mb-4">Delete Account</h3>
+            <p className="text-primary mb-4">
+              This action cannot be undone. This will permanently delete your account, all your posts, comments, and remove all your data from WEGRAM.
+            </p>
+            <p className="text-primary mb-4 font-medium">
+              Type <span className="font-bold text-red-600">"delete"</span> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type 'delete' here"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-primary mb-6"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-secondary rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'delete' || isDeleting}
+                className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
