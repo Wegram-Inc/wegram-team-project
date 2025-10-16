@@ -38,16 +38,12 @@ export const ChatDetail: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [otherUser, setOtherUser] = useState<ChatState | null>(null);
 
-  // Get chat info from navigation state or fetch user info
+  // Always fetch fresh user info to ensure we have avatar data
   useEffect(() => {
-    const state = location.state as ChatState;
-    if (state) {
-      setOtherUser(state);
-    } else if (username) {
-      // If no state provided, we need to fetch user info
+    if (username) {
       fetchUserInfo();
     }
-  }, [username, location.state]);
+  }, [username]);
 
   // Load messages when we have both profile and otherUser
   useEffect(() => {
