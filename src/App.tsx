@@ -232,9 +232,9 @@ function AppContent() {
         {!hideBottomNav && <BottomNav />}
       </div>
 
-      {/* Desktop Floating Composer - Only shows on desktop */}
+      {/* Desktop Floating Composer - Only shows on desktop and home page */}
       <div className="hidden lg:block">
-        <DesktopFloatingComposer />
+        {location.pathname === '/home' && <DesktopFloatingComposer />}
       </div>
 
       {/* Product Key Footer - Commented out - see PRODUCT_KEY_BACKUP.md */}
