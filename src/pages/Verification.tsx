@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, ArrowRight, Users } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 export const Verification: React.FC = () => {
   const { isDark } = useTheme();
@@ -29,12 +30,17 @@ export const Verification: React.FC = () => {
     <div className="max-w-md mx-auto px-4 pt-20 pb-24">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="relative w-16 h-16 mx-auto mb-4 rounded-2xl gradient-bg flex items-center justify-center">
-          <CheckCircle className="w-8 h-8 text-white" />
-          {/* Member Counter */}
-          <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg border-2 border-white min-w-[2.5rem] text-center">
-            {loading ? '...' : memberCount.toLocaleString()}
-          </div>
+        {/* Member Counter */}
+        <div className="mb-6 inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg">
+          <Users className="w-4 h-4" />
+          <span className="text-sm font-bold">
+            {loading ? 'Loading...' : `${memberCount.toLocaleString()} Members`}
+          </span>
+        </div>
+
+        {/* Verification Badge */}
+        <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+          <VerificationBadge type="gold" size="lg" className="w-20 h-20" />
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
@@ -54,8 +60,8 @@ export const Verification: React.FC = () => {
       <div className="card">
         <div className="text-center mb-6">
           {/* Badge Preview */}
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 flex items-center justify-center shadow-xl border-4 border-gray-300">
-            <CheckCircle className="w-10 h-10 text-gray-600" />
+          <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+            <VerificationBadge type="gold" size="lg" className="w-16 h-16" />
           </div>
           <h3 className="text-xl font-bold text-primary mb-2">Verification Badge</h3>
           <div className="text-secondary text-sm">
