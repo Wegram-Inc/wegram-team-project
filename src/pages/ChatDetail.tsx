@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, MoreHorizontal, Phone, Video, Search, Send, Loader2 } from 'lucide-react';
 import { useNeonAuth } from '../hooks/useNeonAuth';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface Message {
   id: string;
@@ -20,6 +21,8 @@ interface ChatState {
   username?: string;
   name?: string;
   isNewChat?: boolean;
+  avatar_url?: string;
+  verified?: boolean;
 }
 
 export const ChatDetail: React.FC = () => {
@@ -57,15 +60,18 @@ export const ChatDetail: React.FC = () => {
     if (!username) return;
 
     try {
-      const response = await fetch(`/api/search-users?q=${encodeURIComponent(username.replace('@', ''))}`);
+      // Use the user-profile API to get complete user data including avatar and verification
+      const response = await fetch(`/api/user-profile?username=${encodeURIComponent(username.replace('@', ''))}`);
       const data = await response.json();
 
-      if (data.success && data.users.length > 0) {
-        const user = data.users[0];
+      if (response.ok && data.user) {
+        const user = data.user;
         setOtherUser({
           userId: user.id,
           username: user.username,
-          name: user.displayName,
+          name: user.username,
+          avatar_url: user.avatar_url,
+          verified: user.verified,
           isNewChat: false
         });
       }
@@ -179,6 +185,18 @@ export const ChatDetail: React.FC = () => {
     return date.toLocaleDateString();
   };
 
+  const handleAvatarClick = () => {
+    if (!otherUser?.username) return;
+
+    const cleanUsername = otherUser.username.replace('@', '');
+    navigate(`/user/${cleanUsername}`, {
+      state: {
+        fromChat: true,
+        returnPath: `/chat/${username}`
+      }
+    });
+  };
+
 
   return (
     <div className="max-w-md mx-auto" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -186,16 +204,48 @@ export const ChatDetail: React.FC = () => {
       <div className="sticky top-0 z-10" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="p-2 hover:bg-overlay-light rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-primary" />
             </button>
+
+            {/* User Avatar */}
+            <button
+              onClick={handleAvatarClick}
+              className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl"
+            >
+              {otherUser?.avatar_url ? (
+                <img
+                  src={otherUser.avatar_url}
+                  alt={otherUser.username || username}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full gradient-bg flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">
+                    {(otherUser?.username || username)?.charAt(1)?.toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+            </button>
+
             <div className="flex-1">
-              <h1 className="text-lg font-semibold text-primary">
-                {otherUser?.name || otherUser?.username || username}
-              </h1>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleAvatarClick}
+                  className="text-lg font-semibold text-primary hover:text-purple-400 hover:underline transition-all duration-200 cursor-pointer"
+                >
+                  {otherUser?.name || otherUser?.username || username}
+                </button>
+                {otherUser?.verified && (
+                  <VerificationBadge
+                    type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(otherUser.username || '') ? 'platinum' : 'gold'}
+                    size="md"
+                  />
+                )}
+              </div>
               <p className="text-sm text-secondary">
                 {otherUser?.isNewChat ? 'Start a conversation' : 'Online'}
               </p>
