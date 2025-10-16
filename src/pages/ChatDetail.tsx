@@ -60,12 +60,12 @@ export const ChatDetail: React.FC = () => {
     if (!username) return;
 
     try {
-      // Use the user-profile API to get complete user data including avatar and verification
-      const response = await fetch(`/api/user-profile?username=${encodeURIComponent(username.replace('@', ''))}`);
+      // Use the search-users API (same as Messages page) since it returns working avatar data
+      const response = await fetch(`/api/search-users?q=${encodeURIComponent(username.replace('@', ''))}`);
       const data = await response.json();
 
-      if (response.ok && data.user) {
-        const user = data.user;
+      if (data.success && data.users.length > 0) {
+        const user = data.users[0];
         setOtherUser({
           userId: user.id,
           username: user.username,
