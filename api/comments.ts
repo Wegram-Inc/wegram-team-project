@@ -95,6 +95,17 @@ export default async function handler(
         }
 
         if (action === 'like') {
+          // Ensure comment_likes table exists
+          await sql`
+            CREATE TABLE IF NOT EXISTS comment_likes (
+              id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+              comment_id UUID REFERENCES comments(id) ON DELETE CASCADE,
+              user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+              created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+              UNIQUE(comment_id, user_id)
+            )
+          `;
+
           // Check if user already liked this comment
           const existingLike = await sql`
             SELECT id FROM comment_likes WHERE comment_id = ${comment_id} AND user_id = ${actionUserId}
