@@ -3,8 +3,7 @@ import { ArrowLeft, MessageCircle, User, Heart, MoreHorizontal, CheckCircle } fr
 import { useParams, useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { CommentComposer } from '../components/Comments/CommentComposer';
-import goldVerificationIcon from '../assets/gold-verification.png';
-import platinumVerificationIcon from '../assets/platinum-verification.png';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface Comment {
   id: string;
@@ -173,19 +172,10 @@ export const PostComments: React.FC = () => {
               <div className="flex items-center gap-2">
                 <h3 className="text-primary font-semibold">{post.username}</h3>
                 {post.verified && (
-                  ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
-                    <img
-                      src={platinumVerificationIcon}
-                      alt="Platinum Verified"
-                      className="w-4 h-4 shadow-lg"
-                    />
-                  ) : (
-                    <img
-                      src={goldVerificationIcon}
-                      alt="Verified"
-                      className="w-4 h-4 shadow-lg"
-                    />
-                  )
+                  <VerificationBadge
+                    type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
+                    size="md"
+                  />
                 )}
               </div>
               <p className="text-secondary text-sm">{formatTimestamp(post.created_at)}</p>
@@ -258,19 +248,10 @@ export const PostComments: React.FC = () => {
                         {comment.username}
                       </button>
                       {comment.verified && (
-                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username) ? (
-                          <img
-                            src={platinumVerificationIcon}
-                            alt="Platinum Verified"
-                            className="w-3 h-3 shadow-sm"
-                          />
-                        ) : (
-                          <img
-                            src={goldVerificationIcon}
-                            alt="Verified"
-                            className="w-3 h-3 shadow-sm"
-                          />
-                        )
+                        <VerificationBadge
+                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username) ? 'platinum' : 'gold'}
+                          size="sm"
+                        />
                       )}
                     </div>
                     <span className="text-secondary text-xs">{formatTimestamp(comment.created_at)}</span>

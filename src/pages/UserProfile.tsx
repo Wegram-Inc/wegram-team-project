@@ -5,8 +5,7 @@ import { MessageModal } from '../components/Layout/MessageModal';
 import { PostCard } from '../components/Post/PostCard';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useNeonPosts } from '../hooks/useNeonPosts';
-import goldVerificationIcon from '../assets/gold-verification.png';
-import platinumVerificationIcon from '../assets/platinum-verification.png';
+import { VerificationBadge } from '../components/VerificationBadge';
 
 interface UserProfileData {
   username: string;
@@ -1110,19 +1109,10 @@ export const UserProfile: React.FC = () => {
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="text-xl font-bold gradient-text">{user.username?.replace('@', '') || 'User'}</h2>
                 {user.verified && (
-                  ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
-                    <img
-                      src={platinumVerificationIcon}
-                      alt="Platinum Verified"
-                      className="w-5 h-5 shadow-lg"
-                    />
-                  ) : (
-                    <img
-                      src={goldVerificationIcon}
-                      alt="Verified"
-                      className="w-5 h-5 shadow-lg"
-                    />
-                  )
+                  <VerificationBadge
+                    type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                    size="lg"
+                  />
                 )}
               </div>
               <p className="text-secondary text-sm mb-3">{user.username}</p>

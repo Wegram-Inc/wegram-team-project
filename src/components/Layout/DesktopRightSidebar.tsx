@@ -3,8 +3,7 @@ import { TrendingUp, Gamepad2, Video, ExternalLink, Hash, Flame, Play, Heart, Me
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Post } from '../../hooks/useNeonPosts';
-import goldVerificationIcon from '../../assets/gold-verification.png';
-import platinumVerificationIcon from '../../assets/platinum-verification.png';
+import { VerificationBadge } from '../VerificationBadge';
 
 export const DesktopRightSidebar: React.FC = () => {
   const { isDark } = useTheme();
@@ -71,19 +70,10 @@ export const DesktopRightSidebar: React.FC = () => {
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-medium text-primary">{post.username.startsWith('@') ? post.username : `@${post.username}`}</span>
                       {post.verified && (
-                        ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
-                          <img
-                            src={platinumVerificationIcon}
-                            alt="Platinum Verified"
-                            className="w-3 h-3 shadow-sm"
-                          />
-                        ) : (
-                          <img
-                            src={goldVerificationIcon}
-                            alt="Verified"
-                            className="w-3 h-3 shadow-sm"
-                          />
-                        )
+                        <VerificationBadge
+                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
+                          size="sm"
+                        />
                       )}
                     </div>
                     <p className="text-sm text-primary line-clamp-2 mt-1">{post.content}</p>

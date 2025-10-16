@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, Search, Users, Loader2 } from 'lucide-react';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
-import goldVerificationIcon from '../../assets/gold-verification.png';
-import platinumVerificationIcon from '../../assets/platinum-verification.png';
+import { VerificationBadge } from '../VerificationBadge';
 
 interface MessageModalProps {
   isOpen: boolean;
@@ -188,19 +187,10 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                     )}
                     {user.verified && (
                       <div className="absolute -bottom-0.5 -right-0.5">
-                        {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? (
-                          <img
-                            src={platinumVerificationIcon}
-                            alt="Platinum Verified"
-                            className="w-4 h-4 shadow-lg"
-                          />
-                        ) : (
-                          <img
-                            src={goldVerificationIcon}
-                            alt="Verified"
-                            className="w-4 h-4 shadow-lg"
-                          />
-                        )}
+                        <VerificationBadge
+                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                          size="md"
+                        />
                       </div>
                     )}
                   </div>
@@ -282,19 +272,10 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                   )}
                   {selectedUser.verified && (
                     <div className="absolute -bottom-0.5 -right-0.5">
-                      {['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username) ? (
-                        <img
-                          src={platinumVerificationIcon}
-                          alt="Platinum Verified"
-                          className="w-4 h-4 shadow-lg"
-                        />
-                      ) : (
-                        <img
-                          src={goldVerificationIcon}
-                          alt="Verified"
-                          className="w-4 h-4 shadow-lg"
-                        />
-                      )}
+                      <VerificationBadge
+                        type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username) ? 'platinum' : 'gold'}
+                        size="md"
+                      />
                     </div>
                   )}
                 </div>

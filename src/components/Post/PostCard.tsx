@@ -5,8 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { Post as MockPost } from '../../data/mockData';
 import { CommentComposer } from '../Comments/CommentComposer';
-import goldVerificationIcon from '../../assets/gold-verification.png';
-import platinumVerificationIcon from '../../assets/platinum-verification.png';
+import { VerificationBadge } from '../VerificationBadge';
 
 // Unified post interface that works with both mock and database posts
 interface UnifiedPost {
@@ -234,19 +233,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                 {post.username}
               </button>
               {post.verified && (
-                ['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? (
-                  <img
-                    src={platinumVerificationIcon}
-                    alt="Platinum Verified"
-                    className="w-4 h-4 shadow-lg"
-                  />
-                ) : (
-                  <img
-                    src={goldVerificationIcon}
-                    alt="Verified"
-                    className="w-4 h-4 shadow-lg"
-                  />
-                )
+                <VerificationBadge
+                  type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
+                  size="md"
+                />
               )}
             </div>
             <div className="text-secondary text-sm">
