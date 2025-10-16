@@ -111,7 +111,12 @@ export const Notifications: React.FC = () => {
     event.stopPropagation(); // Prevent notification click
     const cleanUsername = username?.replace('@', '') || '';
     if (cleanUsername) {
-      navigate(`/user/${cleanUsername}`);
+      navigate(`/user/${cleanUsername}`, {
+        state: {
+          fromNotifications: true,
+          returnPath: '/notifications'
+        }
+      });
     }
   };
 

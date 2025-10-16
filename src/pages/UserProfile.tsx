@@ -704,13 +704,20 @@ export const UserProfile: React.FC = () => {
   
   // Check if we came from chat page
   const isFromChat = location.state?.fromChat;
-  
-  // If no originalProfile is set, this means we came directly from home
-  const isFirstProfileFromHome = !originalProfile;
-  
+
+  // Check if we came from notifications page
+  const isFromNotifications = location.state?.fromNotifications;
+  const returnPath = location.state?.returnPath;
+
+  // If no originalProfile is set and not from notifications, this means we came directly from home
+  const isFirstProfileFromHome = !originalProfile && !isFromNotifications;
+
   // Determine where the back button should go
   const getBackDestination = () => {
-    if (isFromChat) {
+    if (isFromNotifications && returnPath) {
+      // If we came from notifications, go back to notifications
+      return { path: returnPath, state: null };
+    } else if (isFromChat) {
       // If we came from chat, go back to chat
       return { path: '/messages', state: null };
     } else if (isFirstProfileFromHome) {
@@ -719,8 +726,8 @@ export const UserProfile: React.FC = () => {
     } else {
       // If we came from another profile, go back to that original profile
       // The original profile should go back to home (not create a fake home profile)
-      return { 
-        path: `/user/${originalProfile}`, 
+      return {
+        path: `/user/${originalProfile}`,
         state: null // No state, so it will be treated as first profile from home
       };
     }
@@ -731,7 +738,8 @@ export const UserProfile: React.FC = () => {
   // 1. This is the first profile from home (can go back to home)
   // 2. This is a subsequent profile (can go back to original profile)
   // 3. This is from chat (can go back to chat)
-  const canGoBack = isFirstProfileFromHome || originalProfile || isFromChat;
+  // 4. This is from notifications (can go back to notifications)
+  const canGoBack = isFirstProfileFromHome || originalProfile || isFromChat || isFromNotifications;
   
   if (!username) {
     navigate('/home');
