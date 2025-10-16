@@ -39,8 +39,8 @@ export const Verification: React.FC = () => {
         </div>
 
         {/* Verification Badge */}
-        <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-          <VerificationBadge type="gold" size="lg" className="w-20 h-20" />
+        <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center">
+          <VerificationBadge type="gold" size="lg" className="w-32 h-32" />
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
@@ -60,8 +60,8 @@ export const Verification: React.FC = () => {
       <div className="card">
         <div className="text-center mb-6">
           {/* Badge Preview */}
-          <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-            <VerificationBadge type="gold" size="lg" className="w-16 h-16" />
+          <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+            <VerificationBadge type="gold" size="lg" className="w-24 h-24" />
           </div>
           <h3 className="text-xl font-bold text-primary mb-2">Verification Badge</h3>
           <div className="text-secondary text-sm">
