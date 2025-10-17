@@ -9,6 +9,7 @@ export const DesktopRightSidebar: React.FC = () => {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
+  const [showAllTrending, setShowAllTrending] = useState(false);
 
   useEffect(() => {
     // Fetch trending posts from the same API as the home feed trending tab
@@ -18,7 +19,7 @@ export const DesktopRightSidebar: React.FC = () => {
         const result = await response.json();
 
         if (response.ok && result.posts) {
-          setTrendingPosts(result.posts.slice(0, 3)); // Show top 3 trending posts
+          setTrendingPosts(result.posts); // Store all trending posts
         } else {
           console.error('Failed to fetch trending posts:', result.error);
           setTrendingPosts([]);
@@ -43,7 +44,7 @@ export const DesktopRightSidebar: React.FC = () => {
 
         {trendingPosts.length > 0 ? (
           <div className="space-y-3">
-            {trendingPosts.map((post, index) => (
+            {(showAllTrending ? trendingPosts : trendingPosts.slice(0, 3)).map((post, index) => (
               <div
                 key={post.id}
                 className="p-3 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer border-2"
@@ -111,12 +112,14 @@ export const DesktopRightSidebar: React.FC = () => {
           </div>
         )}
 
-        <button
-          onClick={() => navigate('/home?tab=trending')}
-          className="w-full mt-4 py-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
-        >
-          View all trending
-        </button>
+        {trendingPosts.length > 3 && (
+          <button
+            onClick={() => setShowAllTrending(!showAllTrending)}
+            className="w-full mt-4 py-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
+          >
+            {showAllTrending ? 'Show less' : 'View all trending'}
+          </button>
+        )}
       </div>
 
       {/* WeRunner Game Section - Real content */}
