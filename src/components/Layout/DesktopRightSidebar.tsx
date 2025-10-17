@@ -42,7 +42,7 @@ export const DesktopRightSidebar: React.FC = () => {
         </div>
 
         {trendingPosts.length > 0 ? (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-3 max-h-96 overflow-y-auto overflow-x-hidden">
             {trendingPosts.map((post, index) => (
               <div
                 key={post.id}
