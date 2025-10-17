@@ -9,7 +9,6 @@ export const DesktopRightSidebar: React.FC = () => {
   const { isDark } = useTheme();
   const navigate = useNavigate();
   const [trendingPosts, setTrendingPosts] = useState<Post[]>([]);
-  const [showAllTrending, setShowAllTrending] = useState(false);
 
   useEffect(() => {
     // Fetch trending posts from the same API as the home feed trending tab
@@ -43,8 +42,8 @@ export const DesktopRightSidebar: React.FC = () => {
         </div>
 
         {trendingPosts.length > 0 ? (
-          <div className="space-y-3">
-            {(showAllTrending ? trendingPosts : trendingPosts.slice(0, 3)).map((post, index) => (
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {trendingPosts.map((post, index) => (
               <div
                 key={post.id}
                 className="p-3 rounded-lg hover:bg-opacity-50 transition-colors cursor-pointer border-2"
@@ -110,15 +109,6 @@ export const DesktopRightSidebar: React.FC = () => {
             <p className="text-sm text-secondary">No trending posts yet</p>
             <p className="text-xs text-secondary mt-1">Posts need more engagement to trend</p>
           </div>
-        )}
-
-        {trendingPosts.length > 3 && (
-          <button
-            onClick={() => setShowAllTrending(!showAllTrending)}
-            className="w-full mt-4 py-2 text-sm text-orange-400 hover:text-orange-300 transition-colors"
-          >
-            {showAllTrending ? 'Show less' : 'View all trending'}
-          </button>
         )}
       </div>
 
