@@ -39,17 +39,22 @@ export const Verification: React.FC = () => {
         </div>
 
         {/* Premium Verification Badge */}
-        <div className="w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-6 relative">
-          {/* Elegant border frame */}
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 p-1 shadow-xl">
-            <div className="w-full h-full rounded-lg bg-white dark:bg-gray-900 p-4 flex items-center justify-center">
+        <div className="w-48 h-48 sm:w-56 sm:h-56 mx-auto mb-6 relative">
+          {/* Outer glow effect */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 opacity-30 animate-pulse blur-xl"></div>
+
+          {/* Main premium frame */}
+          <div className="absolute inset-2 rounded-2xl bg-gradient-to-br from-yellow-300 via-yellow-400 to-orange-500 p-1 shadow-2xl animate-pulse">
+            <div className="w-full h-full rounded-2xl bg-gradient-to-br from-gray-900 via-black to-gray-900 p-1">
+              <div className="w-full h-full rounded-xl bg-gradient-to-br from-yellow-500 via-yellow-400 to-orange-400 p-0.5">
+                <div className="w-full h-full rounded-xl bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
 
                   {/* Badge SVG */}
                   <svg
                     viewBox="0 0 120 120"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-28 h-28 sm:w-32 sm:h-32 drop-shadow-2xl"
+                    className="w-32 h-32 sm:w-36 sm:h-36 drop-shadow-2xl"
                   >
                     <defs>
                       <linearGradient id="largeGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -123,10 +128,19 @@ export const Verification: React.FC = () => {
                   </svg>
                 </div>
               </div>
+            </div>
+          </div>
 
-          {/* Simple corner accents */}
-          <div className="absolute top-3 right-3 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-3 left-3 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          {/* Epic corner effects */}
+          <div className="absolute top-4 right-4 w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
+          <div className="absolute top-6 left-4 w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-4 left-4 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+          <div className="absolute bottom-6 right-4 w-2 h-2 bg-green-400 rounded-full animate-bounce"></div>
+
+          {/* Floating sparkles */}
+          <div className="absolute top-8 right-8 text-yellow-300 text-lg animate-pulse">✨</div>
+          <div className="absolute bottom-10 left-8 text-blue-300 text-lg animate-bounce">⭐</div>
+          <div className="absolute top-12 left-12 text-purple-300 text-sm animate-pulse">💎</div>
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
