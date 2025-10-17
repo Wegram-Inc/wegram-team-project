@@ -10,11 +10,11 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
 ];
 
 export const LanguageSelector: React.FC = () => {
@@ -44,11 +44,12 @@ export const LanguageSelector: React.FC = () => {
     if (isTranslating || langCode === selectedLang) return;
 
     setIsTranslating(true);
-    setSelectedLang(langCode);
     setIsOpen(false);
 
     try {
       await translationService.setLanguage(langCode);
+      // Update state AFTER translation service is done
+      setSelectedLang(langCode);
     } catch (error) {
       console.error('Failed to change language:', error);
     } finally {
