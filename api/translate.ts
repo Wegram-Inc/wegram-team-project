@@ -21,7 +21,13 @@ export default async function handler(
     // You would need to add GOOGLE_TRANSLATE_API_KEY to your environment variables
 
     // Mock translation for demonstration
+    // In production, replace with Google Translate API
     const translations = texts.map((text: string) => {
+      // Check if it's a number or special character only
+      if (/^[\d\s\W]+$/.test(text)) {
+        return text; // Don't translate numbers and special chars
+      }
+
       // Basic mock translations
       const basicTranslations: any = {
         'es': {
@@ -43,6 +49,21 @@ export default async function handler(
           'Posts': 'Publicaciones',
           'Edit Profile': 'Editar Perfil',
           'Delete Account': 'Eliminar Cuenta',
+          'Search @handle or posts...': 'Buscar @usuario o publicaciones...',
+          'Trenches': 'Trincheras',
+          'followers': 'seguidores',
+          'following': 'siguiendo',
+          'Like': 'Me gusta',
+          'Reply': 'Responder',
+          'Share': 'Compartir',
+          'View all trending': 'Ver todas las tendencias',
+          'Game': 'Juego',
+          'TRENDING': 'TENDENCIAS',
+          'Follow': 'Seguir',
+          'Unfollow': 'Dejar de seguir',
+          'Block': 'Bloquear',
+          'Report': 'Reportar',
+          'Not Interested': 'No me interesa',
         },
         'fr': {
           'Home': 'Accueil',
@@ -63,6 +84,21 @@ export default async function handler(
           'Posts': 'Publications',
           'Edit Profile': 'Modifier le Profil',
           'Delete Account': 'Supprimer le Compte',
+          'Search @handle or posts...': 'Rechercher @pseudo ou publications...',
+          'Trenches': 'Tranchées',
+          'followers': 'abonnés',
+          'following': 'abonnements',
+          'Like': 'J\'aime',
+          'Reply': 'Répondre',
+          'Share': 'Partager',
+          'View all trending': 'Voir toutes les tendances',
+          'Game': 'Jeu',
+          'TRENDING': 'TENDANCES',
+          'Follow': 'Suivre',
+          'Unfollow': 'Ne plus suivre',
+          'Block': 'Bloquer',
+          'Report': 'Signaler',
+          'Not Interested': 'Pas intéressé',
         },
         'zh': {
           'Home': '主页',

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, Check } from 'lucide-react';
+import { translationService } from '../services/translationService';
 
 interface Language {
   code: string;
@@ -25,7 +26,7 @@ const languages: Language[] = [
 
 export const LanguageSelector: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('en');
+  const [selectedLang, setSelectedLang] = useState(() => translationService.getCurrentLanguage());
   const [isTranslating, setIsTranslating] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,126 +41,20 @@ export const LanguageSelector: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    // Check for saved language preference
-    const savedLang = localStorage.getItem('wegram_language');
-    if (savedLang && savedLang !== 'en') {
-      setSelectedLang(savedLang);
-      translatePage(savedLang);
-    }
-  }, []);
-
-  const translatePage = async (targetLang: string) => {
-    if (targetLang === 'en') {
-      // Reset to original content
-      window.location.reload();
-      return;
-    }
+  const handleLanguageSelect = async (langCode: string) => {
+    if (isTranslating || langCode === selectedLang) return;
 
     setIsTranslating(true);
+    setSelectedLang(langCode);
+    setIsOpen(false);
 
     try {
-      // Get all text nodes in the page
-      const textNodes: Node[] = [];
-      const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        {
-          acceptNode: (node) => {
-            // Skip script and style tags
-            const parent = node.parentElement;
-            if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE')) {
-              return NodeFilter.FILTER_REJECT;
-            }
-            // Only accept nodes with actual text content
-            if (node.textContent && node.textContent.trim().length > 0) {
-              return NodeFilter.FILTER_ACCEPT;
-            }
-            return NodeFilter.FILTER_REJECT;
-          }
-        }
-      );
-
-      let node;
-      while (node = walker.nextNode()) {
-        textNodes.push(node);
-      }
-
-      // Batch translate text nodes
-      const textsToTranslate = textNodes.map(node => node.textContent || '');
-      const translations = await translateTexts(textsToTranslate, targetLang);
-
-      // Apply translations
-      textNodes.forEach((node, index) => {
-        if (translations[index]) {
-          node.textContent = translations[index];
-        }
-      });
-
-      // Also translate placeholder attributes
-      const elementsWithPlaceholder = document.querySelectorAll('[placeholder]');
-      for (const element of Array.from(elementsWithPlaceholder)) {
-        const placeholder = element.getAttribute('placeholder');
-        if (placeholder) {
-          const translated = await translateText(placeholder, targetLang);
-          element.setAttribute('placeholder', translated);
-        }
-      }
-
-      // Translate title attributes
-      const elementsWithTitle = document.querySelectorAll('[title]');
-      for (const element of Array.from(elementsWithTitle)) {
-        const title = element.getAttribute('title');
-        if (title) {
-          const translated = await translateText(title, targetLang);
-          element.setAttribute('title', translated);
-        }
-      }
-
+      await translationService.setLanguage(langCode);
     } catch (error) {
-      console.error('Translation error:', error);
-      alert('Translation failed. Please try again.');
+      console.error('Failed to change language:', error);
     } finally {
       setIsTranslating(false);
     }
-  };
-
-  const translateTexts = async (texts: string[], targetLang: string): Promise<string[]> => {
-    try {
-      const response = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          texts,
-          targetLang,
-          sourceLang: 'en'
-        })
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        return result.translations;
-      } else {
-        console.error('Translation API error:', result.error);
-        return texts; // Return original texts if translation fails
-      }
-    } catch (error) {
-      console.error('Translation request failed:', error);
-      return texts; // Return original texts if request fails
-    }
-  };
-
-  const translateText = async (text: string, targetLang: string): Promise<string> => {
-    const translations = await translateTexts([text], targetLang);
-    return translations[0];
-  };
-
-  const handleLanguageSelect = (langCode: string) => {
-    setSelectedLang(langCode);
-    localStorage.setItem('wegram_language', langCode);
-    setIsOpen(false);
-    translatePage(langCode);
   };
 
   const currentLanguage = languages.find(lang => lang.code === selectedLang) || languages[0];
@@ -188,6 +83,7 @@ export const LanguageSelector: React.FC = () => {
                 key={lang.code}
                 onClick={() => handleLanguageSelect(lang.code)}
                 className="w-full px-4 py-3 flex items-center gap-3 hover:bg-overlay-light transition-colors text-left"
+                disabled={isTranslating}
               >
                 <span className="text-2xl">{lang.flag}</span>
                 <div className="flex-1">
