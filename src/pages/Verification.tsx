@@ -38,84 +38,110 @@ export const Verification: React.FC = () => {
           </span>
         </div>
 
-        {/* Large Custom Verification Badge */}
-        <div className="w-40 h-40 mx-auto mb-6 relative animate-pulse">
-          <svg
-            viewBox="0 0 120 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-full drop-shadow-2xl"
-          >
-            <defs>
-              <linearGradient id="largeGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
-                <stop offset="25%" style={{ stopColor: '#FFED4B', stopOpacity: 1 }} />
-                <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
-                <stop offset="75%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#FF6B00', stopOpacity: 1 }} />
-              </linearGradient>
-              <radialGradient id="innerGlow">
-                <stop offset="0%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.4 }} />
-                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0 }} />
-              </radialGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
+        {/* Premium Verification Badge */}
+        <div className="w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-6 relative">
+          {/* Outer glow ring */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20 animate-pulse blur-lg"></div>
 
-            {/* Outer ring */}
-            <circle
-              cx="60"
-              cy="60"
-              r="58"
-              fill="url(#largeGoldGradient)"
-              stroke="white"
-              strokeWidth="4"
-              filter="url(#glow)"
-            />
+          {/* Main border frame */}
+          <div className="absolute inset-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 p-1 shadow-2xl">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-800 via-gray-900 to-black p-3">
 
-            {/* Inner gradient circle for depth */}
-            <circle
-              cx="60"
-              cy="60"
-              r="52"
-              fill="url(#largeGoldGradient)"
-              opacity="0.9"
-            />
+              {/* Inner gold accent */}
+              <div className="w-full h-full rounded-full bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 p-0.5">
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
 
-            {/* Inner glow effect */}
-            <circle
-              cx="60"
-              cy="60"
-              r="48"
-              fill="url(#innerGlow)"
-            />
+                  {/* Badge SVG */}
+                  <svg
+                    viewBox="0 0 120 120"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-28 h-28 sm:w-32 sm:h-32 drop-shadow-2xl"
+                  >
+                    <defs>
+                      <linearGradient id="largeGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#FFD700', stopOpacity: 1 }} />
+                        <stop offset="25%" style={{ stopColor: '#FFED4B', stopOpacity: 1 }} />
+                        <stop offset="50%" style={{ stopColor: '#FFA500', stopOpacity: 1 }} />
+                        <stop offset="75%" style={{ stopColor: '#FF8C00', stopOpacity: 1 }} />
+                        <stop offset="100%" style={{ stopColor: '#FF6B00', stopOpacity: 1 }} />
+                      </linearGradient>
+                      <radialGradient id="innerGlow">
+                        <stop offset="0%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.4 }} />
+                        <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0 }} />
+                      </radialGradient>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                        <feMerge>
+                          <feMergeNode in="coloredBlur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
 
-            {/* Large checkmark */}
-            <path
-              d="M35 60l15 15 30-30"
-              stroke="white"
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-              filter="url(#glow)"
-            />
+                    {/* Outer ring */}
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="58"
+                      fill="url(#largeGoldGradient)"
+                      stroke="white"
+                      strokeWidth="4"
+                      filter="url(#glow)"
+                    />
 
-            {/* Subtle inner checkmark for depth */}
-            <path
-              d="M35 60l15 15 30-30"
-              stroke="rgba(255,255,255,0.5)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-          </svg>
+                    {/* Inner gradient circle for depth */}
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      fill="url(#largeGoldGradient)"
+                      opacity="0.9"
+                    />
+
+                    {/* Inner glow effect */}
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="48"
+                      fill="url(#innerGlow)"
+                    />
+
+                    {/* Large checkmark */}
+                    <path
+                      d="M35 60l15 15 30-30"
+                      stroke="white"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      filter="url(#glow)"
+                    />
+
+                    {/* Subtle inner checkmark for depth */}
+                    <path
+                      d="M35 60l15 15 30-30"
+                      stroke="rgba(255,255,255,0.5)"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Corner accent dots - responsive positioning */}
+          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-2 h-2 sm:w-3 sm:h-3 bg-blue-400 rounded-full animate-pulse"></div>
+          <div className="absolute top-3 left-2 sm:top-4 sm:left-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400 rounded-full animate-bounce"></div>
+          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 w-2 h-2 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-ping"></div>
+          <div className="absolute bottom-3 right-2 sm:bottom-4 sm:right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+
+          {/* Sparkle effects - positioned for mobile/desktop */}
+          <div className="absolute top-6 right-6 sm:top-8 sm:right-8 text-yellow-300 text-sm sm:text-base animate-pulse">✨</div>
+          <div className="absolute bottom-8 left-6 sm:bottom-10 sm:left-8 text-blue-300 text-sm sm:text-base animate-bounce" style={{ animationDelay: '1s' }}>⭐</div>
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
