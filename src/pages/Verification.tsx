@@ -40,16 +40,13 @@ export const Verification: React.FC = () => {
 
         {/* Premium Verification Badge */}
         <div className="w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-6 relative">
-          {/* Outer glow ring */}
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20 animate-pulse blur-lg"></div>
+          {/* Subtle outer glow */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-blue-400/10 animate-pulse blur-xl"></div>
 
-          {/* Main border frame */}
-          <div className="absolute inset-2 rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 p-1 shadow-2xl">
-            <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black p-3">
-
-              {/* Inner gold accent */}
-              <div className="w-full h-full rounded-lg bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 p-0.5">
-                <div className="w-full h-full rounded-md bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+          {/* Main elegant frame */}
+          <div className="absolute inset-1 rounded-xl bg-gradient-to-br from-yellow-200/20 to-yellow-400/30 p-px shadow-xl">
+            <div className="w-full h-full rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-4 backdrop-blur-sm">
+              <div className="w-full h-full rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur flex items-center justify-center shadow-inner">
 
                   {/* Badge SVG */}
                   <svg
@@ -133,15 +130,12 @@ export const Verification: React.FC = () => {
             </div>
           </div>
 
-          {/* Corner accent dots - responsive positioning */}
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 w-2 h-2 sm:w-3 sm:h-3 bg-blue-400 rounded-full animate-pulse"></div>
-          <div className="absolute top-3 left-2 sm:top-4 sm:left-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400 rounded-full animate-bounce"></div>
-          <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 w-2 h-2 sm:w-3 sm:h-3 bg-yellow-400 rounded-full animate-ping"></div>
-          <div className="absolute bottom-3 right-2 sm:bottom-4 sm:right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+          {/* Subtle corner accents */}
+          <div className="absolute top-3 right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-300/60 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-3 left-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-300/60 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
 
-          {/* Sparkle effects - positioned for mobile/desktop */}
-          <div className="absolute top-6 right-6 sm:top-8 sm:right-8 text-yellow-300 text-sm sm:text-base animate-pulse">✨</div>
-          <div className="absolute bottom-8 left-6 sm:bottom-10 sm:left-8 text-blue-300 text-sm sm:text-base animate-bounce" style={{ animationDelay: '1s' }}>⭐</div>
+          {/* Minimal sparkle effects */}
+          <div className="absolute top-5 right-5 sm:top-6 sm:right-6 text-yellow-400/70 text-xs sm:text-sm animate-pulse" style={{ animationDelay: '2s' }}>✨</div>
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
