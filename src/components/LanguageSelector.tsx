@@ -38,9 +38,7 @@ export const LanguageSelector: React.FC = () => {
   useEffect(() => {
     const updateSelectedLang = () => {
       const currentLang = translationService.getCurrentLanguage();
-      if (currentLang !== selectedLang) {
-        setSelectedLang(currentLang);
-      }
+      setSelectedLang(currentLang);
     };
 
     // Check immediately and then periodically
@@ -48,7 +46,7 @@ export const LanguageSelector: React.FC = () => {
     const interval = setInterval(updateSelectedLang, 500);
 
     return () => clearInterval(interval);
-  }, [selectedLang]);
+  }, []); // Remove selectedLang dependency to prevent interference
 
   const handleLanguageSelect = async (langCode: string) => {
     if (isTranslating || langCode === selectedLang) return;
