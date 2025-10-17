@@ -206,6 +206,9 @@ export default async function handler(
           'WeRunner': 'WeRunner',
           'Epic anime-style battle runner': '史诗动漫风格战斗跑酷',
           'Stunning visuals and epic': '令人惊叹的视觉效果和史诗',
+          'View all trending': '查看所有趋势',
+          'Game': '游戏',
+          'Trenches': '战壕',
         }
       };
 
