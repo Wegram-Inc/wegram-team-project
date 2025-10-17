@@ -34,19 +34,11 @@ export const LanguageSelector: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Update component state when translation service language changes
+  // Only sync on mount, not continuously
   useEffect(() => {
-    const updateSelectedLang = () => {
-      const currentLang = translationService.getCurrentLanguage();
-      setSelectedLang(currentLang);
-    };
-
-    // Check immediately and then periodically
-    updateSelectedLang();
-    const interval = setInterval(updateSelectedLang, 500);
-
-    return () => clearInterval(interval);
-  }, []); // Remove selectedLang dependency to prevent interference
+    const currentLang = translationService.getCurrentLanguage();
+    setSelectedLang(currentLang);
+  }, []);
 
   const handleLanguageSelect = async (langCode: string) => {
     if (isTranslating || langCode === selectedLang) return;
