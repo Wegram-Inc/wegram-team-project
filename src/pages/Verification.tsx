@@ -41,12 +41,12 @@ export const Verification: React.FC = () => {
         {/* Premium Verification Badge */}
         <div className="w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-6 relative">
           {/* Subtle outer glow */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-blue-400/10 animate-pulse blur-xl"></div>
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 opacity-10 animate-pulse blur-xl"></div>
 
           {/* Main elegant frame */}
-          <div className="absolute inset-1 rounded-xl bg-gradient-to-br from-yellow-200/20 to-yellow-400/30 p-px shadow-xl">
+          <div className="absolute inset-1 rounded-xl bg-gradient-to-br from-yellow-200 to-yellow-400 opacity-20 p-px shadow-xl">
             <div className="w-full h-full rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-4 backdrop-blur-sm">
-              <div className="w-full h-full rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur flex items-center justify-center shadow-inner">
+              <div className="w-full h-full rounded-lg bg-white bg-opacity-80 dark:bg-slate-800 dark:bg-opacity-80 backdrop-blur flex items-center justify-center shadow-inner">
 
                   {/* Badge SVG */}
                   <svg
@@ -131,11 +131,11 @@ export const Verification: React.FC = () => {
           </div>
 
           {/* Subtle corner accents */}
-          <div className="absolute top-3 right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-300/60 rounded-full animate-pulse"></div>
-          <div className="absolute bottom-3 left-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-300/60 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-3 right-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-300 opacity-60 rounded-full animate-pulse"></div>
+          <div className="absolute bottom-3 left-3 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-300 opacity-60 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
 
           {/* Minimal sparkle effects */}
-          <div className="absolute top-5 right-5 sm:top-6 sm:right-6 text-yellow-400/70 text-xs sm:text-sm animate-pulse" style={{ animationDelay: '2s' }}>✨</div>
+          <div className="absolute top-5 right-5 sm:top-6 sm:right-6 text-yellow-400 opacity-70 text-xs sm:text-sm animate-pulse" style={{ animationDelay: '2s' }}>✨</div>
         </div>
         <h1 className="text-3xl font-bold text-primary mb-2">Get Verified</h1>
         <p className="text-secondary">
