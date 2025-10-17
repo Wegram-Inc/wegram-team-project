@@ -41,15 +41,15 @@ export const Verification: React.FC = () => {
         {/* Premium Verification Badge */}
         <div className="w-44 h-44 sm:w-52 sm:h-52 mx-auto mb-6 relative">
           {/* Outer glow ring */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20 animate-pulse blur-lg"></div>
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20 animate-pulse blur-lg"></div>
 
           {/* Main border frame */}
-          <div className="absolute inset-2 rounded-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 p-1 shadow-2xl">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-800 via-gray-900 to-black p-3">
+          <div className="absolute inset-2 rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 p-1 shadow-2xl">
+            <div className="w-full h-full rounded-lg bg-gradient-to-br from-gray-800 via-gray-900 to-black p-3">
 
               {/* Inner gold accent */}
-              <div className="w-full h-full rounded-full bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 p-0.5">
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+              <div className="w-full h-full rounded-lg bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 p-0.5">
+                <div className="w-full h-full rounded-md bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
 
                   {/* Badge SVG */}
                   <svg
