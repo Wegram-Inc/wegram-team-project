@@ -102,52 +102,112 @@ export default async function handler(
             JOIN profiles pr ON p.user_id = pr.id
             JOIN follows f ON f.following_id = p.user_id
             WHERE f.follower_id = ${current_user_id}
+              AND NOT EXISTS (
+                SELECT 1 FROM blocked_users bu
+                WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = p.user_id)
+                   OR (bu.blocker_id = p.user_id AND bu.blocked_id = ${current_user_id})
+              )
             ORDER BY p.created_at DESC
             LIMIT 50
           `;
         } else if (feed_type === 'trending') {
           // Trending feed - most liked posts
-          posts = await sql`
-            SELECT
-              p.id,
-              p.user_id,
-              p.content,
-              p.image_url,
-              p.likes_count as likes,
-              p.comments_count as replies,
-              p.shares_count as shares,
-              p.created_at,
-              p.updated_at,
-              pr.username,
-              pr.avatar_url,
-              pr.verified
-            FROM posts p
-            JOIN profiles pr ON p.user_id = pr.id
-            ORDER BY p.likes_count DESC, p.created_at DESC
-            LIMIT 50
-          `;
+          if (current_user_id) {
+            posts = await sql`
+              SELECT
+                p.id,
+                p.user_id,
+                p.content,
+                p.image_url,
+                p.likes_count as likes,
+                p.comments_count as replies,
+                p.shares_count as shares,
+                p.created_at,
+                p.updated_at,
+                pr.username,
+                pr.avatar_url,
+                pr.verified
+              FROM posts p
+              JOIN profiles pr ON p.user_id = pr.id
+              WHERE NOT EXISTS (
+                SELECT 1 FROM blocked_users bu
+                WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = p.user_id)
+                   OR (bu.blocker_id = p.user_id AND bu.blocked_id = ${current_user_id})
+              )
+              ORDER BY p.likes_count DESC, p.created_at DESC
+              LIMIT 50
+            `;
+          } else {
+            posts = await sql`
+              SELECT
+                p.id,
+                p.user_id,
+                p.content,
+                p.image_url,
+                p.likes_count as likes,
+                p.comments_count as replies,
+                p.shares_count as shares,
+                p.created_at,
+                p.updated_at,
+                pr.username,
+                pr.avatar_url,
+                pr.verified
+              FROM posts p
+              JOIN profiles pr ON p.user_id = pr.id
+              ORDER BY p.likes_count DESC, p.created_at DESC
+              LIMIT 50
+            `;
+          }
         } else {
           // Trenches feed (default) - newest posts from all users
-          posts = await sql`
-            SELECT
-              p.id,
-              p.user_id,
-              p.content,
-              p.image_url,
-              p.likes_count as likes,
-              p.comments_count as replies,
-              p.shares_count as shares,
-              0 as gifts,
-              p.created_at,
-              p.updated_at,
-              pr.username,
-              pr.avatar_url,
-              pr.verified
-            FROM posts p
-            JOIN profiles pr ON p.user_id = pr.id
-            ORDER BY p.created_at DESC
-            LIMIT 50
-          `;
+          if (current_user_id) {
+            posts = await sql`
+              SELECT
+                p.id,
+                p.user_id,
+                p.content,
+                p.image_url,
+                p.likes_count as likes,
+                p.comments_count as replies,
+                p.shares_count as shares,
+                0 as gifts,
+                p.created_at,
+                p.updated_at,
+                pr.username,
+                pr.avatar_url,
+                pr.verified
+              FROM posts p
+              JOIN profiles pr ON p.user_id = pr.id
+              WHERE NOT EXISTS (
+                SELECT 1 FROM blocked_users bu
+                WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = p.user_id)
+                   OR (bu.blocker_id = p.user_id AND bu.blocked_id = ${current_user_id})
+              )
+              ORDER BY p.created_at DESC
+              LIMIT 50
+            `;
+          } else {
+            posts = await sql`
+              SELECT
+                p.id,
+                p.user_id,
+                p.content,
+                p.image_url,
+                p.likes_count as likes,
+                p.comments_count as replies,
+                p.shares_count as shares,
+                0 as gifts,
+                p.created_at,
+                p.updated_at,
+                pr.username,
+                pr.avatar_url,
+                pr.verified
+              FROM posts p
+              JOIN profiles pr ON p.user_id = pr.id
+              ORDER BY p.created_at DESC
+              LIMIT 50
+            `;
+          }
         }
         
         return res.status(200).json({ posts });

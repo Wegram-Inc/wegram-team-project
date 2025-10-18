@@ -18,27 +18,53 @@ export default async function handler(
     switch (req.method) {
       case 'GET':
         // Fetch comments for a specific post
-        const { postId } = req.query;
+        const { postId, current_user_id } = req.query;
 
         if (!postId) {
           return res.status(400).json({ error: 'postId is required' });
         }
 
-        const comments = await sql`
-          SELECT
-            c.id,
-            c.content,
-            c.user_id,
-            c.likes_count,
-            c.created_at,
-            pr.username,
-            pr.avatar_url,
-            pr.verified
-          FROM comments c
-          JOIN profiles pr ON c.user_id = pr.id
-          WHERE c.post_id = ${postId}
-          ORDER BY c.created_at ASC
-        `;
+        let comments;
+
+        if (current_user_id) {
+          // Filter out comments from blocked users
+          comments = await sql`
+            SELECT
+              c.id,
+              c.content,
+              c.user_id,
+              c.likes_count,
+              c.created_at,
+              pr.username,
+              pr.avatar_url,
+              pr.verified
+            FROM comments c
+            JOIN profiles pr ON c.user_id = pr.id
+            WHERE c.post_id = ${postId}
+              AND NOT EXISTS (
+                SELECT 1 FROM blocked_users bu
+                WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = c.user_id)
+                   OR (bu.blocker_id = c.user_id AND bu.blocked_id = ${current_user_id})
+              )
+            ORDER BY c.created_at ASC
+          `;
+        } else {
+          comments = await sql`
+            SELECT
+              c.id,
+              c.content,
+              c.user_id,
+              c.likes_count,
+              c.created_at,
+              pr.username,
+              pr.avatar_url,
+              pr.verified
+            FROM comments c
+            JOIN profiles pr ON c.user_id = pr.id
+            WHERE c.post_id = ${postId}
+            ORDER BY c.created_at ASC
+          `;
+        }
 
         return res.status(200).json({ success: true, comments });
 

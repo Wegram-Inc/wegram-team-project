@@ -11,7 +11,7 @@ export default async function handler(
   }
 
   try {
-    const { q: query, exclude_user } = req.query;
+    const { q: query, exclude_user, current_user_id } = req.query;
 
     if (!query || typeof query !== 'string') {
       return res.status(400).json({ error: 'Search query is required' });
@@ -33,7 +33,7 @@ export default async function handler(
     const searchPattern = `%${query.toLowerCase()}%`;
     let searchQuery;
 
-    if (exclude_user) {
+    if (exclude_user && current_user_id) {
       searchQuery = sql`
         SELECT
           id, username, email, avatar_url, bio, verified,
@@ -46,6 +46,59 @@ export default async function handler(
           OR LOWER(COALESCE(twitter_username, '')) LIKE ${searchPattern}
         )
         AND id != ${exclude_user}
+        AND NOT EXISTS (
+          SELECT 1 FROM blocked_users bu
+          WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = profiles.id)
+             OR (bu.blocker_id = profiles.id AND bu.blocked_id = ${current_user_id})
+        )
+        ORDER BY
+          CASE
+            WHEN LOWER(username) = ${query.toLowerCase()} THEN 1
+            WHEN LOWER(username) LIKE ${query.toLowerCase() + '%'} THEN 2
+            ELSE 3
+          END,
+          followers_count DESC
+        LIMIT 20
+      `;
+    } else if (exclude_user) {
+      searchQuery = sql`
+        SELECT
+          id, username, email, avatar_url, bio, verified,
+          followers_count, following_count, posts_count,
+          twitter_username, created_at
+        FROM profiles
+        WHERE (
+          LOWER(username) LIKE ${searchPattern}
+          OR LOWER(COALESCE(bio, '')) LIKE ${searchPattern}
+          OR LOWER(COALESCE(twitter_username, '')) LIKE ${searchPattern}
+        )
+        AND id != ${exclude_user}
+        ORDER BY
+          CASE
+            WHEN LOWER(username) = ${query.toLowerCase()} THEN 1
+            WHEN LOWER(username) LIKE ${query.toLowerCase() + '%'} THEN 2
+            ELSE 3
+          END,
+          followers_count DESC
+        LIMIT 20
+      `;
+    } else if (current_user_id) {
+      searchQuery = sql`
+        SELECT
+          id, username, email, avatar_url, bio, verified,
+          followers_count, following_count, posts_count,
+          twitter_username, created_at
+        FROM profiles
+        WHERE (
+          LOWER(username) LIKE ${searchPattern}
+          OR LOWER(COALESCE(bio, '')) LIKE ${searchPattern}
+          OR LOWER(COALESCE(twitter_username, '')) LIKE ${searchPattern}
+        )
+        AND NOT EXISTS (
+          SELECT 1 FROM blocked_users bu
+          WHERE (bu.blocker_id = ${current_user_id} AND bu.blocked_id = profiles.id)
+             OR (bu.blocker_id = profiles.id AND bu.blocked_id = ${current_user_id})
+        )
         ORDER BY
           CASE
             WHEN LOWER(username) = ${query.toLowerCase()} THEN 1
