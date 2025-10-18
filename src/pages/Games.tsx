@@ -7,7 +7,7 @@ export const Games: React.FC = () => {
   };
 
   const handlePlayWegramMiner = () => {
-    window.open('/games/wegram-miner', '_blank', 'noopener,noreferrer');
+    window.open('/games/wegram-miner/index.html', '_blank', 'noopener,noreferrer');
   };
 
 
