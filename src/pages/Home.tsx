@@ -135,14 +135,14 @@ export const Home: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-md mx-auto px-4 pt-20 pb-24 text-center">
+      <div className="max-w-md mx-auto px-4 pt-28 pb-24 text-center lg:pt-20">
         <div className="animate-pulse">Loading posts...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 pt-20 pb-24 lg:max-w-none lg:pt-4 lg:pb-4">
+    <div className="max-w-md mx-auto px-4 pt-28 pb-24 lg:max-w-none lg:pt-4 lg:pb-4">
       
       {/* "The long blue thing" removed - saved to BACKUP_the_long_blue_thing.tsx */}
 
