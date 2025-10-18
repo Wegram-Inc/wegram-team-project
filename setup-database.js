@@ -95,6 +95,19 @@ async function setupDatabase() {
     `;
     console.log('✅ Follows table created');
 
+    // Create blocked_users table
+    await sql`
+      CREATE TABLE IF NOT EXISTS blocked_users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        blocker_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+        blocked_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        UNIQUE(blocker_id, blocked_id),
+        CHECK (blocker_id != blocked_id)
+      )
+    `;
+    console.log('✅ Blocked users table created');
+
     // Create indexes for performance
     await sql`CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC)`;
@@ -103,6 +116,8 @@ async function setupDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_profiles_twitter_id ON profiles(twitter_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_blocked_users_blocker ON blocked_users(blocker_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_blocked_users_blocked ON blocked_users(blocked_id)`;
     console.log('✅ Performance indexes created');
 
     // Create update timestamp function

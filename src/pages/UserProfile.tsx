@@ -673,6 +673,14 @@ export const UserProfile: React.FC = () => {
             const followResponse = await fetch(`/api/follow?follower_id=${currentUser.id}&following_id=${result.user.id}`);
             const followResult = await followResponse.json();
             setIsFollowing(followResult.isFollowing || false);
+
+            // Check if current user has blocked this user
+            const blockResponse = await fetch(`/api/block-user?user_id=${currentUser.id}`);
+            const blockResult = await blockResponse.json();
+            if (blockResult.success && blockResult.blocked_users) {
+              const isUserBlocked = blockResult.blocked_users.some((blockedUser: any) => blockedUser.id === result.user.id);
+              setIsBlocked(isUserBlocked);
+            }
           }
         } else {
           // Fallback to mock data if user not found in database
