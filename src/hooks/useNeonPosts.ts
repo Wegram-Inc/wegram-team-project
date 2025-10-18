@@ -31,11 +31,11 @@ export const useNeonPosts = () => {
       const params = new URLSearchParams();
       params.append('feed_type', feedType);
       if (userId) {
-        params.append('user_id', userId);
+        params.append('current_user_id', userId);
       }
-      
+
       const url = `/api/posts?${params.toString()}`;
-      
+
       const response = await fetch(url);
       const result = await response.json();
 

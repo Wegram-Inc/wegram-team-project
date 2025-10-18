@@ -103,7 +103,7 @@ export const Messages: React.FC = () => {
 
     setIsSearchingUsers(true);
     try {
-      const response = await fetch(`/api/search-users?q=${encodeURIComponent(searchQuery)}&exclude_user=${profile.id}`);
+      const response = await fetch(`/api/search-users?q=${encodeURIComponent(searchQuery)}&exclude_user=${profile.id}&current_user_id=${profile.id}`);
       const data = await response.json();
 
       if (data.success) {
