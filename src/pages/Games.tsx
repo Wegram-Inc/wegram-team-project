@@ -2,10 +2,6 @@ import React from 'react';
 import { Play, Gamepad2, ArrowRight } from 'lucide-react';
 
 export const Games: React.FC = () => {
-  const handlePlayWeRunner = () => {
-    window.open('https://centricj20.github.io/We-Runner/', '_blank', 'noopener,noreferrer');
-  };
-
   const handlePlayWegramMiner = () => {
     window.open('/games/wegram-miner/index.html', '_blank', 'noopener,noreferrer');
   };
@@ -20,50 +16,6 @@ export const Games: React.FC = () => {
           <h1 className="text-2xl font-bold text-primary">Gaming</h1>
         </div>
         <p className="text-secondary text-sm">Play amazing games on Wegram</p>
-      </div>
-
-      {/* Featured Game - WeRunner */}
-      <div className="relative mb-8">
-        {/* Hero Card */}
-        <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-          {/* Background Gradient */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #6366F1 100%)'
-            }}
-          />
-
-          {/* Animated Background Pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16 animate-pulse" />
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-white rounded-full translate-x-12 translate-y-12 animate-pulse delay-1000" />
-            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white rounded-full animate-pulse delay-500" />
-          </div>
-
-          {/* Content */}
-          <div className="relative p-8 text-white text-center">
-            {/* Game Icon */}
-            <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-5xl mb-6 mx-auto shadow-lg">
-              🏃‍♂️
-            </div>
-
-            {/* Game Title */}
-            <h2 className="text-4xl font-bold mb-4 tracking-tight">WeRunner</h2>
-            <p className="text-white/90 text-lg mb-8 leading-relaxed max-w-sm mx-auto">
-              Epic anime-style battle runner with stunning visuals
-            </p>
-
-            {/* Play Button */}
-            <button
-              onClick={handlePlayWeRunner}
-              className="bg-white text-purple-600 font-bold py-4 px-8 rounded-xl hover:bg-white/90 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 group mx-auto"
-            >
-              <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Play WeRunner
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Featured Game - Wegram Miner */}
