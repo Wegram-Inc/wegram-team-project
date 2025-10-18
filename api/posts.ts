@@ -48,7 +48,7 @@ export default async function handler(
         }
 
         // Fetch posts with different feed types
-        const { feed_type = 'all', user_id: current_user_id, user_posts } = req.query;
+        const { feed_type = 'all', current_user_id, user_posts } = req.query;
         
         console.log('🔍 Feed API Debug:', {
           feed_type,
