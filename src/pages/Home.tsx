@@ -20,10 +20,20 @@ export const Home: React.FC = () => {
     const tabParam = urlParams.get('tab');
     if (tabParam === 'trending') {
       setActiveTab('trending');
+      if (profile?.id) {
+        fetchPosts('trending', profile.id);
+      } else {
+        fetchPosts('trending');
+      }
     } else if (tabParam === 'trenches') {
       setActiveTab('trenches');
+      if (profile?.id) {
+        fetchPosts('trenches', profile.id);
+      } else {
+        fetchPosts('trenches');
+      }
     }
-  }, [location.search]);
+  }, [location.search, profile?.id]);
   
   // Use real posts from database only - NO MOCK FALLBACKS
   const displayPosts = posts;
