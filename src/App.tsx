@@ -48,6 +48,7 @@ import { Settings } from './pages/Settings';
 import { CreateNew } from './pages/CreateNew';
 import { CreateGroup } from './pages/CreateGroup';
 import { WeRunner } from './pages/WeRunner';
+import { WegramMiner } from './pages/WegramMiner';
 import { AuthCallback } from './pages/AuthCallback';
 import { TwitterCallback } from './pages/TwitterCallback';
 import { DirectMessage } from './pages/DirectMessage';
@@ -89,6 +90,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/bookmarks" element={<Bookmarks />} />
     <Route path="/explore" element={<Explore />} />
     <Route path="/games" element={<Games />} />
+    <Route path="/games/wegram-miner" element={<WegramMiner />} />
     <Route path="/messages" element={<Messages />} />
 
     {/* User Profile */}
