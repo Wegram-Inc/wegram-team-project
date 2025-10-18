@@ -23,7 +23,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch unread notifications count
   const fetchUnreadCount = async () => {
@@ -90,7 +92,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      const clickedOutsideDesktop = searchRef.current && !searchRef.current.contains(event.target as Node);
+      const clickedOutsideMobile = mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node);
+
+      if (clickedOutsideDesktop && clickedOutsideMobile) {
         setShowResults(false);
       }
     };
@@ -289,10 +294,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
         </div>
 
         {/* Row 2: Search Bar - Full Width */}
-        <div className="relative" ref={searchRef}>
+        <div className="relative" ref={mobileSearchRef}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
-            ref={inputRef}
+            ref={mobileInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
