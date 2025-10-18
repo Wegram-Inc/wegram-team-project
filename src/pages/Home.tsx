@@ -14,27 +14,25 @@ export const Home: React.FC = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'following' | 'trenches' | 'trending'>('trenches');
 
-  // Check URL params to set initial tab
+  // Check URL params to set initial tab and fetch posts
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    const tabParam = urlParams.get('tab');
-    if (tabParam === 'trending') {
-      setActiveTab('trending');
-      if (profile?.id) {
-        fetchPosts('trending', profile.id);
-      } else {
-        fetchPosts('trending');
-      }
-    } else if (tabParam === 'trenches') {
-      setActiveTab('trenches');
-      if (profile?.id) {
-        fetchPosts('trenches', profile.id);
-      } else {
-        fetchPosts('trenches');
-      }
+    const tabParam = urlParams.get('tab') as 'following' | 'trenches' | 'trending' | null;
+
+    // Determine which tab should be active
+    const targetTab = tabParam || 'trenches';
+
+    // Update active tab
+    setActiveTab(targetTab);
+
+    // Fetch posts for the target tab
+    if (profile?.id) {
+      fetchPosts(targetTab, profile.id);
+    } else {
+      fetchPosts(targetTab);
     }
   }, [location.search, profile?.id]);
-  
+
   // Use real posts from database only - NO MOCK FALLBACKS
   const displayPosts = posts;
 
@@ -47,15 +45,6 @@ export const Home: React.FC = () => {
       fetchPosts(tab);
     }
   };
-
-  // Load initial feed when component mounts or profile changes
-  useEffect(() => {
-    if (profile?.id) {
-      fetchPosts(activeTab, profile.id);
-    } else {
-      fetchPosts(activeTab);
-    }
-  }, [profile?.id]); // Remove activeTab from dependencies to prevent infinite loop
 
   const handlePost = async (content: string, imageUrl?: string) => {
     if (!profile) return;
