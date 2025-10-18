@@ -650,6 +650,7 @@ export const UserProfile: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [blockedCount, setBlockedCount] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [userPosts, setUserPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -680,6 +681,15 @@ export const UserProfile: React.FC = () => {
             if (blockResult.success && blockResult.blocked_users) {
               const isUserBlocked = blockResult.blocked_users.some((blockedUser: any) => blockedUser.id === result.user.id);
               setIsBlocked(isUserBlocked);
+            }
+          }
+
+          // If viewing own profile, get blocked count
+          if (currentUser && result.user.id === currentUser.id) {
+            const blockResponse = await fetch(`/api/block-user?user_id=${currentUser.id}`);
+            const blockResult = await blockResponse.json();
+            if (blockResult.success && blockResult.blocked_users) {
+              setBlockedCount(blockResult.blocked_users.length);
             }
           }
         } else {
@@ -913,10 +923,13 @@ export const UserProfile: React.FC = () => {
       if (response.ok && result.success) {
         setIsBlocked(!isBlocked);
         if (!isBlocked) {
-          // If we just blocked them, also unfollow
+          // If we just blocked them, also unfollow and increment count
           setIsFollowing(false);
-          alert(`🚫 Blocked @${user.username}. You will no longer see their posts or receive messages from them.`);
+          setBlockedCount(prev => prev + 1);
+          alert(`🚫 Blocked @${user.username}. You will no longer see each other's content.`);
         } else {
+          // Unblocking - decrement count
+          setBlockedCount(prev => Math.max(0, prev - 1));
           alert(`✅ Unblocked @${user.username}.`);
         }
       } else {
@@ -1173,7 +1186,21 @@ export const UserProfile: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className={`grid gap-4 mb-6 ${(user.twitter_username || user.twitter_id) ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          <div className={`grid gap-4 mb-6 ${
+            currentUser && user.id === currentUser.id
+              ? (user.twitter_username || user.twitter_id) ? 'grid-cols-4' : 'grid-cols-3'
+              : (user.twitter_username || user.twitter_id) ? 'grid-cols-3' : 'grid-cols-2'
+          }`}>
+            {/* Show Blocked count only on own profile */}
+            {currentUser && user.id === currentUser.id && (
+              <button
+                onClick={() => navigate(`/user/${username}/blocked`)}
+                className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+              >
+                <div className="text-lg font-bold text-primary">{blockedCount.toLocaleString()}</div>
+                <div className="text-secondary text-xs">BLOCKED</div>
+              </button>
+            )}
             <button
               onClick={() => navigate(`/user/${username}/followers`)}
               className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"

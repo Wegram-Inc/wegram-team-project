@@ -55,6 +55,7 @@ import { PostComments } from './pages/PostComments';
 import { NotificationSettings } from './pages/NotificationSettings';
 import { Following } from './pages/Following';
 import { Followers } from './pages/Followers';
+import { BlockedUsers } from './pages/BlockedUsers';
 import { Logout } from './pages/Logout';
 import { DesktopSidebar } from './components/Layout/DesktopSidebar';
 import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
@@ -94,6 +95,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/user/:username" element={<UserProfile />} />
     <Route path="/user/:username/following" element={<Following />} />
     <Route path="/user/:username/followers" element={<Followers />} />
+    <Route path="/user/:username/blocked" element={<BlockedUsers />} />
 
     {/* Post Comments */}
     <Route path="/post/:postId/comments" element={<PostComments />} />
