@@ -64,12 +64,16 @@ export const LanguageSelector: React.FC = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isTranslating}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-overlay-light hover:bg-overlay-dark transition-colors text-primary"
+        className="flex items-center gap-2 px-2 py-2 rounded-lg bg-overlay-light hover:bg-overlay-dark transition-colors text-primary sm:px-3"
       >
-        <Globe className="w-4 h-4" />
+        {/* Only show Globe icon on desktop */}
+        <Globe className="w-4 h-4 hidden sm:block" />
+        {/* Desktop: Show flag + name + arrow */}
         <span className="text-sm font-medium hidden sm:inline">{currentLanguage.flag} {currentLanguage.nativeName}</span>
-        <span className="text-sm font-medium sm:hidden">{currentLanguage.flag}</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        {/* Mobile: Only show flag (more compact) */}
+        <span className="text-lg sm:hidden">{currentLanguage.flag}</span>
+        {/* Only show dropdown arrow on desktop */}
+        <ChevronDown className={`w-4 h-4 transition-transform hidden sm:block ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu */}
