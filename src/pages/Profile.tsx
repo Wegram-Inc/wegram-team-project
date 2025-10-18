@@ -114,6 +114,7 @@ export const Profile: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [blockedCount, setBlockedCount] = useState(0);
   const { profile, updateProfile, refreshProfile } = useNeonAuth();
   const { posts: userPosts, loading: postsLoading, fetchUserPosts, deletePost } = useNeonPosts();
 
@@ -142,10 +143,20 @@ export const Profile: React.FC = () => {
     mutualConnections: 0
   } : null;
 
-  // Load user posts when profile is available
+  // Load user posts and blocked count when profile is available
   React.useEffect(() => {
     if (profile?.id) {
       fetchUserPosts(profile.id);
+
+      // Fetch blocked users count
+      fetch(`/api/block-user?user_id=${profile.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.blocked_users) {
+            setBlockedCount(data.blocked_users.length);
+          }
+        })
+        .catch(err => console.error('Error fetching blocked count:', err));
     }
   }, [profile?.id]);
 
@@ -739,7 +750,16 @@ export const Profile: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className={`grid gap-4 mb-6 ${profile.twitter_username ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          <div className={`grid gap-4 mb-6 ${profile.twitter_username ? 'grid-cols-4' : 'grid-cols-3'}`}>
+            {/* Blocked Users */}
+            <button
+              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
+              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+            >
+              <div className="text-lg font-bold text-primary">{blockedCount.toLocaleString()}</div>
+              <div className="text-secondary text-xs">BLOCKED</div>
+            </button>
+
             {/* WEGRAM Followers */}
             <button
               onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
