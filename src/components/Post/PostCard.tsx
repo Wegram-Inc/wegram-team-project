@@ -234,7 +234,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
               </button>
               {post.verified && (
                 <VerificationBadge
-                  type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
+                  type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
                   size="md"
                 />
               )}

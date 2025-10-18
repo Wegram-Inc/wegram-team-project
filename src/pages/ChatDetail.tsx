@@ -237,7 +237,7 @@ export const ChatDetail: React.FC = () => {
                 </button>
                 {otherUser?.verified && (
                   <VerificationBadge
-                    type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(otherUser.username || '') ? 'platinum' : 'gold'}
+                    type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(otherUser.username || '') ? 'platinum' : 'gold'}
                     size="md"
                   />
                 )}

@@ -249,7 +249,7 @@ export const Notifications: React.FC = () => {
                       {/* Verification Badge */}
                       {notification.verified && (
                         <VerificationBadge
-                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? 'platinum' : 'gold'}
+                          type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(notification.from_username || '') ? 'platinum' : 'gold'}
                           size="md"
                         />
                       )}

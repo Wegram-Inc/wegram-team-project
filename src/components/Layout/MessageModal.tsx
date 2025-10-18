@@ -188,7 +188,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                     {user.verified && (
                       <div className="absolute -bottom-0.5 -right-0.5">
                         <VerificationBadge
-                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                          type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
                           size="md"
                         />
                       </div>
@@ -273,7 +273,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({
                   {selectedUser.verified && (
                     <div className="absolute -bottom-0.5 -right-0.5">
                       <VerificationBadge
-                        type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(selectedUser.username) ? 'platinum' : 'gold'}
+                        type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(selectedUser.username) ? 'platinum' : 'gold'}
                         size="md"
                       />
                     </div>

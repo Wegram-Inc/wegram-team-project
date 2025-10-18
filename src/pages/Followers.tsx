@@ -253,7 +253,7 @@ export const Followers: React.FC = () => {
                           </span>
                           {user.verified && (
                             <VerificationBadge
-                              type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                              type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
                               size="md"
                             />
                           )}

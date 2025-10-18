@@ -460,7 +460,7 @@ export const Explore: React.FC = () => {
                         <h3 className="text-primary font-semibold">{creator.displayName}</h3>
                         {creator.verified && (
                           <VerificationBadge
-                            type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(creator.username) ? 'platinum' : 'gold'}
+                            type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(creator.username) ? 'platinum' : 'gold'}
                             size="md"
                           />
                         )}

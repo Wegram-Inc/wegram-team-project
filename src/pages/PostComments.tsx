@@ -241,7 +241,7 @@ export const PostComments: React.FC = () => {
                 <h3 className="text-primary font-semibold">{post.username}</h3>
                 {post.verified && (
                   <VerificationBadge
-                    type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
+                    type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(post.username) ? 'platinum' : 'gold'}
                     size="md"
                   />
                 )}
@@ -321,7 +321,7 @@ export const PostComments: React.FC = () => {
                       </button>
                       {comment.verified && (
                         <VerificationBadge
-                          type={['puff012', '@puff012', '@TheWegramApp', '@_fudder'].includes(comment.username) ? 'platinum' : 'gold'}
+                          type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(comment.username) ? 'platinum' : 'gold'}
                           size="sm"
                         />
                       )}
