@@ -89,9 +89,6 @@ export const Wallet: React.FC = () => {
     alert('More wallet features coming soon!');
   };
 
-  const handleBuy = () => {
-    alert('Buy SOL with cash coming soon! Moonpay/Phantom integration in development.');
-  };
 
   // Load token list when swap modal opens
   useEffect(() => {
@@ -336,19 +333,6 @@ export const Wallet: React.FC = () => {
                 <RefreshCw className="w-5 h-5 text-purple-400" />
               </div>
               <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>Swap</span>
-            </button>
-            <button
-              onClick={handleBuy}
-              className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-colors ${
-                isDark ? 'hover:bg-gray-700 hover:bg-opacity-30' : 'hover:bg-gray-200 hover:bg-opacity-50'
-              }`}
-            >
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                isDark ? 'bg-gray-800' : 'bg-gray-200'
-              }`}>
-                <DollarSign className="w-5 h-5 text-purple-400" />
-              </div>
-              <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>Buy</span>
             </button>
             <button
               onClick={handleMore}
