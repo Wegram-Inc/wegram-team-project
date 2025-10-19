@@ -81,17 +81,23 @@ export const Wallet: React.FC = () => {
       return;
     }
 
-    // Initialize Jupiter Terminal
-    (window as any).Jupiter.init({
-      displayMode: "integrated",
-      integratedTargetId: "jupiter-terminal",
-      endpoint: "https://api.mainnet-beta.solana.com",
-      formProps: {
-        initialInputMint: "So11111111111111111111111111111111111111112", // SOL
-      },
-    });
-
     setShowBuyModal(true);
+
+    // Initialize Jupiter Terminal after modal opens
+    setTimeout(() => {
+      if ((window as any).Jupiter) {
+        (window as any).Jupiter.init({
+          displayMode: "integrated",
+          integratedTargetId: "jupiter-terminal",
+          endpoint: "https://api.mainnet-beta.solana.com",
+          formProps: {
+            initialInputMint: "So11111111111111111111111111111111111111112", // SOL
+          },
+        });
+      } else {
+        alert('Jupiter widget failed to load. Please refresh and try again.');
+      }
+    }, 100);
   };
 
   const handleMore = () => {
