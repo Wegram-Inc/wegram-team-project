@@ -38,12 +38,6 @@ export const Wallet: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [availableTokens, setAvailableTokens] = useState<any[]>([]);
   const [showBuyModal, setShowBuyModal] = useState(false);
-  const [tokenSearch, setTokenSearch] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [selectedBuyToken, setSelectedBuyToken] = useState<any>(null);
-  const [buyAmount, setBuyAmount] = useState('');
-  const [isBuying, setIsBuying] = useState(false);
-  const [allTokens, setAllTokens] = useState<any[]>([]);
 
   const solanaWallet = new SolanaWallet();
 
@@ -82,6 +76,21 @@ export const Wallet: React.FC = () => {
   };
 
   const handleSwap = () => {
+    if (!walletData) {
+      alert('No wallet found');
+      return;
+    }
+
+    // Initialize Jupiter Terminal
+    (window as any).Jupiter.init({
+      displayMode: "integrated",
+      integratedTargetId: "jupiter-terminal",
+      endpoint: "https://api.mainnet-beta.solana.com",
+      formProps: {
+        initialInputMint: "So11111111111111111111111111111111111111112", // SOL
+      },
+    });
+
     setShowBuyModal(true);
   };
 
@@ -90,81 +99,6 @@ export const Wallet: React.FC = () => {
   };
 
 
-  // Load token list when swap modal opens
-  useEffect(() => {
-    if (showBuyModal && allTokens.length === 0) {
-      console.log('Loading tokens from Jupiter...');
-      fetch('/api/jupiter-tokens')
-        .then(res => {
-          console.log('Response status:', res.status);
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
-          return res.json();
-        })
-        .then(data => {
-          console.log('✅ Loaded tokens:', data.tokens.length);
-          console.log('Sample tokens:', data.tokens.slice(0, 5));
-          setAllTokens(data.tokens);
-        })
-        .catch(err => {
-          console.error('❌ Failed to load tokens:', err);
-          alert('Failed to load token list. Please try again.');
-        });
-    }
-  }, [showBuyModal, allTokens.length]);
-
-  const handleTokenSearch = (query: string) => {
-    setTokenSearch(query);
-
-    if (query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    // Filter from cached token list
-    const results = allTokens.filter((token: any) =>
-      token.name?.toLowerCase().includes(query.toLowerCase()) ||
-      token.symbol?.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 10); // Limit to 10 results
-
-    console.log('Search results:', results);
-    setSearchResults(results);
-  };
-
-  const handleBuyToken = async () => {
-    if (!selectedBuyToken || !buyAmount || !walletData) {
-      alert('Please select a token and enter amount');
-      return;
-    }
-
-    setIsBuying(true);
-    try {
-      // Get quote from Jupiter
-      const quoteResponse = await fetch(
-        `https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=${selectedBuyToken.address}&amount=${parseFloat(buyAmount) * 1000000000}&slippageBps=50`
-      );
-      const quoteData = await quoteResponse.json();
-
-      if (!quoteData.routePlan) {
-        alert('No route found for this swap');
-        setIsBuying(false);
-        return;
-      }
-
-      // For now, show quote details
-      alert(`✅ Quote received!\n\nYou'll receive approximately: ${(quoteData.outAmount / Math.pow(10, selectedBuyToken.decimals)).toFixed(6)} ${selectedBuyToken.symbol}\n\nPrice impact: ${quoteData.priceImpactPct}%\n\nFull swap integration coming soon!`);
-
-      setShowBuyModal(false);
-      setTokenSearch('');
-      setBuyAmount('');
-      setSelectedBuyToken(null);
-    } catch (error) {
-      alert('❌ Failed to get quote. Please try again.');
-    } finally {
-      setIsBuying(false);
-    }
-  };
 
   const handleClaimRewards = () => {
     navigate('/rewards');
@@ -593,89 +527,23 @@ export const Wallet: React.FC = () => {
 
           {/* Modal */}
           <div
-            className={`relative w-full max-w-md p-6 rounded-2xl shadow-xl ${
+            className={`relative w-full max-w-4xl p-6 rounded-2xl shadow-xl ${
               isDark ? 'bg-gray-800' : 'bg-white'
             }`}
             style={{ backgroundColor: 'var(--card)' }}
           >
-            <h2 className="text-2xl font-bold text-primary mb-6">Swap Tokens</h2>
-
-            {/* Token Search */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-secondary mb-2">Search Token</label>
-              <input
-                type="text"
-                value={tokenSearch}
-                onChange={(e) => handleTokenSearch(e.target.value)}
-                placeholder="Search by name or symbol..."
-                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
-              />
-            </div>
-
-            {/* Search Results */}
-            {searchResults.length > 0 && (
-              <div className="mb-4 max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg">
-                {searchResults.map((token, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setSelectedBuyToken(token);
-                      setSearchResults([]);
-                      setTokenSearch(token.symbol);
-                    }}
-                    className="w-full p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-600 last:border-b-0"
-                  >
-                    <div className="font-medium text-primary">{token.symbol}</div>
-                    <div className="text-sm text-secondary">{token.name}</div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Selected Token */}
-            {selectedBuyToken && (
-              <div className="mb-4 p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <div className="font-medium text-primary">Selected: {selectedBuyToken.symbol}</div>
-                <div className="text-sm text-secondary">{selectedBuyToken.name}</div>
-              </div>
-            )}
-
-            {/* Amount in SOL */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-secondary mb-2">Amount (SOL to spend)</label>
-              <input
-                type="number"
-                value={buyAmount}
-                onChange={(e) => setBuyAmount(e.target.value)}
-                placeholder="0.00"
-                step="0.001"
-                min="0"
-                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
-              />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-primary">Swap Tokens</h2>
               <button
-                onClick={() => {
-                  setShowBuyModal(false);
-                  setTokenSearch('');
-                  setSelectedBuyToken(null);
-                  setBuyAmount('');
-                }}
-                className="flex-1 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-primary font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                disabled={isBuying}
+                onClick={() => setShowBuyModal(false)}
+                className="text-secondary hover:text-primary"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleBuyToken}
-                disabled={isBuying || !selectedBuyToken}
-                className="flex-1 py-3 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isBuying ? 'Getting Quote...' : 'Swap'}
+                ✕
               </button>
             </div>
+
+            {/* Jupiter Terminal Container */}
+            <div id="jupiter-terminal" style={{ minHeight: '600px' }}></div>
           </div>
         </div>
       )}
