@@ -209,13 +209,18 @@ export const Profile: React.FC = () => {
         telegram_link: editTelegramLink
       });
 
-      // Update username only
+      // Update profile with all fields
       const response = await fetch('/api/user-profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: profile.id,
-          username: editUsername
+          username: editUsername,
+          bio: editBio,
+          avatar_url: editAvatar,
+          twitter_link: editTwitterLink,
+          discord_link: editDiscordLink,
+          telegram_link: editTelegramLink
         })
       });
 
