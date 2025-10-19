@@ -234,7 +234,7 @@ export class SolanaWallet {
   // Get SOL balance
   async getSolBalance(publicKeyString: string): Promise<number> {
     try {
-      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+      const connection = new Connection('https://mainnet.helius-rpc.com/?api-key=demo', 'confirmed');
       const publicKey = new PublicKey(publicKeyString);
       const balance = await connection.getBalance(publicKey);
       return balance / LAMPORTS_PER_SOL;
