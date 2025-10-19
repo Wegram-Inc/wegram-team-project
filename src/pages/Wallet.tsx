@@ -181,7 +181,7 @@ export const Wallet: React.FC = () => {
     {
       symbol: 'SOL',
       name: 'Solana',
-      balance: 0,
+      balance: solBalance,
       usdValue: 0,
       logo: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png'
     }
