@@ -5,12 +5,12 @@ import { config } from 'dotenv';
 // Load environment variables from .env.local
 config({ path: '.env.local' });
 
-const DATABASE_URL = process.env.DATABASE_URL;
+const DATABASE_URL = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 console.log('🔍 Database URL found:', DATABASE_URL ? 'Yes' : 'No');
 
 if (!DATABASE_URL) {
-  console.error('❌ DATABASE_URL not found in .env.local');
-  console.log('Make sure your .env.local file exists and contains DATABASE_URL');
+  console.error('❌ POSTGRES_URL or DATABASE_URL not found in .env.local');
+  console.log('Make sure your .env.local file exists and contains POSTGRES_URL');
   process.exit(1);
 }
 
@@ -148,13 +148,23 @@ async function setupDatabase() {
       console.log('⚠️  Triggers skipped (not critical):', triggerError.message);
     }
 
+    // Add social link columns if they don't exist
+    try {
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS twitter_link TEXT`;
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS discord_link TEXT`;
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS telegram_link TEXT`;
+      console.log('✅ Social link columns added to profiles table');
+    } catch (alterError) {
+      console.log('⚠️  Social link columns may already exist:', alterError.message);
+    }
+
     // Test the connection by counting tables
     const result = await sql`
-      SELECT table_name 
-      FROM information_schema.tables 
+      SELECT table_name
+      FROM information_schema.tables
       WHERE table_schema = 'public'
     `;
-    
+
     console.log(`\n🎉 Database setup complete!`);
     console.log(`📊 Created ${result.length} tables:`, result.map(r => r.table_name).join(', '));
     console.log(`\n✅ Your WEGRAM database is ready for X login!`);
