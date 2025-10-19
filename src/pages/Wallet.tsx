@@ -43,6 +43,7 @@ export const Wallet: React.FC = () => {
   const [selectedBuyToken, setSelectedBuyToken] = useState<any>(null);
   const [buyAmount, setBuyAmount] = useState('');
   const [isBuying, setIsBuying] = useState(false);
+  const [allTokens, setAllTokens] = useState<any[]>([]);
 
   const solanaWallet = new SolanaWallet();
 
@@ -81,7 +82,7 @@ export const Wallet: React.FC = () => {
   };
 
   const handleSwap = () => {
-    alert('Swap feature coming soon! DEX integration in development.');
+    setShowBuyModal(true);
   };
 
   const handleMore = () => {
@@ -89,10 +90,23 @@ export const Wallet: React.FC = () => {
   };
 
   const handleBuy = () => {
-    setShowBuyModal(true);
+    alert('Buy SOL with cash coming soon! Moonpay/Phantom integration in development.');
   };
 
-  const handleTokenSearch = async (query: string) => {
+  // Load token list when swap modal opens
+  useEffect(() => {
+    if (showBuyModal && allTokens.length === 0) {
+      fetch('https://token.jup.ag/strict')
+        .then(res => res.json())
+        .then(tokens => {
+          console.log('Loaded tokens:', tokens.length);
+          setAllTokens(tokens);
+        })
+        .catch(err => console.error('Failed to load tokens:', err));
+    }
+  }, [showBuyModal]);
+
+  const handleTokenSearch = (query: string) => {
     setTokenSearch(query);
 
     if (query.length < 2) {
@@ -100,20 +114,14 @@ export const Wallet: React.FC = () => {
       return;
     }
 
-    try {
-      // Search for tokens using Jupiter token list API
-      const response = await fetch('https://token.jup.ag/all');
-      const allTokens = await response.json();
+    // Filter from cached token list
+    const results = allTokens.filter((token: any) =>
+      token.name?.toLowerCase().includes(query.toLowerCase()) ||
+      token.symbol?.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 10); // Limit to 10 results
 
-      const results = allTokens.filter((token: any) =>
-        token.name.toLowerCase().includes(query.toLowerCase()) ||
-        token.symbol.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10); // Limit to 10 results
-
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Token search error:', error);
-    }
+    console.log('Search results:', results);
+    setSearchResults(results);
   };
 
   const handleBuyToken = async () => {
@@ -595,7 +603,7 @@ export const Wallet: React.FC = () => {
             }`}
             style={{ backgroundColor: 'var(--card)' }}
           >
-            <h2 className="text-2xl font-bold text-primary mb-6">Buy Tokens</h2>
+            <h2 className="text-2xl font-bold text-primary mb-6">Swap Tokens</h2>
 
             {/* Token Search */}
             <div className="mb-4">
@@ -670,7 +678,7 @@ export const Wallet: React.FC = () => {
                 disabled={isBuying || !selectedBuyToken}
                 className="flex-1 py-3 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isBuying ? 'Getting Quote...' : 'Buy'}
+                {isBuying ? 'Getting Quote...' : 'Swap'}
               </button>
             </div>
           </div>
