@@ -8,6 +8,11 @@ import {
   LAMPORTS_PER_SOL,
   sendAndConfirmTransaction
 } from '@solana/web3.js';
+import {
+  getAssociatedTokenAddress,
+  createTransferInstruction,
+  getAccount
+} from '@solana/spl-token';
 
 export interface WalletData {
   publicKey: string;
@@ -140,6 +145,89 @@ export class SolanaWallet {
         success: false,
         error: error instanceof Error ? error.message : 'Transaction failed'
       };
+    }
+  }
+
+  // Send SPL token transaction
+  async sendToken(
+    privateKeyHex: string,
+    toAddress: string,
+    tokenMintAddress: string,
+    amount: number,
+    decimals: number = 9
+  ): Promise<{ success: boolean; signature?: string; error?: string }> {
+    try {
+      // Convert hex private key to keypair
+      const secretKey = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
+      const fromKeypair = Keypair.fromSecretKey(secretKey);
+
+      // Connect to Solana mainnet
+      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+
+      // Create public keys
+      const toPublicKey = new PublicKey(toAddress);
+      const mintPublicKey = new PublicKey(tokenMintAddress);
+
+      // Get token accounts
+      const fromTokenAccount = await getAssociatedTokenAddress(
+        mintPublicKey,
+        fromKeypair.publicKey
+      );
+
+      const toTokenAccount = await getAssociatedTokenAddress(
+        mintPublicKey,
+        toPublicKey
+      );
+
+      // Convert amount to token's smallest unit
+      const tokenAmount = amount * Math.pow(10, decimals);
+
+      // Create transfer instruction
+      const transaction = new Transaction().add(
+        createTransferInstruction(
+          fromTokenAccount,
+          toTokenAccount,
+          fromKeypair.publicKey,
+          tokenAmount
+        )
+      );
+
+      // Send transaction
+      const signature = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [fromKeypair]
+      );
+
+      return { success: true, signature };
+    } catch (error) {
+      console.error('Send token error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Token transfer failed'
+      };
+    }
+  }
+
+  // Get all tokens in wallet
+  async getWalletTokens(publicKeyString: string): Promise<any[]> {
+    try {
+      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+      const publicKey = new PublicKey(publicKeyString);
+
+      // Get token accounts
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+        programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA')
+      });
+
+      return tokenAccounts.value.map((account) => ({
+        mint: account.account.data.parsed.info.mint,
+        balance: account.account.data.parsed.info.tokenAmount.uiAmount,
+        decimals: account.account.data.parsed.info.tokenAmount.decimals
+      }));
+    } catch (error) {
+      console.error('Error fetching tokens:', error);
+      return [];
     }
   }
 }

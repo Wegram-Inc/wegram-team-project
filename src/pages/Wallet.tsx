@@ -36,6 +36,7 @@ export const Wallet: React.FC = () => {
   const [sendAmount, setSendAmount] = useState('');
   const [selectedToken, setSelectedToken] = useState('SOL');
   const [isSending, setIsSending] = useState(false);
+  const [availableTokens, setAvailableTokens] = useState<any[]>([]);
 
   const solanaWallet = new SolanaWallet();
 
@@ -89,7 +90,12 @@ export const Wallet: React.FC = () => {
     navigate('/rewards');
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
+    if (walletData) {
+      // Load tokens from wallet
+      const tokens = await solanaWallet.getWalletTokens(walletData.publicKey);
+      setAvailableTokens(tokens);
+    }
     setShowSendModal(true);
   };
 
@@ -105,23 +111,31 @@ export const Wallet: React.FC = () => {
       return;
     }
 
-    // Only SOL is supported for now
-    if (selectedToken !== 'SOL') {
-      alert('Only SOL transfers are currently supported. SPL token transfers coming soon!');
-      return;
-    }
-
     setIsSending(true);
     try {
-      // Send actual Solana transaction
-      const result = await solanaWallet.sendSOL(
-        walletData.privateKey,
-        sendAddress,
-        parseFloat(sendAmount)
-      );
+      let result;
+
+      if (selectedToken === 'SOL') {
+        // Send SOL
+        result = await solanaWallet.sendSOL(
+          walletData.privateKey,
+          sendAddress,
+          parseFloat(sendAmount)
+        );
+      } else {
+        // Send SPL token
+        const tokenData = JSON.parse(selectedToken);
+        result = await solanaWallet.sendToken(
+          walletData.privateKey,
+          sendAddress,
+          tokenData.mint,
+          parseFloat(sendAmount),
+          tokenData.decimals
+        );
+      }
 
       if (result.success) {
-        alert(`✅ Transaction successful!\n\nSignature: ${result.signature}\n\nSent ${sendAmount} SOL to ${sendAddress.substring(0, 8)}...${sendAddress.substring(sendAddress.length - 8)}`);
+        alert(`✅ Transaction successful!\n\nSignature: ${result.signature}\n\nSent ${sendAmount} ${selectedToken === 'SOL' ? 'SOL' : JSON.parse(selectedToken).mint.substring(0, 8)} to ${sendAddress.substring(0, 8)}...${sendAddress.substring(sendAddress.length - 8)}`);
         setShowSendModal(false);
         setSendAddress('');
         setSendAmount('');
@@ -446,9 +460,11 @@ export const Wallet: React.FC = () => {
                 className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
               >
                 <option value="SOL">SOL - Solana</option>
-                <option value="WGR">WGR - Wegram</option>
-                <option value="USDC">USDC</option>
-                <option value="USDT">USDT</option>
+                {availableTokens.map((token, index) => (
+                  <option key={index} value={JSON.stringify(token)}>
+                    {token.mint.substring(0, 8)}... - Balance: {token.balance}
+                  </option>
+                ))}
               </select>
             </div>
 
