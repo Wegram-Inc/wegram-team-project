@@ -27,7 +27,7 @@ export default async function handler(
 
     // Get user data from database
     const user = await sql`
-      SELECT id, username, email, avatar_url, bio, verified, created_at, updated_at
+      SELECT id, username, email, avatar_url, bio, verified, twitter_link, discord_link, telegram_link, created_at, updated_at
       FROM profiles
       WHERE id = ${user_id}
     `;
