@@ -500,37 +500,6 @@ export const Wallet: React.FC = () => {
         </div>
       )}
 
-      {/* Buy Token Modal */}
-      {showBuyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setShowBuyModal(false)}
-          />
-
-          {/* Modal */}
-          <div
-            className={`relative w-full max-w-4xl p-6 rounded-2xl shadow-xl ${
-              isDark ? 'bg-gray-800' : 'bg-white'
-            }`}
-            style={{ backgroundColor: 'var(--card)' }}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-primary">Swap Tokens</h2>
-              <button
-                onClick={() => setShowBuyModal(false)}
-                className="text-secondary hover:text-primary"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Jupiter Terminal Container */}
-            <div id="jupiter-terminal" style={{ minHeight: '600px' }}></div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
