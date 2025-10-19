@@ -68,22 +68,8 @@ export const Wallet: React.FC = () => {
 
     setIsLoadingBalance(true);
     try {
-      const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getBalance',
-          params: [walletData.publicKey]
-        })
-      });
-
-      const data = await response.json();
-      if (data.result && data.result.value !== undefined) {
-        const balanceInSol = data.result.value / 1000000000; // Convert lamports to SOL
-        setSolBalance(balanceInSol);
-      }
+      const balance = await solanaWallet.getSolBalance(walletData.publicKey);
+      setSolBalance(balance);
     } catch (error) {
       console.error('Failed to fetch SOL balance:', error);
     } finally {
