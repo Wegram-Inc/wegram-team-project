@@ -28,7 +28,8 @@ export const Wallet: React.FC = () => {
   const navigate = useNavigate();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [activeTab, setActiveTab] = useState<'tokens' | 'tickets' | 'activity'>('tokens');
-  // const [walletBalance] = useState(0); // Reserved for future use
+  const [solBalance, setSolBalance] = useState<number>(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
   const [earnings] = useState(0);
   const [pendingRewards] = useState(0);
   const [showSendModal, setShowSendModal] = useState(false);
@@ -61,6 +62,41 @@ export const Wallet: React.FC = () => {
     setWalletData(wallet);
     localStorage.setItem('wegram_wallet', JSON.stringify(wallet));
   };
+
+  const fetchSolBalance = async () => {
+    if (!walletData) return;
+
+    setIsLoadingBalance(true);
+    try {
+      const response = await fetch(`https://api.mainnet-beta.solana.com`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getBalance',
+          params: [walletData.publicKey]
+        })
+      });
+
+      const data = await response.json();
+      if (data.result && data.result.value !== undefined) {
+        const balanceInSol = data.result.value / 1000000000; // Convert lamports to SOL
+        setSolBalance(balanceInSol);
+      }
+    } catch (error) {
+      console.error('Failed to fetch SOL balance:', error);
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  // Fetch balance when wallet loads
+  useEffect(() => {
+    if (walletData) {
+      fetchSolBalance();
+    }
+  }, [walletData]);
 
 
   const handleDeposit = () => {
@@ -196,16 +232,22 @@ export const Wallet: React.FC = () => {
             <div>
               <h3 className="text-secondary text-sm mb-2">Wallet Balance</h3>
               <div className="flex items-center gap-2">
-                <img 
+                <img
                   src="https://i.ibb.co/TxdWc0kL/IMG-9101.jpg"
-                  alt="WEGRAM" 
+                  alt="WEGRAM"
                   className="w-6 h-6 rounded-full object-cover"
                 />
-                <span className="text-3xl font-bold text-primary">${totalUsdValue.toFixed(0)}</span>
-                <button className={`p-1 rounded transition-colors ${
-                  isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
-                }`}>
-                  <RefreshCw className="w-4 h-4 text-secondary" />
+                <span className="text-3xl font-bold text-primary">
+                  {isLoadingBalance ? '...' : `${solBalance.toFixed(4)} SOL`}
+                </span>
+                <button
+                  onClick={fetchSolBalance}
+                  disabled={isLoadingBalance}
+                  className={`p-1 rounded transition-colors ${
+                    isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
+                  }`}
+                >
+                  <RefreshCw className={`w-4 h-4 text-secondary ${isLoadingBalance ? 'animate-spin' : ''}`} />
                 </button>
               </div>
             </div>
