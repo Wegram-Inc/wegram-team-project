@@ -1,44 +1,50 @@
 // Jupiter Token List Proxy API
-export const config = {
-  runtime: 'edge',
-};
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import https from 'https';
 
-export default async function handler(req: Request) {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+) {
   if (req.method !== 'GET') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Fetch token list from Jupiter
-    const response = await fetch('https://token.jup.ag/strict');
+    // Fetch token list from Jupiter using https module
+    const data = await new Promise<string>((resolve, reject) => {
+      https.get('https://token.jup.ag/strict', (response) => {
+        let data = '';
 
-    if (!response.ok) {
-      throw new Error(`Jupiter API returned ${response.status}`);
-    }
+        response.on('data', (chunk) => {
+          data += chunk;
+        });
 
-    const tokens = await response.json();
+        response.on('end', () => {
+          resolve(data);
+        });
 
-    // Return tokens with CORS headers
-    return new Response(JSON.stringify({
+        response.on('error', (error) => {
+          reject(error);
+        });
+      }).on('error', (error) => {
+        reject(error);
+      });
+    });
+
+    const tokens = JSON.parse(data);
+
+    return res.status(200).json({
       success: true,
       tokens,
       count: tokens.length
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
     console.error('Jupiter tokens API error:', error);
-    return new Response(JSON.stringify({
+    return res.status(500).json({
       error: 'Failed to fetch token list',
       details: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
