@@ -93,15 +93,23 @@ export const Wallet: React.FC = () => {
   // Load token list when swap modal opens
   useEffect(() => {
     if (showBuyModal && allTokens.length === 0) {
+      console.log('Loading tokens from Jupiter...');
       fetch('https://token.jup.ag/strict')
-        .then(res => res.json())
+        .then(res => {
+          console.log('Response status:', res.status);
+          return res.json();
+        })
         .then(tokens => {
-          console.log('Loaded tokens:', tokens.length);
+          console.log('✅ Loaded tokens:', tokens.length);
+          console.log('Sample tokens:', tokens.slice(0, 5));
           setAllTokens(tokens);
         })
-        .catch(err => console.error('Failed to load tokens:', err));
+        .catch(err => {
+          console.error('❌ Failed to load tokens:', err);
+          alert('Failed to load token list. Please try again.');
+        });
     }
-  }, [showBuyModal]);
+  }, [showBuyModal, allTokens.length]);
 
   const handleTokenSearch = (query: string) => {
     setTokenSearch(query);
