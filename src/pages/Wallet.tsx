@@ -37,7 +37,6 @@ export const Wallet: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState('SOL');
   const [isSending, setIsSending] = useState(false);
   const [availableTokens, setAvailableTokens] = useState<any[]>([]);
-  const [showBuyModal, setShowBuyModal] = useState(false);
 
   const solanaWallet = new SolanaWallet();
 
@@ -76,28 +75,7 @@ export const Wallet: React.FC = () => {
   };
 
   const handleSwap = () => {
-    if (!walletData) {
-      alert('No wallet found');
-      return;
-    }
-
-    setShowBuyModal(true);
-
-    // Initialize Jupiter Terminal after modal opens
-    setTimeout(() => {
-      if ((window as any).Jupiter) {
-        (window as any).Jupiter.init({
-          displayMode: "integrated",
-          integratedTargetId: "jupiter-terminal",
-          endpoint: "https://api.mainnet-beta.solana.com",
-          formProps: {
-            initialInputMint: "So11111111111111111111111111111111111111112", // SOL
-          },
-        });
-      } else {
-        alert('Jupiter widget failed to load. Please refresh and try again.');
-      }
-    }, 100);
+    alert('Swap feature coming soon!');
   };
 
   const handleMore = () => {
