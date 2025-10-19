@@ -37,6 +37,12 @@ export const Wallet: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState('SOL');
   const [isSending, setIsSending] = useState(false);
   const [availableTokens, setAvailableTokens] = useState<any[]>([]);
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [tokenSearch, setTokenSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedBuyToken, setSelectedBuyToken] = useState<any>(null);
+  const [buyAmount, setBuyAmount] = useState('');
+  const [isBuying, setIsBuying] = useState(false);
 
   const solanaWallet = new SolanaWallet();
 
@@ -83,7 +89,65 @@ export const Wallet: React.FC = () => {
   };
 
   const handleBuy = () => {
-    alert('Buy crypto feature coming soon! Connect to exchange integration.');
+    setShowBuyModal(true);
+  };
+
+  const handleTokenSearch = async (query: string) => {
+    setTokenSearch(query);
+
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      // Search for tokens using Jupiter token list API
+      const response = await fetch('https://token.jup.ag/all');
+      const allTokens = await response.json();
+
+      const results = allTokens.filter((token: any) =>
+        token.name.toLowerCase().includes(query.toLowerCase()) ||
+        token.symbol.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 10); // Limit to 10 results
+
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Token search error:', error);
+    }
+  };
+
+  const handleBuyToken = async () => {
+    if (!selectedBuyToken || !buyAmount || !walletData) {
+      alert('Please select a token and enter amount');
+      return;
+    }
+
+    setIsBuying(true);
+    try {
+      // Get quote from Jupiter
+      const quoteResponse = await fetch(
+        `https://quote-api.jup.ag/v6/quote?inputMint=So11111111111111111111111111111111111111112&outputMint=${selectedBuyToken.address}&amount=${parseFloat(buyAmount) * 1000000000}&slippageBps=50`
+      );
+      const quoteData = await quoteResponse.json();
+
+      if (!quoteData.routePlan) {
+        alert('No route found for this swap');
+        setIsBuying(false);
+        return;
+      }
+
+      // For now, show quote details
+      alert(`✅ Quote received!\n\nYou'll receive approximately: ${(quoteData.outAmount / Math.pow(10, selectedBuyToken.decimals)).toFixed(6)} ${selectedBuyToken.symbol}\n\nPrice impact: ${quoteData.priceImpactPct}%\n\nFull swap integration coming soon!`);
+
+      setShowBuyModal(false);
+      setTokenSearch('');
+      setBuyAmount('');
+      setSelectedBuyToken(null);
+    } catch (error) {
+      alert('❌ Failed to get quote. Please try again.');
+    } finally {
+      setIsBuying(false);
+    }
   };
 
   const handleClaimRewards = () => {
@@ -509,6 +573,104 @@ export const Wallet: React.FC = () => {
                 className="flex-1 py-3 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSending ? 'Sending...' : 'Send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Buy Token Modal */}
+      {showBuyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowBuyModal(false)}
+          />
+
+          {/* Modal */}
+          <div
+            className={`relative w-full max-w-md p-6 rounded-2xl shadow-xl ${
+              isDark ? 'bg-gray-800' : 'bg-white'
+            }`}
+            style={{ backgroundColor: 'var(--card)' }}
+          >
+            <h2 className="text-2xl font-bold text-primary mb-6">Buy Tokens</h2>
+
+            {/* Token Search */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-secondary mb-2">Search Token</label>
+              <input
+                type="text"
+                value={tokenSearch}
+                onChange={(e) => handleTokenSearch(e.target.value)}
+                placeholder="Search by name or symbol..."
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
+              />
+            </div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="mb-4 max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg">
+                {searchResults.map((token, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setSelectedBuyToken(token);
+                      setSearchResults([]);
+                      setTokenSearch(token.symbol);
+                    }}
+                    className="w-full p-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                  >
+                    <div className="font-medium text-primary">{token.symbol}</div>
+                    <div className="text-sm text-secondary">{token.name}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Selected Token */}
+            {selectedBuyToken && (
+              <div className="mb-4 p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                <div className="font-medium text-primary">Selected: {selectedBuyToken.symbol}</div>
+                <div className="text-sm text-secondary">{selectedBuyToken.name}</div>
+              </div>
+            )}
+
+            {/* Amount in SOL */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-secondary mb-2">Amount (SOL to spend)</label>
+              <input
+                type="number"
+                value={buyAmount}
+                onChange={(e) => setBuyAmount(e.target.value)}
+                placeholder="0.00"
+                step="0.001"
+                min="0"
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowBuyModal(false);
+                  setTokenSearch('');
+                  setSelectedBuyToken(null);
+                  setBuyAmount('');
+                }}
+                className="flex-1 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-primary font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                disabled={isBuying}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBuyToken}
+                disabled={isBuying || !selectedBuyToken}
+                className="flex-1 py-3 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isBuying ? 'Getting Quote...' : 'Buy'}
               </button>
             </div>
           </div>
