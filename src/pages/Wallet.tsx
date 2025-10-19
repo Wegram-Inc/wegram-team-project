@@ -30,6 +30,7 @@ export const Wallet: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tokens' | 'tickets' | 'activity'>('tokens');
   const [solBalance, setSolBalance] = useState<number>(0);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [solPrice, setSolPrice] = useState<number>(0);
   const [earnings] = useState(0);
   const [pendingRewards] = useState(0);
   const [showSendModal, setShowSendModal] = useState(false);
@@ -70,6 +71,11 @@ export const Wallet: React.FC = () => {
     try {
       const balance = await solanaWallet.getSolBalance(walletData.publicKey);
       setSolBalance(balance);
+
+      // Fetch SOL price
+      const priceResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+      const priceData = await priceResponse.json();
+      setSolPrice(priceData.solana?.usd || 0);
     } catch (error) {
       console.error('Failed to fetch SOL balance:', error);
     } finally {
@@ -182,7 +188,7 @@ export const Wallet: React.FC = () => {
       symbol: 'SOL',
       name: 'Solana',
       balance: solBalance,
-      usdValue: 0,
+      usdValue: solBalance * solPrice,
       logo: 'https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png'
     }
   ];
@@ -218,13 +224,8 @@ export const Wallet: React.FC = () => {
             <div>
               <h3 className="text-secondary text-sm mb-2">Wallet Balance</h3>
               <div className="flex items-center gap-2">
-                <img
-                  src="https://i.ibb.co/TxdWc0kL/IMG-9101.jpg"
-                  alt="WEGRAM"
-                  className="w-6 h-6 rounded-full object-cover"
-                />
                 <span className="text-3xl font-bold text-primary">
-                  {isLoadingBalance ? '...' : `${solBalance.toFixed(4)} SOL`}
+                  {isLoadingBalance ? '...' : `$${totalUsdValue.toFixed(2)}`}
                 </span>
                 <button
                   onClick={fetchSolBalance}
