@@ -94,15 +94,18 @@ export const Wallet: React.FC = () => {
   useEffect(() => {
     if (showBuyModal && allTokens.length === 0) {
       console.log('Loading tokens from Jupiter...');
-      fetch('https://token.jup.ag/strict')
+      fetch('/api/jupiter-tokens')
         .then(res => {
           console.log('Response status:', res.status);
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
           return res.json();
         })
-        .then(tokens => {
-          console.log('✅ Loaded tokens:', tokens.length);
-          console.log('Sample tokens:', tokens.slice(0, 5));
-          setAllTokens(tokens);
+        .then(data => {
+          console.log('✅ Loaded tokens:', data.tokens.length);
+          console.log('Sample tokens:', data.tokens.slice(0, 5));
+          setAllTokens(data.tokens);
         })
         .catch(err => {
           console.error('❌ Failed to load tokens:', err);
