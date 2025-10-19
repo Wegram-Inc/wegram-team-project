@@ -130,8 +130,8 @@ export default async function handler(
         });
 
       case 'PUT':
-        // Update username only
-        const { id, username: newUsername } = req.body;
+        // Update user profile (username, bio, avatar, social links)
+        const { id, username: newUsername, bio, avatar_url, twitter_link, discord_link, telegram_link } = req.body;
 
         if (!id || !newUsername) {
           return res.status(400).json({ error: 'User ID and username are required' });
@@ -146,12 +146,19 @@ export default async function handler(
           return res.status(400).json({ error: 'Username already taken' });
         }
 
-        // Update username
+        // Update profile with all fields
         const updatedUser = await sql`
           UPDATE profiles
-          SET username = ${newUsername}, updated_at = NOW()
+          SET
+            username = ${newUsername},
+            bio = ${bio || null},
+            avatar_url = ${avatar_url || null},
+            twitter_link = ${twitter_link || null},
+            discord_link = ${discord_link || null},
+            telegram_link = ${telegram_link || null},
+            updated_at = NOW()
           WHERE id = ${id}
-          RETURNING id, username, bio, avatar_url, verified
+          RETURNING id, username, bio, avatar_url, verified, twitter_link, discord_link, telegram_link
         `;
 
         if (updatedUser.length === 0) {
