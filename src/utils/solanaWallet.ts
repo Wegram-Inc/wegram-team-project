@@ -1,5 +1,13 @@
 // Simple working Solana wallet without complex crypto dependencies
-import { Keypair } from '@solana/web3.js';
+import {
+  Keypair,
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  LAMPORTS_PER_SOL,
+  sendAndConfirmTransaction
+} from '@solana/web3.js';
 
 export interface WalletData {
   publicKey: string;
@@ -86,6 +94,52 @@ export class SolanaWallet {
       return address.length >= 32 && address.length <= 44;
     } catch {
       return false;
+    }
+  }
+
+  // Send SOL transaction
+  async sendSOL(
+    privateKeyHex: string,
+    toAddress: string,
+    amountSOL: number
+  ): Promise<{ success: boolean; signature?: string; error?: string }> {
+    try {
+      // Convert hex private key to keypair
+      const secretKey = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
+      const fromKeypair = Keypair.fromSecretKey(secretKey);
+
+      // Connect to Solana mainnet
+      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+
+      // Create recipient public key
+      const toPublicKey = new PublicKey(toAddress);
+
+      // Convert SOL to lamports
+      const lamports = amountSOL * LAMPORTS_PER_SOL;
+
+      // Create transaction
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: fromKeypair.publicKey,
+          toPubkey: toPublicKey,
+          lamports: lamports
+        })
+      );
+
+      // Send transaction
+      const signature = await sendAndConfirmTransaction(
+        connection,
+        transaction,
+        [fromKeypair]
+      );
+
+      return { success: true, signature };
+    } catch (error) {
+      console.error('Send transaction error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Transaction failed'
+      };
     }
   }
 }

@@ -99,23 +99,35 @@ export const Wallet: React.FC = () => {
       return;
     }
 
-    // Validate Solana address (basic check)
-    if (sendAddress.length < 32 || sendAddress.length > 44) {
+    // Validate Solana address
+    if (!solanaWallet.isValidAddress(sendAddress)) {
       alert('Invalid Solana address');
+      return;
+    }
+
+    // Only SOL is supported for now
+    if (selectedToken !== 'SOL') {
+      alert('Only SOL transfers are currently supported. SPL token transfers coming soon!');
       return;
     }
 
     setIsSending(true);
     try {
-      // TODO: Implement actual Solana transaction
-      // For now, just simulate
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Send actual Solana transaction
+      const result = await solanaWallet.sendSOL(
+        walletData.privateKey,
+        sendAddress,
+        parseFloat(sendAmount)
+      );
 
-      alert(`✅ Sent ${sendAmount} ${selectedToken} to ${sendAddress.substring(0, 8)}...${sendAddress.substring(sendAddress.length - 8)}`);
-
-      setShowSendModal(false);
-      setSendAddress('');
-      setSendAmount('');
+      if (result.success) {
+        alert(`✅ Transaction successful!\n\nSignature: ${result.signature}\n\nSent ${sendAmount} SOL to ${sendAddress.substring(0, 8)}...${sendAddress.substring(sendAddress.length - 8)}`);
+        setShowSendModal(false);
+        setSendAddress('');
+        setSendAmount('');
+      } else {
+        alert(`❌ Transaction failed: ${result.error}`);
+      }
     } catch (error) {
       alert('❌ Transaction failed. Please try again.');
     } finally {
