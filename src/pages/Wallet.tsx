@@ -31,6 +31,11 @@ export const Wallet: React.FC = () => {
   // const [walletBalance] = useState(0); // Reserved for future use
   const [earnings] = useState(0);
   const [pendingRewards] = useState(0);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [sendAddress, setSendAddress] = useState('');
+  const [sendAmount, setSendAmount] = useState('');
+  const [selectedToken, setSelectedToken] = useState('SOL');
+  const [isSending, setIsSending] = useState(false);
 
   const solanaWallet = new SolanaWallet();
 
@@ -82,6 +87,40 @@ export const Wallet: React.FC = () => {
 
   const handleClaimRewards = () => {
     navigate('/rewards');
+  };
+
+  const handleSend = () => {
+    setShowSendModal(true);
+  };
+
+  const handleSendSubmit = async () => {
+    if (!sendAddress || !sendAmount || !walletData) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    // Validate Solana address (basic check)
+    if (sendAddress.length < 32 || sendAddress.length > 44) {
+      alert('Invalid Solana address');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      // TODO: Implement actual Solana transaction
+      // For now, just simulate
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      alert(`✅ Sent ${sendAmount} ${selectedToken} to ${sendAddress.substring(0, 8)}...${sendAddress.substring(sendAddress.length - 8)}`);
+
+      setShowSendModal(false);
+      setSendAddress('');
+      setSendAmount('');
+    } catch (error) {
+      alert('❌ Transaction failed. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   // Real tokens data (starting at 0)
@@ -175,7 +214,7 @@ export const Wallet: React.FC = () => {
               <span className={`text-xs font-medium ${isDark ? 'text-white' : 'text-gray-800'}`}>Receive</span>
             </button>
             <button
-              onClick={handleWithdraw}
+              onClick={handleSend}
               className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-colors ${
                 isDark ? 'hover:bg-gray-700 hover:bg-opacity-30' : 'hover:bg-gray-200 hover:bg-opacity-50'
               }`}
@@ -367,6 +406,86 @@ export const Wallet: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Send Modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setShowSendModal(false)}
+          />
+
+          {/* Modal */}
+          <div
+            className={`relative w-full max-w-md p-6 rounded-2xl shadow-xl ${
+              isDark ? 'bg-gray-800' : 'bg-white'
+            }`}
+            style={{ backgroundColor: 'var(--card)' }}
+          >
+            <h2 className="text-2xl font-bold text-primary mb-6">Send Tokens</h2>
+
+            {/* Token Selector */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-secondary mb-2">Token</label>
+              <select
+                value={selectedToken}
+                onChange={(e) => setSelectedToken(e.target.value)}
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
+              >
+                <option value="SOL">SOL - Solana</option>
+                <option value="WGR">WGR - Wegram</option>
+                <option value="USDC">USDC</option>
+                <option value="USDT">USDT</option>
+              </select>
+            </div>
+
+            {/* Recipient Address */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-secondary mb-2">Recipient Address</label>
+              <input
+                type="text"
+                value={sendAddress}
+                onChange={(e) => setSendAddress(e.target.value)}
+                placeholder="Enter Solana wallet address"
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
+              />
+            </div>
+
+            {/* Amount */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-secondary mb-2">Amount</label>
+              <input
+                type="number"
+                value={sendAmount}
+                onChange={(e) => setSendAmount(e.target.value)}
+                placeholder="0.00"
+                step="0.001"
+                min="0"
+                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-primary"
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="flex-1 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-primary font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                disabled={isSending}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendSubmit}
+                disabled={isSending}
+                className="flex-1 py-3 rounded-lg bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSending ? 'Sending...' : 'Send'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
