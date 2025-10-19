@@ -48,6 +48,7 @@ import { Settings } from './pages/Settings';
 import { CreateNew } from './pages/CreateNew';
 import { CreateGroup } from './pages/CreateGroup';
 import { WeRunner } from './pages/WeRunner';
+import { Maintenance } from './pages/Maintenance';
 import { WegramMiner } from './pages/WegramMiner';
 import { AuthCallback } from './pages/AuthCallback';
 import { TwitterCallback } from './pages/TwitterCallback';
@@ -129,10 +130,28 @@ function AppContent() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [messageRecipient, setMessageRecipient] = useState<string | undefined>(undefined);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceChecked, setMaintenanceChecked] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const { profile, loading } = useNeonAuth();
+
+  // Check maintenance mode on app load
+  useEffect(() => {
+    const checkMaintenance = async () => {
+      try {
+        const response = await fetch('/api/maintenance');
+        const data = await response.json();
+        setMaintenanceMode(data.maintenance_mode || false);
+      } catch (error) {
+        console.error('Failed to check maintenance mode:', error);
+      } finally {
+        setMaintenanceChecked(true);
+      }
+    };
+    checkMaintenance();
+  }, []);
 
   // Show auth modal if not authenticated and not loading
   useEffect(() => {
@@ -186,6 +205,20 @@ function AppContent() {
     location.pathname.startsWith('/messages') ||
     location.pathname.startsWith('/settings') ||
     location.pathname.startsWith('/create-');
+
+  // Show maintenance page if in maintenance mode (except on landing page)
+  if (maintenanceChecked && maintenanceMode && location.pathname !== '/') {
+    return <Maintenance />;
+  }
+
+  // Show loading while checking maintenance
+  if (!maintenanceChecked) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-pulse text-2xl font-bold">WEGRAM</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>

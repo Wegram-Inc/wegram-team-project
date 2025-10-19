@@ -6,6 +6,8 @@ import { useNeonAuth } from '../hooks/useNeonAuth';
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
+  const [maintenancePassword, setMaintenancePassword] = useState('');
   const { profile, loading } = useNeonAuth();
 
   useEffect(() => {
@@ -24,6 +26,31 @@ export const Landing: React.FC = () => {
   const handleGuestEntry = () => {
     // Navigate directly to main app as guest
     navigate('/home');
+  };
+
+  const handleMaintenanceToggle = async () => {
+    try {
+      const response = await fetch('/api/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: maintenancePassword })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(data.maintenance_mode ? 'Site locked for maintenance' : 'Site unlocked');
+        setShowMaintenanceModal(false);
+        setMaintenancePassword('');
+        if (data.maintenance_mode) {
+          window.location.reload();
+        }
+      } else {
+        alert('Invalid password');
+      }
+    } catch (error) {
+      alert('Failed to toggle maintenance mode');
+    }
   };
 
   // Show loading while checking authentication
@@ -69,11 +96,12 @@ export const Landing: React.FC = () => {
 
         {/* Main Text */}
         <div className="text-center mb-16">
-          <div className="text-5xl font-bold text-white mb-2">Connect.</div>
+          <div className="text-5xl font-bold text-white mb-2">
+            Connect<span onClick={() => setShowMaintenanceModal(true)} className="cursor-default">.</span>
+          </div>
           <div className="text-5xl font-bold text-white mb-2">Engage.</div>
           <div className="text-5xl font-bold text-white">Monetize.</div>
         </div>
-
         {/* Main CTA Button - X Login */}
         <div className="w-full max-w-sm mb-6">
           <button
@@ -176,6 +204,40 @@ export const Landing: React.FC = () => {
                 style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)' }}
               >
                 I already installed the app
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Maintenance Mode Modal */}
+      {showMaintenanceModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75">
+          <div className="bg-gray-900 p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-700">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Maintenance Mode</h2>
+            <input
+              type="password"
+              value={maintenancePassword}
+              onChange={(e) => setMaintenancePassword(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleMaintenanceToggle()}
+              placeholder="Enter password"
+              className="w-full p-4 rounded-lg bg-gray-800 text-white border border-gray-600 mb-6 focus:outline-none focus:border-purple-500"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowMaintenanceModal(false);
+                  setMaintenancePassword('');
+                }}
+                className="flex-1 py-3 rounded-lg bg-gray-700 text-white font-semibold hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMaintenanceToggle}
+                className="flex-1 py-3 rounded-lg bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors"
+              >
+                Toggle
               </button>
             </div>
           </div>
