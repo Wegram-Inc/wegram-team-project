@@ -1,16 +1,14 @@
 // Jupiter Token List Proxy API
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 export const config = {
   runtime: 'edge',
 };
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse,
-) {
+export default async function handler(req: Request) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
@@ -24,17 +22,23 @@ export default async function handler(
     const tokens = await response.json();
 
     // Return tokens with CORS headers
-    return res.status(200).json({
+    return new Response(JSON.stringify({
       success: true,
       tokens,
       count: tokens.length
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
     console.error('Jupiter tokens API error:', error);
-    return res.status(500).json({
+    return new Response(JSON.stringify({
       error: 'Failed to fetch token list',
       details: error instanceof Error ? error.message : 'Unknown error'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
