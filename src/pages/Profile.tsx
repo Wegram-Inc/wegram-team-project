@@ -201,12 +201,26 @@ export const Profile: React.FC = () => {
     
     setIsUpdating(true);
     try {
+      // Add https:// to links if missing
+      const formatUrl = (url: string) => {
+        if (!url) return '';
+        url = url.trim();
+        if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+          return `https://${url}`;
+        }
+        return url;
+      };
+
+      const formattedTwitterLink = formatUrl(editTwitterLink);
+      const formattedDiscordLink = formatUrl(editDiscordLink);
+      const formattedTelegramLink = formatUrl(editTelegramLink);
+
       console.log('🔄 Updating profile with:', {
         bio: editBio,
         avatar_url: editAvatar,
-        twitter_link: editTwitterLink,
-        discord_link: editDiscordLink,
-        telegram_link: editTelegramLink
+        twitter_link: formattedTwitterLink,
+        discord_link: formattedDiscordLink,
+        telegram_link: formattedTelegramLink
       });
 
       // Update profile with all fields
@@ -218,9 +232,9 @@ export const Profile: React.FC = () => {
           username: editUsername,
           bio: editBio,
           avatar_url: editAvatar,
-          twitter_link: editTwitterLink,
-          discord_link: editDiscordLink,
-          telegram_link: editTelegramLink
+          twitter_link: formattedTwitterLink,
+          discord_link: formattedDiscordLink,
+          telegram_link: formattedTelegramLink
         })
       });
 
