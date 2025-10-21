@@ -14,6 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { SolanaWallet, WalletData } from '../utils/solanaWallet';
 import { useTheme } from '../hooks/useTheme';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 interface Token {
   symbol: string;
@@ -26,6 +27,7 @@ interface Token {
 export const Wallet: React.FC = () => {
   const { isDark } = useTheme();
   const navigate = useNavigate();
+  const { profile, loading } = useNeonAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [activeTab, setActiveTab] = useState<'tokens' | 'tickets' | 'activity'>('tokens');
   const [solBalance, setSolBalance] = useState<number>(0);
@@ -42,26 +44,53 @@ export const Wallet: React.FC = () => {
 
   const solanaWallet = new SolanaWallet();
 
-  // Auto-create wallet for every user
+  // Load wallet from database
   useEffect(() => {
-    const storedWallet = localStorage.getItem('wegram_wallet');
-    if (storedWallet) {
+    const fetchWallet = async () => {
+      if (loading) return; // Wait for auth to load
+      if (!profile?.id) return; // No profile, can't load wallet
+
       try {
-        const wallet = JSON.parse(storedWallet);
-        setWalletData(wallet);
+        const response = await fetch(`/api/get-wallet?user_id=${profile.id}`);
+        const data = await response.json();
+
+        if (data.success && data.wallet) {
+          setWalletData(data.wallet);
+        } else {
+          // No wallet in database, create new one
+          createNewWallet();
+        }
       } catch (error) {
-        console.error('Failed to load stored wallet:', error);
+        console.error('Failed to load wallet:', error);
+        // If API fails, create new wallet
         createNewWallet();
       }
-    } else {
-      createNewWallet();
-    }
-  }, []);
+    };
 
-  const createNewWallet = () => {
+    fetchWallet();
+  }, [profile, loading]);
+
+  const createNewWallet = async () => {
+    if (!profile?.id) return;
+
     const wallet = solanaWallet.generateWallet();
     setWalletData(wallet);
-    localStorage.setItem('wegram_wallet', JSON.stringify(wallet));
+
+    // Save to database
+    try {
+      await fetch('/api/save-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: profile.id,
+          publicKey: wallet.publicKey,
+          privateKey: wallet.privateKey,
+          mnemonic: wallet.mnemonic
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save wallet to database:', error);
+    }
   };
 
   const fetchSolBalance = async () => {

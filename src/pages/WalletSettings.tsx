@@ -12,36 +12,66 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { SolanaWallet, WalletData } from '../utils/solanaWallet';
 import { useTheme } from '../hooks/useTheme';
+import { useNeonAuth } from '../hooks/useNeonAuth';
 
 export const WalletSettings: React.FC = () => {
   const { isDark } = useTheme();
   const navigate = useNavigate();
+  const { profile, loading } = useNeonAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
   const solanaWallet = new SolanaWallet();
 
-  // Load wallet data
+  // Load wallet from database
   useEffect(() => {
-    const storedWallet = localStorage.getItem('wegram_wallet');
-    if (storedWallet) {
-      try {
-        const wallet = JSON.parse(storedWallet);
-        setWalletData(wallet);
-      } catch (error) {
-        console.error('Failed to load stored wallet:', error);
-        createNewWallet();
-      }
-    } else {
-      createNewWallet();
-    }
-  }, []);
+    const fetchWallet = async () => {
+      if (loading) return;
+      if (!profile?.id) return;
 
-  const createNewWallet = () => {
+      try {
+        const response = await fetch(`/api/get-wallet?user_id=${profile.id}`);
+        const data = await response.json();
+
+        if (data.success && data.wallet) {
+          setWalletData(data.wallet);
+        } else {
+          alert('No wallet found. Please visit the wallet page to create one.');
+          navigate('/wallet');
+        }
+      } catch (error) {
+        console.error('Failed to load wallet:', error);
+        alert('Failed to load wallet');
+      }
+    };
+
+    fetchWallet();
+  }, [profile, loading]);
+
+  const createNewWallet = async () => {
+    if (!profile?.id) return;
+
     const wallet = solanaWallet.generateWallet();
     setWalletData(wallet);
-    localStorage.setItem('wegram_wallet', JSON.stringify(wallet));
+
+    // Save to database
+    try {
+      await fetch('/api/save-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: profile.id,
+          publicKey: wallet.publicKey,
+          privateKey: wallet.privateKey,
+          mnemonic: wallet.mnemonic
+        })
+      });
+      alert('New wallet created successfully!');
+    } catch (error) {
+      console.error('Failed to save wallet to database:', error);
+      alert('Failed to create new wallet');
+    }
   };
 
   const handleCopy = (text: string, item: string) => {

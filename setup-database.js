@@ -158,6 +158,16 @@ async function setupDatabase() {
       console.log('⚠️  Social link columns may already exist:', alterError.message);
     }
 
+    // Add wallet columns if they don't exist
+    try {
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS wallet_public_key TEXT`;
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS wallet_private_key TEXT`;
+      await sql`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS wallet_mnemonic TEXT`;
+      console.log('✅ Wallet columns added to profiles table');
+    } catch (alterError) {
+      console.log('⚠️  Wallet columns may already exist:', alterError.message);
+    }
+
     // Test the connection by counting tables
     const result = await sql`
       SELECT table_name
