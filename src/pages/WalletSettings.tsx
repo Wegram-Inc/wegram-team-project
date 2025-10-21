@@ -106,8 +106,11 @@ export const WalletSettings: React.FC = () => {
             <Shield className="w-5 h-5 text-orange-500 mt-0.5" />
             <div>
               <h3 className="font-semibold text-orange-600 mb-2">Security Notice</h3>
+              <p className="text-sm text-orange-600 mb-2">
+                <strong>Do not add money to your wallet unless you save the private key.</strong>
+              </p>
               <p className="text-sm text-orange-600">
-                Never share your private key or recovery phrase with anyone. Store them securely offline.
+                You can use this wallet anywhere, like Phantom or Solflare, as long as you have the private key or seed phrase saved.
               </p>
             </div>
           </div>
