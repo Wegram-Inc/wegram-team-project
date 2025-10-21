@@ -37,12 +37,13 @@ export const WalletSettings: React.FC = () => {
         if (data.success && data.wallet) {
           setWalletData(data.wallet);
         } else {
-          alert('No wallet found. Please visit the wallet page to create one.');
+          // No wallet found, redirect to wallet page to create one
           navigate('/wallet');
         }
       } catch (error) {
         console.error('Failed to load wallet:', error);
-        alert('Failed to load wallet');
+        // Redirect to wallet page if API fails
+        navigate('/wallet');
       }
     };
 
