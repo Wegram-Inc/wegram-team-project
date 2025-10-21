@@ -244,45 +244,6 @@ export const WalletSettings: React.FC = () => {
               </div>
             )}
 
-            {/* Additional Settings */}
-            <div className="card">
-              <h3 className="text-primary font-semibold mb-4">Wallet Actions</h3>
-              <div className="space-y-3">
-                <button
-                  onClick={() => alert('Export feature coming soon!')}
-                  className={`w-full p-3 rounded-lg text-left transition-colors ${
-                    isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-primary" />
-                    <span className="text-primary">Export Wallet</span>
-                  </div>
-                  <p className="text-secondary text-sm mt-1 ml-8">
-                    Export wallet data for backup
-                  </p>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    if (confirm('This will create a new wallet. Make sure you have backed up your current wallet. Continue?')) {
-                      createNewWallet();
-                    }
-                  }}
-                  className={`w-full p-3 rounded-lg text-left transition-colors ${
-                    isDark ? 'hover:bg-red-900 hover:bg-opacity-20' : 'hover:bg-red-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-red-500" />
-                    <span className="text-red-500">Generate New Wallet</span>
-                  </div>
-                  <p className="text-secondary text-sm mt-1 ml-8">
-                    Create a new wallet (current one will be lost)
-                  </p>
-                </button>
-              </div>
-            </div>
           </div>
         )}
       </div>
