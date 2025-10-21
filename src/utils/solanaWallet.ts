@@ -113,8 +113,8 @@ export class SolanaWallet {
       const secretKey = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
       const fromKeypair = Keypair.fromSecretKey(secretKey);
 
-      // Connect to Solana mainnet
-      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+      // Connect to Solana mainnet using public RPC
+      const connection = new Connection('https://solana-rpc.publicnode.com', 'confirmed');
 
       // Create recipient public key
       const toPublicKey = new PublicKey(toAddress);
@@ -161,8 +161,8 @@ export class SolanaWallet {
       const secretKey = new Uint8Array(Buffer.from(privateKeyHex, 'hex'));
       const fromKeypair = Keypair.fromSecretKey(secretKey);
 
-      // Connect to Solana mainnet
-      const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
+      // Connect to Solana mainnet using public RPC
+      const connection = new Connection('https://solana-rpc.publicnode.com', 'confirmed');
 
       // Create public keys
       const toPublicKey = new PublicKey(toAddress);
