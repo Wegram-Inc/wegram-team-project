@@ -134,4 +134,4 @@ This is an active development project. The core social features and Web3 integra
 
 Proprietary software. All rights reserved.
 
-<!-- Force deployment - October 16 fix selector -->
+<!-- Deploy safe commit aa7ce62 -->
