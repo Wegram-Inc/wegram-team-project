@@ -71,14 +71,18 @@ export const Wallet: React.FC = () => {
   }, [profile, loading]);
 
   const createNewWallet = async () => {
-    if (!profile?.id) return;
+    if (!profile?.id) {
+      console.error('Cannot create wallet: profile.id is not available');
+      return;
+    }
 
+    console.log('Creating new wallet for user:', profile.id);
     const wallet = solanaWallet.generateWallet();
     setWalletData(wallet);
 
     // Save to database
     try {
-      await fetch('/api/save-wallet', {
+      const response = await fetch('/api/save-wallet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -88,6 +92,8 @@ export const Wallet: React.FC = () => {
           mnemonic: wallet.mnemonic
         })
       });
+      const result = await response.json();
+      console.log('Wallet saved to database:', result);
     } catch (error) {
       console.error('Failed to save wallet to database:', error);
     }
