@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, MessageCircle, Gift, Bell, Moon, Sun, X, User } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
 import { VerificationBadge } from '../VerificationBadge';
 import { LanguageSelector } from '../LanguageSelector';
@@ -17,6 +17,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
   const { isDark, toggleTheme } = useTheme();
   const { profile } = useNeonAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomeFeed = location.pathname === '/home';
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -115,8 +117,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
     <div className="lg:static lg:bg-opacity-100 lg:backdrop-blur-none fixed top-0 left-0 right-0 z-50 bg-opacity-95 backdrop-blur-sm" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Desktop: Single row layout */}
       <div className="hidden lg:flex lg:max-w-none lg:mx-0 lg:px-6 lg:py-4 items-center gap-3">
-        {/* Search Field - Desktop */}
-        <div className="flex-1 relative" ref={searchRef}>
+        {/* Search Field - Desktop - Only on Home Feed */}
+        {isHomeFeed && (
+          <div className="flex-1 relative" ref={searchRef}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             ref={inputRef}
@@ -188,6 +191,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
             </div>
           )}
         </div>
+        )}
 
         {/* Right Icons - Desktop */}
         <div className="flex items-center gap-2">
@@ -293,8 +297,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
           </div>
         </div>
 
-        {/* Row 2: Search Bar - Full Width */}
-        <div className="relative" ref={mobileSearchRef}>
+        {/* Row 2: Search Bar - Full Width - Only on Home Feed */}
+        {isHomeFeed && (
+          <div className="relative" ref={mobileSearchRef}>
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             ref={mobileInputRef}
@@ -366,6 +371,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );
