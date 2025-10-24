@@ -704,7 +704,6 @@ export const Profile: React.FC = () => {
         >
           <ArrowLeft className="w-5 h-5 text-primary" />
         </button>
-        <h1 className="text-xl font-bold text-primary flex-1">{user.displayName}</h1>
       </div>
 
       <div className="max-w-md mx-auto animate-in slide-in-from-top-4 duration-300">
@@ -796,7 +795,7 @@ export const Profile: React.FC = () => {
             {/* Delete Account Button */}
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg font-medium transition-colors"
+              className="flex-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs rounded-full font-medium transition-colors"
             >
               Delete Account
             </button>
@@ -804,7 +803,7 @@ export const Profile: React.FC = () => {
             {/* Edit Profile Button */}
             <button
               onClick={handleEditProfile}
-              className="flex-1 btn-primary px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              className="flex-1 btn-primary px-3 py-1.5 rounded-full font-medium transition-colors text-xs"
             >
               Edit Profile
             </button>
