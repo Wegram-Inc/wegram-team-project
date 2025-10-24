@@ -710,9 +710,10 @@ export const Profile: React.FC = () => {
       <div className="max-w-md mx-auto animate-in slide-in-from-top-4 duration-300">
         {/* Profile Header */}
         <div className="px-4 py-6">
-          {/* Avatar and Name */}
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+          {/* Avatar, Stats and Actions Row */}
+          <div className="flex items-start gap-4 mb-4">
+            {/* Avatar */}
+            <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
               {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('data:')) ? (
                 <img
                   src={user.avatar}
@@ -720,104 +721,94 @@ export const Profile: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
                   {user.avatarInitial || user.avatar}
                 </div>
               )}
             </div>
+
+            {/* Stats Grid - Next to Avatar */}
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-xl font-bold gradient-text">{user.displayName}</h2>
-                {user.verified && (
-                  <VerificationBadge
-                    type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
-                    size="lg"
-                  />
+              <div className={`grid gap-3 ${profile.twitter_username ? 'grid-cols-2' : 'grid-cols-2'}`}>
+                {/* WEGRAM Followers */}
+                <button
+                  onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
+                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                >
+                  <div className="text-base font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
+                  <div className="text-secondary text-xs">Followers</div>
+                </button>
+
+                {/* WEGRAM Following */}
+                <button
+                  onClick={() => navigate(`/user/${profile.username.replace('@', '')}/following`)}
+                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                >
+                  <div className="text-base font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
+                  <div className="text-secondary text-xs">Following</div>
+                </button>
+
+                {/* Blocked Users */}
+                <button
+                  onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
+                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                >
+                  <div className="text-base font-bold text-primary">{blockedCount.toLocaleString()}</div>
+                  <div className="text-secondary text-xs">Blocked</div>
+                </button>
+
+                {/* Twitter Followers - Only show if user actually signed up with Twitter */}
+                {profile.twitter_username && (
+                  <button
+                    onClick={() => window.open(`https://x.com/${user.twitterUsername}`, '_blank')}
+                    className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <div className="text-base font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
+                      <svg className="w-3.5 h-3.5 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </div>
+                    <div className="text-secondary text-xs flex items-center justify-center gap-1">
+                      X
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </div>
+                  </button>
                 )}
               </div>
-              <p className="text-secondary text-sm mb-3">{user.username}</p>
-              
-              {/* Action Icons - 3 dots only (no gift for own profile) */}
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleProfileMenu}
-                  className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
-                >
-                  <MoreHorizontal className="w-4 h-4 text-secondary" />
-                </button>
-              </div>
-            </div>
-
-            {/* Account Actions */}
-            <div className="flex flex-col gap-2">
-              {/* Delete Account Button */}
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="px-4 py-1.5 bg-red-500 hover:bg-red-600 text-white text-sm rounded-full font-medium transition-colors"
-              >
-                Delete Account
-              </button>
-
-              {/* Edit Profile Button */}
-              <button
-                onClick={handleEditProfile}
-                className="btn-primary px-6 py-2 rounded-full font-medium transition-colors"
-              >
-                Edit Profile
-              </button>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className={`grid gap-4 mb-6 ${profile.twitter_username ? 'grid-cols-4' : 'grid-cols-3'}`}>
-            {/* Blocked Users */}
-            <button
-              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
-              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
-            >
-              <div className="text-lg font-bold text-primary">{blockedCount.toLocaleString()}</div>
-              <div className="text-secondary text-xs">BLOCKED</div>
-            </button>
-
-            {/* WEGRAM Followers */}
-            <button
-              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
-              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
-            >
-              <div className="text-lg font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
-              <div className="text-secondary text-xs">FOLLOWERS</div>
-            </button>
-
-            {/* WEGRAM Following */}
-            <button
-              onClick={() => navigate(`/user/${profile.username.replace('@', '')}/following`)}
-              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
-            >
-              <div className="text-lg font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
-              <div className="text-secondary text-xs">FOLLOWING</div>
-            </button>
-
-            {/* Twitter Followers - Only show if user actually signed up with Twitter */}
-            {profile.twitter_username && (
-              <div className="text-center">
-                <button
-                  onClick={() => window.open(`https://x.com/${user.twitterUsername}`, '_blank')}
-                  className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
-                >
-                  <div className="flex items-center gap-1">
-                    <div className="text-lg font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
-                    {/* Real X Logo */}
-                    <svg className="w-4 h-4 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                  </div>
-                  <div className="text-secondary text-xs flex items-center gap-1">
-                    X
-                    <ExternalLink className="w-3 h-3" />
-                  </div>
-                </button>
-              </div>
+          {/* Username with Badge */}
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-lg font-bold text-primary">{user.displayName}</h2>
+            {user.verified && (
+              <VerificationBadge
+                type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                size="md"
+              />
             )}
+          </div>
+
+          <div className="text-secondary text-sm mb-4">{user.username}</div>
+
+          {/* Action Buttons Row */}
+          <div className="flex gap-2 mb-4">
+            {/* Delete Account Button */}
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg font-medium transition-colors"
+            >
+              Delete Account
+            </button>
+
+            {/* Edit Profile Button */}
+            <button
+              onClick={handleEditProfile}
+              className="flex-1 btn-primary px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+            >
+              Edit Profile
+            </button>
           </div>
 
           {/* Bio */}
