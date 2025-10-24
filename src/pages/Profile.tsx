@@ -727,51 +727,50 @@ export const Profile: React.FC = () => {
               )}
             </div>
 
-            {/* Stats Grid - Next to Avatar */}
+            {/* Stats Row - Next to Avatar */}
             <div className="flex-1">
-              <div className={`grid gap-3 ${profile.twitter_username ? 'grid-cols-2' : 'grid-cols-2'}`}>
+              <div className="flex gap-2 justify-between">
                 {/* WEGRAM Followers */}
                 <button
                   onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
-                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                 >
-                  <div className="text-base font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
-                  <div className="text-secondary text-xs">Followers</div>
+                  <div className="text-sm font-bold text-primary">{user.wegramFollowers.toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Followers</div>
                 </button>
 
                 {/* WEGRAM Following */}
                 <button
                   onClick={() => navigate(`/user/${profile.username.replace('@', '')}/following`)}
-                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                 >
-                  <div className="text-base font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
-                  <div className="text-secondary text-xs">Following</div>
+                  <div className="text-sm font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Following</div>
                 </button>
 
                 {/* Blocked Users */}
                 <button
                   onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
-                  className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                 >
-                  <div className="text-base font-bold text-primary">{blockedCount.toLocaleString()}</div>
-                  <div className="text-secondary text-xs">Blocked</div>
+                  <div className="text-sm font-bold text-primary">{blockedCount.toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Blocked</div>
                 </button>
 
                 {/* Twitter Followers - Only show if user actually signed up with Twitter */}
                 {profile.twitter_username && (
                   <button
                     onClick={() => window.open(`https://x.com/${user.twitterUsername}`, '_blank')}
-                    className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                    className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                   >
-                    <div className="flex items-center justify-center gap-1">
-                      <div className="text-base font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
-                      <svg className="w-3.5 h-3.5 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <div className="flex items-center justify-center gap-0.5">
+                      <div className="text-sm font-bold text-primary">{user.twitterFollowers.toLocaleString()}</div>
+                      <svg className="w-3 h-3 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                       </svg>
                     </div>
-                    <div className="text-secondary text-xs flex items-center justify-center gap-1">
+                    <div className="text-secondary text-[10px] flex items-center justify-center gap-0.5">
                       X
-                      <ExternalLink className="w-2.5 h-2.5" />
                     </div>
                   </button>
                 )}
