@@ -729,6 +729,15 @@ export const Profile: React.FC = () => {
             {/* Stats Row - Next to Avatar */}
             <div className="flex-1">
               <div className="flex gap-2 justify-between">
+                {/* Blocked Users */}
+                <button
+                  onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                >
+                  <div className="text-sm font-bold text-primary">{blockedCount.toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Blocked</div>
+                </button>
+
                 {/* WEGRAM Followers */}
                 <button
                   onClick={() => navigate(`/user/${profile.username.replace('@', '')}/followers`)}
@@ -745,15 +754,6 @@ export const Profile: React.FC = () => {
                 >
                   <div className="text-sm font-bold text-primary">{user.wegramFollowing.toLocaleString()}</div>
                   <div className="text-secondary text-[10px]">Following</div>
-                </button>
-
-                {/* Blocked Users */}
-                <button
-                  onClick={() => navigate(`/user/${profile.username.replace('@', '')}/blocked`)}
-                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
-                >
-                  <div className="text-sm font-bold text-primary">{blockedCount.toLocaleString()}</div>
-                  <div className="text-secondary text-[10px]">Blocked</div>
                 </button>
 
                 {/* Twitter Followers - Only show if user actually signed up with Twitter */}
