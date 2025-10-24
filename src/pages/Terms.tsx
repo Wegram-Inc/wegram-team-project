@@ -1,4 +1,6 @@
-export default function Terms(): JSX.Element {
+import React from 'react';
+
+export const Terms: React.FC = () => {
   return (
     <div
       className='fixed inset-0 w-screen h-screen overflow-y-auto bg-gray-50 text-gray-900 flex justify-center items-start p-8'
@@ -115,4 +117,4 @@ export default function Terms(): JSX.Element {
       </main>
     </div>
   );
-}
+};
