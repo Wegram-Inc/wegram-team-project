@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Bell, Heart, MessageCircle, UserPlus, Settings, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, Bell, Heart, MessageCircle, UserPlus, UserMinus, Settings, MoreHorizontal, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
@@ -24,6 +24,9 @@ export const Notifications: React.FC = () => {
   const { isDark } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [followingStatus, setFollowingStatus] = useState<{ [key: string]: boolean }>({});
+  const [actioningUsernames, setActioningUsernames] = useState<Set<string>>(new Set());
+  const [userIdCache, setUserIdCache] = useState<{ [key: string]: string }>({});
 
   // Fetch notifications when component mounts
   useEffect(() => {
@@ -36,6 +39,11 @@ export const Notifications: React.FC = () => {
 
         if (response.ok) {
           setNotifications(data.notifications || []);
+
+          // Fetch follow status for all follow notifications
+          if (data.notifications) {
+            await fetchFollowStatusForNotifications(data.notifications);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch notifications:', error);
@@ -46,6 +54,43 @@ export const Notifications: React.FC = () => {
 
     fetchNotifications();
   }, [profile?.id]);
+
+  // Fetch follow status for follow notifications
+  const fetchFollowStatusForNotifications = async (notifs: Notification[]) => {
+    if (!profile?.id) return;
+
+    const followNotifs = notifs.filter(n => n.type === 'follow' && n.from_username);
+    const statusMap: { [key: string]: boolean } = {};
+    const idCache: { [key: string]: string } = {};
+
+    for (const notif of followNotifs) {
+      if (!notif.from_username) continue;
+
+      try {
+        const cleanUsername = notif.from_username.replace('@', '');
+
+        // Get user ID from username
+        const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
+        const userData = await userResponse.json();
+
+        if (userData.success && userData.user) {
+          const userId = userData.user.id;
+          idCache[notif.from_username] = userId;
+
+          // Check if we're following this user
+          const followResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${userId}`);
+          const followData = await followResponse.json();
+          statusMap[notif.from_username] = followData.isFollowing || false;
+        }
+      } catch (error) {
+        console.error(`Error fetching follow status for ${notif.from_username}:`, error);
+        statusMap[notif.from_username] = false;
+      }
+    }
+
+    setFollowingStatus(statusMap);
+    setUserIdCache(idCache);
+  };
 
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
@@ -138,8 +183,8 @@ export const Notifications: React.FC = () => {
     }
   };
 
-  // Handle follow back from notification
-  const handleFollowBack = async (username: string, event: React.MouseEvent) => {
+  // Handle follow/unfollow toggle - EXACTLY like Followers page
+  const handleFollowToggle = async (username: string, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent notification click
 
     if (!profile?.id) {
@@ -150,43 +195,58 @@ export const Notifications: React.FC = () => {
     const cleanUsername = username?.replace('@', '');
     if (!cleanUsername) return;
 
-    try {
-      // Get the user ID from username
-      const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
-      const userData = await userResponse.json();
+    // Add to actioning set
+    setActioningUsernames(prev => new Set(prev).add(username));
 
-      if (!userData.success || !userData.user) {
-        alert('User not found');
-        return;
+    try {
+      // Get user ID (from cache or fetch)
+      let userId = userIdCache[username];
+
+      if (!userId) {
+        const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
+        const userData = await userResponse.json();
+
+        if (!userData.success || !userData.user) {
+          alert('User not found');
+          return;
+        }
+
+        userId = userData.user.id;
+        setUserIdCache(prev => ({ ...prev, [username]: userId }));
       }
 
-      // Check if already following
-      const followCheckResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${userData.user.id}`);
-      const followCheckResult = await followCheckResponse.json();
-      const isFollowing = followCheckResult.isFollowing || false;
+      const isCurrentlyFollowing = followingStatus[username];
+      const method = isCurrentlyFollowing ? 'DELETE' : 'POST';
 
-      // Follow or unfollow
-      const method = isFollowing ? 'DELETE' : 'POST';
       const response = await fetch('/api/follow', {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           follower_id: profile.id,
-          following_id: userData.user.id
+          following_id: userId
         })
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (response.ok && result.success) {
-        // Show success message
-        alert(isFollowing ? 'Unfollowed successfully' : 'Following!');
+      if (data.success) {
+        setFollowingStatus(prev => ({
+          ...prev,
+          [username]: !isCurrentlyFollowing
+        }));
       } else {
-        alert(result.error || 'Failed to follow user');
+        alert(`Failed to ${isCurrentlyFollowing ? 'unfollow' : 'follow'} user`);
       }
     } catch (error) {
-      console.error('Follow error:', error);
-      alert('Failed to follow user');
+      console.error('Error toggling follow:', error);
+      alert('Failed to update follow status');
+    } finally {
+      // Remove from actioning set
+      setActioningUsernames(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(username);
+        return newSet;
+      });
     }
   };
 
@@ -259,6 +319,9 @@ export const Notifications: React.FC = () => {
         <div className="space-y-3">
           {notifications.map((notification) => {
             const { icon: Icon, color, bg } = getNotificationIcon(notification.type);
+            const isFollowNotif = notification.type === 'follow';
+            const isActioning = notification.from_username && actioningUsernames.has(notification.from_username);
+            const isFollowing = notification.from_username && followingStatus[notification.from_username];
 
             return (
               <div
@@ -321,16 +384,31 @@ export const Notifications: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Notification Type Icon - Make clickable for follow notifications */}
-                  {notification.type === 'follow' ? (
+                  {/* Follow/Unfollow Button for follow notifications - EXACTLY like Followers page */}
+                  {isFollowNotif && notification.from_username ? (
                     <button
-                      onClick={(e) => handleFollowBack(notification.from_username || '', e)}
-                      className={`w-8 h-8 rounded-full ${bg} bg-opacity-20 hover:bg-opacity-40 flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 cursor-pointer`}
-                      title="Follow back"
+                      onClick={(e) => handleFollowToggle(notification.from_username || '', e)}
+                      disabled={isActioning}
+                      className={`px-4 py-1.5 rounded-full border transition-colors disabled:opacity-50 text-sm font-medium flex items-center gap-1 ${
+                        isFollowing
+                          ? 'border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20'
+                          : 'border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-900/20'
+                      }`}
                     >
-                      <Icon className={`w-4 h-4 ${color}`} />
+                      {isActioning ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isFollowing ? (
+                        <UserMinus className="w-3 h-3" />
+                      ) : (
+                        <UserPlus className="w-3 h-3" />
+                      )}
+                      {isActioning
+                        ? (isFollowing ? 'Unfollowing...' : 'Following...')
+                        : (isFollowing ? 'Unfollow' : 'Follow Back')
+                      }
                     </button>
                   ) : (
+                    /* Regular icon for non-follow notifications */
                     <div className={`w-8 h-8 rounded-full ${bg} bg-opacity-20 flex items-center justify-center flex-shrink-0`}>
                       <Icon className={`w-4 h-4 ${color}`} />
                     </div>
