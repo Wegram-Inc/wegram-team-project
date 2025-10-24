@@ -19,7 +19,7 @@ export interface TwitterAuthResponse {
 }
 
 class TwitterAuthService {
-  private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
+  private readonly clientId = import.meta.env.VITE_TWITTER_API_KEY || 'RHA0V29TbXVmNkxLcnQ1ejljUjE6MTpjaQ';
   private readonly redirectUri = window.location.hostname === 'localhost'
     ? `http://localhost:${window.location.port}/twitter/callback`
     : 'https://www.wegram.social/twitter/callback';

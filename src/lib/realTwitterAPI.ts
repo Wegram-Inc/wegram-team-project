@@ -1,5 +1,5 @@
 // Real Twitter OAuth API Integration via Backend
-const TWITTER_API_KEY = import.meta.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
+const TWITTER_API_KEY = import.meta.env.VITE_TWITTER_API_KEY || 'RHA0V29TbXVmNkxLcnQ1ejljUjE6MTpjaQ';
 
 export const realTwitterAPI = {
   // Exchange authorization code for access token via backend
