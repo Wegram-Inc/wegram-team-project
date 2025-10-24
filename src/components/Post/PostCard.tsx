@@ -193,7 +193,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   };
 
   return (
-    <div className="card mb-4">
+    <div className="card mb-4 overflow-hidden">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <button 
@@ -347,7 +347,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         onClick={handlePostContentClick}
         className="cursor-pointer"
       >
-        <p className="text-primary mb-4 leading-relaxed">{post.content}</p>
+        <p className="text-primary mb-4 leading-relaxed break-words overflow-wrap-anywhere">{post.content}</p>
       </div>
 
       {/* Media Display */}
