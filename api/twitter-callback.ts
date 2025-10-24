@@ -1,8 +1,8 @@
 // Vercel Serverless Function for Twitter OAuth Token Exchange
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const TWITTER_API_KEY = process.env.VITE_TWITTER_API_KEY || 'RHA0V29TbXVmNkxLcnQ1ejljUjE6MTpjaQ';
-const TWITTER_API_SECRET = process.env.VITE_TWITTER_API_SECRET || '6N-q3fX_CF5YzoXMDxqdWdeW_dqkLUbA_54QhHyfGzeEV17vmX';
+const TWITTER_API_KEY = process.env.VITE_TWITTER_API_KEY || 'Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ';
+const TWITTER_API_SECRET = process.env.VITE_TWITTER_API_SECRET || 'yVLRkNMGNMr0alpbKCSPdKDlwMmZeySkR9wnMIojSc6wPjcztI';
 
 export default async function handler(
   req: VercelRequest,
