@@ -1119,9 +1119,10 @@ export const UserProfile: React.FC = () => {
       <div className="max-w-md mx-auto animate-in slide-in-from-top-4 duration-300">
         {/* Profile Header */}
         <div className="px-4 py-6">
-          {/* Avatar and Name */}
-          <div className="flex items-start gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+          {/* Avatar, Stats and Actions Row */}
+          <div className="flex items-start gap-4 mb-4">
+            {/* Avatar */}
+            <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
               {user.avatar_url ? (
                 <img
                   src={user.avatar_url}
@@ -1129,106 +1130,87 @@ export const UserProfile: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
                   {user.username?.charAt(1)?.toUpperCase() || '👤'}
                 </div>
               )}
             </div>
+
+            {/* Stats Row - Next to Avatar */}
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h2 className="text-xl font-bold gradient-text">{user.username?.replace('@', '') || 'User'}</h2>
-                {user.verified && (
-                  <VerificationBadge
-                    type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
-                    size="lg"
-                  />
-                )}
-              </div>
-              <p className="text-secondary text-sm mb-3">{user.username}</p>
-              
-              {/* Action Icons - Gift and 3 dots (only for other users) */}
-              <div className="flex items-center gap-2">
+              <div className="flex gap-2 justify-between">
+                {/* WEGRAM Followers */}
                 <button
-                  onClick={() => navigate('/rewards')}
-                  className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
+                  onClick={() => navigate(`/user/${username}/followers`)}
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                 >
-                  <Gift className="w-4 h-4 text-accent" />
+                  <div className="text-sm font-bold text-primary">{(user.followers_count || 0).toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Followers</div>
                 </button>
-                {/* Only show action menu for other users, not your own profile */}
-                {currentUser && user && currentUser.username !== user.username && (
+
+                {/* WEGRAM Following */}
+                <button
+                  onClick={() => navigate(`/user/${username}/following`)}
+                  className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
+                >
+                  <div className="text-sm font-bold text-primary">{(user.following_count || 0).toLocaleString()}</div>
+                  <div className="text-secondary text-[10px]">Following</div>
+                </button>
+
+                {/* Twitter Followers - Only show if user signed up with Twitter */}
+                {(user.twitter_username || user.twitter_id) && (
                   <button
-                    onClick={handleProfileMenu}
-                    className="w-8 h-8 rounded-full bg-overlay-light flex items-center justify-center"
+                    onClick={() => window.open(`https://x.com/${user.twitter_username}`, '_blank')}
+                    className="flex-1 text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-1.5 rounded-lg transition-colors"
                   >
-                    <MoreHorizontal className="w-4 h-4 text-secondary" />
+                    <div className="flex items-center justify-center gap-0.5">
+                      <div className="text-sm font-bold text-primary">{(user.twitter_followers_count || 0).toLocaleString()}</div>
+                      <svg className="w-3 h-3 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </div>
+                    <div className="text-secondary text-[10px] flex items-center justify-center gap-0.5">
+                      X
+                    </div>
                   </button>
                 )}
               </div>
             </div>
-            
-            {/* Message and Follow Buttons - positioned on the right */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleMessage}
-                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                title="Send message"
-              >
-                <Mail className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-              </button>
-              <button
-                onClick={handleFollow}
-                disabled={isLoading}
-                className={`btn-primary px-3 py-1.5 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs`}
-              >
-                {isLoading ? '...' : (isFollowing ? 'Unfollow' : 'Follow')}
-              </button>
-            </div>
           </div>
 
-          {/* Stats */}
-          <div className={`grid gap-4 mb-6 ${
-            currentUser && user.id === currentUser.id
-              ? (user.twitter_username || user.twitter_id) ? 'grid-cols-4' : 'grid-cols-3'
-              : (user.twitter_username || user.twitter_id) ? 'grid-cols-3' : 'grid-cols-2'
-          }`}>
-            {/* Show Blocked count only on own profile */}
-            {currentUser && user.id === currentUser.id && (
-              <button
-                onClick={() => navigate(`/user/${username}/blocked`)}
-                className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
-              >
-                <div className="text-lg font-bold text-primary">{blockedCount.toLocaleString()}</div>
-                <div className="text-secondary text-xs">BLOCKED</div>
-              </button>
+          {/* Username with Badge */}
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-lg font-bold text-primary">{user.username?.replace('@', '') || 'User'}</h2>
+            {user.verified && (
+              <VerificationBadge
+                type={['puff012', '@puff012', 'Puffnutz', '@Puffnutz', '@TheWegramApp', '@_fudder'].includes(user.username) ? 'platinum' : 'gold'}
+                size="md"
+              />
             )}
+          </div>
+
+          <div className="text-secondary text-sm mb-4">{user.username}</div>
+
+          {/* Action Buttons Row - Message and Follow */}
+          <div className="flex gap-2 mb-4">
+            {/* Message Button (envelope) - in Delete Account position */}
             <button
-              onClick={() => navigate(`/user/${username}/followers`)}
-              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+              onClick={handleMessage}
+              className="flex-1 px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-xs rounded-full font-medium transition-colors flex items-center justify-center gap-2"
+              title="Send message"
             >
-              <div className="text-lg font-bold text-primary">{(user.followers_count || 0).toLocaleString()}</div>
-              <div className="text-secondary text-xs">FOLLOWERS</div>
+              <Mail className="w-4 h-4" />
+              Message
             </button>
+
+            {/* Follow Button - in Edit Profile position */}
             <button
-              onClick={() => navigate(`/user/${username}/following`)}
-              className="text-center hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+              onClick={handleFollow}
+              disabled={isLoading}
+              className="flex-1 btn-primary px-3 py-1.5 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
             >
-              <div className="text-lg font-bold text-primary">{(user.following_count || 0).toLocaleString()}</div>
-              <div className="text-secondary text-xs">FOLLOWING</div>
+              {isLoading ? '...' : (isFollowing ? 'Unfollow' : 'Follow')}
             </button>
-            {(user.twitter_username || user.twitter_id) && (
-              <button
-                onClick={() => window.open(`https://x.com/${user.twitter_username}`, '_blank')}
-                className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-              >
-                <div className="text-lg font-bold text-primary">{(user.twitter_followers_count || 0).toLocaleString()}</div>
-                <div className="text-secondary text-xs flex items-center justify-center gap-1">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                  X
-                </div>
-              </button>
-            )}
           </div>
 
 
