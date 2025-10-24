@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, TrendingUp, Compass, Gamepad2, MessageCircle, Gift, Bot, Video, Bell, RotateCcw, Bookmark, Coins, Play, ShoppingCart, CheckCircle, LogOut, Shield, User, BarChart3, Wallet, HelpCircle } from 'lucide-react';
+import { Home, TrendingUp, Compass, Gamepad2, MessageCircle, Gift, Bot, Video, Bell, RotateCcw, Bookmark, Coins, Play, ShoppingCart, CheckCircle, LogOut, Shield, User, BarChart3, Wallet, HelpCircle, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { TwoFactorModal } from '../Auth/TwoFactorModal';
@@ -24,6 +24,7 @@ export const DesktopSidebar: React.FC = () => {
     { id: 'rewards', label: 'Rewards', icon: Gift, path: '/rewards' },
     { id: 'video', label: 'Video', icon: Play, path: '/video' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' },
+    { id: 'stats', label: 'Stats', icon: Activity, path: '/stats' },
     { id: 'wallet', label: 'Wallet', icon: Wallet, path: '/wallet' },
     { id: 'help', label: 'Help', icon: HelpCircle, path: '/help' },
     { id: 'ai', label: 'Wegram AI', icon: Bot, path: '/ai' },

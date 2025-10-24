@@ -41,6 +41,7 @@ import { PlaceholderPage } from './pages/PlaceholderPage';
 import { Staking } from './pages/Staking';
 import { BuyWegram } from './pages/BuyWegram';
 import { Notifications } from './pages/Notifications';
+import { Stats } from './pages/Stats';
 import { LaunchToken } from './pages/LaunchToken';
 import { Video } from './pages/Video';
 import { ChatDetail } from './pages/ChatDetail';
@@ -121,6 +122,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/buy-wegram" element={<BuyWegram />} />
     <Route path="/notifications" element={<Notifications />} />
     <Route path="/notification-settings" element={<NotificationSettings />} />
+    <Route path="/stats" element={<Stats />} />
     <Route path="/launch-token" element={<LaunchToken />} />
   </Routes>
 );

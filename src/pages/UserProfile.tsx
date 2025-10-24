@@ -1091,7 +1091,13 @@ export const UserProfile: React.FC = () => {
           <p className="text-sm text-secondary">{user.username}</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          {/* Empty space - 3 dots are in profile section, not header */}
+          {/* Three dots menu button */}
+          <button
+            onClick={handleProfileMenu}
+            className="p-2 rounded-lg transition-colors hover:bg-overlay-light"
+          >
+            <MoreHorizontal className="w-5 h-5 text-primary" />
+          </button>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, MessageCircle, Gift, Bell, Moon, Sun, X, User } from 'lucide-react';
+import { Search, MessageCircle, Gift, Bell, Moon, Sun, X, User, Activity } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
@@ -258,6 +258,15 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick, onGiftClick, onMess
 
           {/* Right Icons - Mobile */}
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => navigate('/stats')}
+              className={`p-2 rounded-lg transition-colors ${
+                isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
+              }`}
+              aria-label="Stats"
+            >
+              <Activity className="w-5 h-5 text-gray-400" />
+            </button>
             <LanguageSelector />
             <button
               onClick={toggleTheme}
