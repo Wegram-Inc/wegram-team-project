@@ -1167,18 +1167,18 @@ export const UserProfile: React.FC = () => {
             </div>
             
             {/* Message and Follow Buttons - positioned on the right */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleMessage}
-                className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 title="Send message"
               >
-                <Mail className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                <Mail className="w-4 h-4 text-gray-600 dark:text-gray-300" />
               </button>
               <button
                 onClick={handleFollow}
                 disabled={isLoading}
-                className={`btn-primary px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`btn-primary px-3 py-1.5 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs`}
               >
                 {isLoading ? '...' : (isFollowing ? 'Unfollow' : 'Follow')}
               </button>
