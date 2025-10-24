@@ -138,6 +138,58 @@ export const Notifications: React.FC = () => {
     }
   };
 
+  // Handle follow back from notification
+  const handleFollowBack = async (username: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent notification click
+
+    if (!profile?.id) {
+      alert('Please log in to follow users');
+      return;
+    }
+
+    const cleanUsername = username?.replace('@', '');
+    if (!cleanUsername) return;
+
+    try {
+      // Get the user ID from username
+      const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
+      const userData = await userResponse.json();
+
+      if (!userData.success || !userData.user) {
+        alert('User not found');
+        return;
+      }
+
+      // Check if already following
+      const followCheckResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${userData.user.id}`);
+      const followCheckResult = await followCheckResponse.json();
+      const isFollowing = followCheckResult.isFollowing || false;
+
+      // Follow or unfollow
+      const method = isFollowing ? 'DELETE' : 'POST';
+      const response = await fetch('/api/follow', {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          follower_id: profile.id,
+          following_id: userData.user.id
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Show success message
+        alert(isFollowing ? 'Unfollowed successfully' : 'Following!');
+      } else {
+        alert(result.error || 'Failed to follow user');
+      }
+    } catch (error) {
+      console.error('Follow error:', error);
+      alert('Failed to follow user');
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
@@ -269,10 +321,20 @@ export const Notifications: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Notification Type Icon */}
-                  <div className={`w-8 h-8 rounded-full ${bg} bg-opacity-20 flex items-center justify-center flex-shrink-0`}>
-                    <Icon className={`w-4 h-4 ${color}`} />
-                  </div>
+                  {/* Notification Type Icon - Make clickable for follow notifications */}
+                  {notification.type === 'follow' ? (
+                    <button
+                      onClick={(e) => handleFollowBack(notification.from_username || '', e)}
+                      className={`w-8 h-8 rounded-full ${bg} bg-opacity-20 hover:bg-opacity-40 flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 cursor-pointer`}
+                      title="Follow back"
+                    >
+                      <Icon className={`w-4 h-4 ${color}`} />
+                    </button>
+                  ) : (
+                    <div className={`w-8 h-8 rounded-full ${bg} bg-opacity-20 flex items-center justify-center flex-shrink-0`}>
+                      <Icon className={`w-4 h-4 ${color}`} />
+                    </div>
+                  )}
 
                   {/* Unread Indicator */}
                   {!notification.read && (
