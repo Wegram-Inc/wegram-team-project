@@ -6,8 +6,8 @@ Add these environment variables to your backend deployment (wegram.onrender.com)
 
 ```bash
 # Twitter OAuth 2.0 Credentials
-TWITTER_CLIENT_ID=Q3FhWHhNdWtHR19YTGJtNUhSRWY6MTpjaQ
-TWITTER_CLIENT_SECRET=yVLRkNMGNMr0alpbKCSPdKDlwMmZeySkR9wnMIojSc6wPjcztI
+TWITTER_CLIENT_ID=RHA0V29TbXVmNkxLcnQ1ejljUjE6MTpjaQ
+TWITTER_CLIENT_SECRET=6N-q3fX_CF5YzoXMDxqdWdeW_dqkLUbA_54QhHyfGzeEV17vmX
 
 # Callback URL (already configured in Twitter Developer Portal)
 TWITTER_CALLBACK_URL=https://wegram.onrender.com/api/auth/twitter/callback
