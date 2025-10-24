@@ -12,6 +12,7 @@ interface Notification {
   read: boolean;
   created_at: string;
   post_id?: string;
+  from_user_id?: string;
   from_username?: string;
   from_avatar_url?: string;
   post_content?: string;
@@ -59,29 +60,21 @@ export const Notifications: React.FC = () => {
   const fetchFollowStatusForNotifications = async (notifs: Notification[]) => {
     if (!profile?.id) return;
 
-    const followNotifs = notifs.filter(n => n.type === 'follow' && n.from_username);
+    const followNotifs = notifs.filter(n => n.type === 'follow' && n.from_username && n.from_user_id);
     const statusMap: { [key: string]: boolean } = {};
     const idCache: { [key: string]: string } = {};
 
     for (const notif of followNotifs) {
-      if (!notif.from_username) continue;
+      if (!notif.from_username || !notif.from_user_id) continue;
 
       try {
-        const cleanUsername = notif.from_username.replace('@', '');
+        // Store user ID in cache
+        idCache[notif.from_username] = notif.from_user_id;
 
-        // Get user ID from username
-        const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
-        const userData = await userResponse.json();
-
-        if (userData.success && userData.user) {
-          const userId = userData.user.id;
-          idCache[notif.from_username] = userId;
-
-          // Check if we're following this user
-          const followResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${userId}`);
-          const followData = await followResponse.json();
-          statusMap[notif.from_username] = followData.isFollowing || false;
-        }
+        // Check if we're following this user
+        const followResponse = await fetch(`/api/follow?follower_id=${profile.id}&following_id=${notif.from_user_id}`);
+        const followData = await followResponse.json();
+        statusMap[notif.from_username] = followData.isFollowing || false;
       } catch (error) {
         console.error(`Error fetching follow status for ${notif.from_username}:`, error);
         statusMap[notif.from_username] = false;
@@ -183,7 +176,7 @@ export const Notifications: React.FC = () => {
     }
   };
 
-  // Handle follow/unfollow toggle - EXACTLY like Followers page
+  // Handle follow/unfollow toggle - Uses cached user ID from API
   const handleFollowToggle = async (username: string, event: React.MouseEvent) => {
     event.stopPropagation(); // Prevent notification click
 
@@ -192,29 +185,17 @@ export const Notifications: React.FC = () => {
       return;
     }
 
-    const cleanUsername = username?.replace('@', '');
-    if (!cleanUsername) return;
+    // Get user ID from cache (populated from notifications API)
+    const userId = userIdCache[username];
+    if (!userId) {
+      console.error('User ID not found in cache for:', username);
+      return;
+    }
 
     // Add to actioning set
     setActioningUsernames(prev => new Set(prev).add(username));
 
     try {
-      // Get user ID (from cache or fetch)
-      let userId = userIdCache[username];
-
-      if (!userId) {
-        const userResponse = await fetch(`/api/user-profile?username=${cleanUsername}`);
-        const userData = await userResponse.json();
-
-        if (!userData.success || !userData.user) {
-          alert('User not found');
-          return;
-        }
-
-        userId = userData.user.id;
-        setUserIdCache(prev => ({ ...prev, [username]: userId }));
-      }
-
       const isCurrentlyFollowing = followingStatus[username];
       const method = isCurrentlyFollowing ? 'DELETE' : 'POST';
 
