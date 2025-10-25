@@ -1197,7 +1197,7 @@ export const UserProfile: React.FC = () => {
             {/* Three Dots Menu Button */}
             <button
               onClick={handleProfileMenu}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="p-2 hover:opacity-70 transition-opacity"
               title="More options"
             >
               <MoreHorizontal className="w-5 h-5 text-primary" />
