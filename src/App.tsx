@@ -64,6 +64,7 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Terms } from './pages/Terms';
 import { Compose1A } from './pages/Compose1A';
 import { EditProfile1A } from './pages/EditProfile1A';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { DesktopSidebar } from './components/Layout/DesktopSidebar';
 import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
 import { DesktopFloatingComposer } from './components/Layout/DesktopFloatingComposer';
@@ -124,6 +125,9 @@ const AppRoutes: React.FC = () => (
 
     {/* Game Routes */}
     <Route path="/werunner" element={<WeRunner />} />
+
+    {/* Admin */}
+    <Route path="/admin" element={<AdminDashboard />} />
 
     {/* Pages that need to be built */}
     <Route path="/staking" element={<Staking />} />
