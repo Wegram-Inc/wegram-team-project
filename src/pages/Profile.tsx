@@ -186,14 +186,7 @@ export const Profile: React.FC = () => {
   const handleEditProfile = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Initialize edit form with current data
-    setEditUsername(user.username.replace('@', '') || '');
-    setEditBio(user.bio || '');
-    setEditAvatar(user.avatar || '');
-    setEditTwitterLink(user.twitterLink || '');
-    setEditDiscordLink(user.discordLink || '');
-    setEditTelegramLink(user.telegramLink || '');
-    setShowEditModal(true);
+    navigate('/editprofile1a');
   };
 
   const handleSaveProfile = async () => {
