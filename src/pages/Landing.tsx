@@ -11,6 +11,16 @@ export const Landing: React.FC = () => {
   const { profile, loading } = useNeonAuth();
 
   useEffect(() => {
+    // Capture referral code from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+
+    if (refCode) {
+      // Store referral code in localStorage for later use during signup
+      localStorage.setItem('referralCode', refCode);
+      console.log('Referral code captured:', refCode);
+    }
+
     // Redirect logged-in users to home feed
     if (!loading && profile) {
       navigate('/home');

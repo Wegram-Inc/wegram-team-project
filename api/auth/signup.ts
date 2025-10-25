@@ -20,7 +20,7 @@ export default async function handler(
   }
 
   try {
-    const { email, password, username } = req.body;
+    const { email, password, username, referralCode } = req.body;
 
     // Validation
     if (!email || !password || !username) {
@@ -92,6 +92,26 @@ export default async function handler(
     `;
 
     const user = result[0];
+
+    // Handle referral if referralCode was provided
+    if (referralCode) {
+      try {
+        const referralResponse = await fetch(`${req.headers.origin || 'https://wegram.social'}/api/referrals`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            referrer_username: referralCode,
+            referred_user_id: user.id
+          })
+        });
+
+        const referralData = await referralResponse.json();
+        console.log('Referral processed:', referralData);
+      } catch (referralError) {
+        console.error('Failed to process referral:', referralError);
+        // Don't fail signup if referral processing fails
+      }
+    }
 
     return res.status(201).json({
       success: true,

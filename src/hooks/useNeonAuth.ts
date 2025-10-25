@@ -182,15 +182,22 @@ export const useNeonAuth = () => {
   // 🚀 Sign up with email/password
   const signUpWithEmail = async (email: string, password: string, username: string) => {
     try {
+      // Get referral code from localStorage if it exists
+      const referralCode = localStorage.getItem('referralCode');
+
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, username })
+        body: JSON.stringify({ email, password, username, referralCode })
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
+        // Clear referral code after successful signup
+        if (referralCode) {
+          localStorage.removeItem('referralCode');
+        }
         localStorage.setItem('wegram_user', JSON.stringify(result.user));
         setProfile(result.user);
         return { success: true, user: result.user };
@@ -198,9 +205,9 @@ export const useNeonAuth = () => {
         return { success: false, error: result.error || 'Signup failed' };
       }
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Signup failed' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Signup failed'
       };
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gift, Users, Trophy, Star, CheckCircle, Copy, Coins, TrendingUp, Award, ExternalLink, Share, Twitter, MessageCircle, Send, Info, Crown, Medal, Zap } from 'lucide-react';
 import { useNeonAuth } from '../hooks/useNeonAuth';
 import { useTheme } from '../hooks/useTheme';
@@ -19,10 +19,21 @@ interface ReferralStats {
   currentTier: string;
 }
 
+interface ReferralHistoryItem {
+  id: string;
+  reward_amount: number;
+  tier_name: string;
+  created_at: string;
+  referred_username: string;
+  referred_avatar: string | null;
+}
+
 export const Rewards: React.FC = () => {
   const { isDark } = useTheme();
   const { profile } = useNeonAuth();
   const [linkCopied, setLinkCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [referralHistory, setReferralHistory] = useState<ReferralHistoryItem[]>([]);
 
   // Referral tiers configuration
   const referralTiers: ReferralTier[] = [
@@ -52,19 +63,50 @@ export const Rewards: React.FC = () => {
     }
   ];
 
-  // Real user referral stats (currently 0 - ready for smart contract integration)
-  const referralStats: ReferralStats = {
+  // Real user referral stats (fetched from API)
+  const [referralStats, setReferralStats] = useState<ReferralStats>({
     totalReferrals: 0,
     totalEarned: 0,
     thisMonthEarned: 0,
     currentTier: 'Bronze'
-  };
+  });
+
+  // Fetch referral data
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      if (!profile?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/referrals?user_id=${profile.id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setReferralStats({
+            totalReferrals: data.stats.totalReferrals || 0,
+            totalEarned: data.stats.totalEarned || 0,
+            thisMonthEarned: data.stats.thisMonthEarned || 0,
+            currentTier: 'Bronze' // Will be calculated
+          });
+          setReferralHistory(data.referralHistory || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch referral data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReferralData();
+  }, [profile?.id]);
 
   // Generate unique referral link for user
   const generateReferralLink = () => {
-    if (!profile?.username) return 'https://wegram.com/invite/demo';
+    if (!profile?.username) return 'https://wegram.social/?ref=demo';
     const cleanUsername = profile.username.replace('@', '');
-    return `https://wegram.com/invite/${cleanUsername}`;
+    return `https://wegram.social/?ref=${cleanUsername}`;
   };
 
   const referralLink = generateReferralLink();
@@ -232,13 +274,48 @@ export const Rewards: React.FC = () => {
           <h3 className="text-primary font-semibold">Referral History</h3>
         </div>
 
-        <div className="text-center py-8">
-          <Users className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-          <h4 className="text-primary font-medium mb-2">No referrals yet</h4>
-          <p className="text-secondary text-sm">
-            When friends join using your referral link, they will appear here with their join date and your earned WEGRAM.
-          </p>
-        </div>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-secondary">Loading...</p>
+          </div>
+        ) : referralHistory.length === 0 ? (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+            <h4 className="text-primary font-medium mb-2">No referrals yet</h4>
+            <p className="text-secondary text-sm">
+              When friends join using your referral link, they will appear here with their join date and your earned WEGRAM.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {referralHistory.map((referral) => (
+              <div key={referral.id} className="flex items-center justify-between p-3 bg-overlay-light rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                    {referral.referred_avatar ? (
+                      <img src={referral.referred_avatar} alt={referral.referred_username} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold">
+                        {referral.referred_username?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-primary font-medium">{referral.referred_username}</div>
+                    <div className="text-secondary text-xs">
+                      {new Date(referral.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-green-400 font-bold">+{referral.reward_amount} WEGRAM</div>
+                  <div className="text-secondary text-xs">{referral.tier_name} Tier</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* How It Works */}
