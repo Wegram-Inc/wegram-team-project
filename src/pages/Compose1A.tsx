@@ -15,24 +15,44 @@ export const Compose1A: React.FC = () => {
   const imageInputRef = React.useRef<HTMLInputElement>(null);
   const videoInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handlePost = () => {
+  const handlePost = async () => {
     const content = textContent.trim() || (uploadedImageUrl ? 'Shared media' : '');
     if (!content && !uploadedImageUrl) return;
 
-    window.dispatchEvent(new CustomEvent('wegram:new-post', {
-      detail: {
-        content,
-        imageUrl: uploadedImageUrl || undefined
-      }
-    }));
+    if (!profile?.id) {
+      alert('Please sign in to post');
+      return;
+    }
 
-    // Reset and navigate back
-    setTextContent('');
-    setSelectedFiles([]);
-    setUploadedImageUrl('');
-    setUploadedImage(null);
-    setIsUploading(false);
-    navigate('/home');
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          user_id: profile.id,
+          username: profile.username,
+          image_url: uploadedImageUrl || undefined
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Reset and navigate back
+        setTextContent('');
+        setSelectedFiles([]);
+        setUploadedImageUrl('');
+        setUploadedImage(null);
+        setIsUploading(false);
+        navigate('/home');
+      } else {
+        alert('Failed to create post: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      alert('Failed to create post');
+    }
   };
 
   return (
