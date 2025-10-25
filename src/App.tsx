@@ -194,7 +194,9 @@ function AppContent() {
   const hideNavigation = location.pathname === '/' ||
     location.pathname === '/auth' ||
     location.pathname === '/x-auth' ||
-    location.pathname === '/email-auth';
+    location.pathname === '/email-auth' ||
+    location.pathname === '/privacy' ||
+    location.pathname === '/terms';
 
   // Hide desktop sidebars only on landing/auth pages, not when loading or logged in
   const hideDesktopSidebars = hideNavigation;
