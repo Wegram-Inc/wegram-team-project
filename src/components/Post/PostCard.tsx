@@ -50,6 +50,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
   const [viewsCount, setViewsCount] = React.useState(post.views || 0);
+
+  // Debug: Log initial views value
+  React.useEffect(() => {
+    console.log('🔍 Post loaded with views:', post.views, 'for post ID:', post.id);
+  }, []);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [isBlocked, setIsBlocked] = React.useState(false);
