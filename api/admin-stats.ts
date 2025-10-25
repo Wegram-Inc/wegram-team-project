@@ -28,14 +28,14 @@ export default async function handler(
       SELECT SUM(likes_count) as count FROM posts
     `;
 
-    // Email users (profiles with email containing @)
+    // Email users (signed up with email)
     const emailUsers = await sql`
-      SELECT COUNT(*) as count FROM profiles WHERE email LIKE '%@%'
+      SELECT COUNT(*) as count FROM profiles WHERE email IS NOT NULL AND email != ''
     `;
 
-    // Users with Twitter linked
+    // Twitter users (signed up with Twitter/X)
     const xUsers = await sql`
-      SELECT COUNT(*) as count FROM profiles WHERE twitter_link IS NOT NULL AND twitter_link != ''
+      SELECT COUNT(*) as count FROM profiles WHERE twitter_id IS NOT NULL AND twitter_id != ''
     `;
 
     // Total views
