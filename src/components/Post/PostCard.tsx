@@ -49,10 +49,47 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [sharesCount, setSharesCount] = React.useState(post.shares);
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
-  const [viewsCount] = React.useState(post.views || 0);
+  const [viewsCount, setViewsCount] = React.useState(post.views || 0);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [isBlocked, setIsBlocked] = React.useState(false);
+  const [hasTrackedView, setHasTrackedView] = React.useState(false);
+  const postRef = React.useRef<HTMLDivElement>(null);
+
+  // Track view when post becomes visible
+  React.useEffect(() => {
+    if (hasTrackedView) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasTrackedView) {
+            // Post is visible, track the view
+            setHasTrackedView(true);
+            setViewsCount(prev => prev + 1);
+
+            // Send view to API
+            fetch('/api/post-views', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ post_id: post.id })
+            }).catch(error => console.error('Failed to track view:', error));
+          }
+        });
+      },
+      { threshold: 0.5 } // Track when 50% of post is visible
+    );
+
+    if (postRef.current) {
+      observer.observe(postRef.current);
+    }
+
+    return () => {
+      if (postRef.current) {
+        observer.unobserve(postRef.current);
+      }
+    };
+  }, [post.id, hasTrackedView]);
 
   const handleAvatarClick = () => {
     console.log('PostCard handleAvatarClick called with:', post.username);
@@ -195,7 +232,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   };
 
   return (
-    <div className="card mb-4 overflow-hidden">
+    <div ref={postRef} className="card mb-4 overflow-hidden">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <button 
