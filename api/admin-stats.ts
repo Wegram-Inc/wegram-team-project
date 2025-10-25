@@ -33,9 +33,9 @@ export default async function handler(
       SELECT COUNT(*) as count FROM profiles WHERE email LIKE '%@%'
     `;
 
-    // X/Twitter users (profiles with twitter auth)
+    // Users with Twitter linked
     const xUsers = await sql`
-      SELECT COUNT(*) as count FROM profiles WHERE auth_provider = 'twitter'
+      SELECT COUNT(*) as count FROM profiles WHERE twitter_link IS NOT NULL AND twitter_link != ''
     `;
 
     // Total views
