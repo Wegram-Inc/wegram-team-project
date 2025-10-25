@@ -292,8 +292,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
           </div>
         </div>
         <div className="relative">
-          <button 
+          <button
             onClick={() => setShowMenu(!showMenu)}
+            aria-label={`post-menu-${post.id}`}
             className={`p-1 rounded transition-colors ${
               isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-200'
             }`}
@@ -309,12 +310,27 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                 onClick={() => setShowMenu(false)}
               />
               
-              {/* Menu - positioned to avoid cutoff */}
-              <div className={`absolute right-0 bottom-8 z-20 rounded-lg shadow-lg py-2 min-w-48 ${
+              {/* Menu - absolute on mobile, fixed on desktop to avoid cutoff */}
+              <div className={`absolute lg:fixed right-0 top-8 lg:top-auto lg:right-auto z-20 rounded-lg shadow-lg py-2 min-w-48 ${
                 isDark
                   ? 'bg-gray-800 border border-gray-700'
                   : 'bg-white border border-gray-300'
-              }`}>
+              }`}
+              style={
+                typeof window !== 'undefined' && window.innerWidth >= 1024 && showMenu
+                  ? (() => {
+                      const button = document.querySelector(`button[aria-label="post-menu-${post.id}"]`) as HTMLElement;
+                      if (button) {
+                        const rect = button.getBoundingClientRect();
+                        return {
+                          top: `${rect.bottom + 8}px`,
+                          left: `${rect.right - 192}px`
+                        };
+                      }
+                      return {};
+                    })()
+                  : {}
+              }>
                 <button
                   onClick={handlePostReactions}
                   className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-primary ${
