@@ -106,6 +106,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/user/:username/blocked" element={<BlockedUsers />} />
 
     {/* Post Comments */}
+    <Route path="/post/:postId" element={<PostComments />} />
     <Route path="/post/:postId/comments" element={<PostComments />} />
 
     {/* Chat Routes */}
