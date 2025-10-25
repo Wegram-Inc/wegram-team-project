@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2, UserX } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2, UserX, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
@@ -20,6 +20,7 @@ interface UnifiedPost {
   replies: number;
   shares: number;
   gifts?: number;
+  views?: number;
   avatar_url?: string | null;
   image_url?: string | null;
   verified?: boolean;
@@ -48,6 +49,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [sharesCount, setSharesCount] = React.useState(post.shares);
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
+  const [viewsCount] = React.useState(post.views || 0);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [isBlocked, setIsBlocked] = React.useState(false);
@@ -436,8 +438,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         <button
           onClick={handleBookmark}
           className={`flex items-center gap-2 transition-all duration-200 ${
-            isBookmarked 
-              ? 'text-purple-500 scale-110' 
+            isBookmarked
+              ? 'text-purple-500 scale-110'
               : 'hover:text-purple-400 hover:scale-105'
           }`}
         >
@@ -445,6 +447,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
             isBookmarked ? 'fill-current' : ''
           }`} />
         </button>
+
+        <div className="flex items-center gap-2 text-gray-400">
+          <Eye className="w-4 h-4" />
+          <span className="text-sm">{viewsCount}</span>
+        </div>
       </div>
 
       {/* Comment Composer Modal */}
