@@ -880,18 +880,6 @@ export const UserProfile: React.FC = () => {
     setShowActionMenu(false);
   };
 
-  const handleNotInterested = () => {
-    setShowActionMenu(false);
-    // TODO: Implement not interested functionality
-    console.log('Not interested in this profile');
-  };
-
-  const handleReport = () => {
-    setShowActionMenu(false);
-    // TODO: Implement report functionality
-    console.log('Report this profile');
-  };
-
   const handleShareProfile = async () => {
     setShowActionMenu(false);
     const profileUrl = `${window.location.origin}/user/${username}`;
@@ -1033,24 +1021,6 @@ export const UserProfile: React.FC = () => {
             {/* Menu Items */}
             <div className="py-2">
               <button
-                onClick={handleNotInterested}
-                className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <XCircle className="w-5 h-5 text-red-500" />
-                <span className="text-gray-900 dark:text-white font-medium">Not Interested</span>
-              </button>
-              
-              <button
-                onClick={handleReport}
-                className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                style={{ backgroundColor: 'transparent' }}
-              >
-                <Flag className="w-5 h-5 text-orange-500" />
-                <span className="text-gray-900 dark:text-white font-medium">Report</span>
-              </button>
-
-              <button
                 onClick={handleBlockUser}
                 className="w-full px-6 py-4 flex items-center gap-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 style={{ backgroundColor: 'transparent' }}
@@ -1068,7 +1038,7 @@ export const UserProfile: React.FC = () => {
                 style={{ backgroundColor: 'transparent' }}
               >
                 <Share className="w-5 h-5 text-blue-500" />
-                <span className="text-gray-900 dark:text-white font-medium">Share</span>
+                <span className="text-gray-900 dark:text-white font-medium">Share Profile Link</span>
               </button>
             </div>
           </div>
