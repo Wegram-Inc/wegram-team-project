@@ -68,18 +68,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
           if (entry.isIntersecting) {
             setHasTrackedView(true);
 
-            // Optimistically update the view count
-            setViewsCount(prev => prev + 1);
-
-            // Send view to API
+            // Send view to API and update count
             fetch('/api/post-views', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ post_id: post.id })
             })
-            .then(response => {
-              if (!response.ok) {
-                console.error('Failed to track view:', response.status);
+            .then(response => response.json())
+            .then(data => {
+              if (data.success && data.views_count) {
+                setViewsCount(data.views_count);
               }
             })
             .catch(error => {
