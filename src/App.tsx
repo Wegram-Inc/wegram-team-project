@@ -60,6 +60,8 @@ import { Following } from './pages/Following';
 import { Followers } from './pages/Followers';
 import { BlockedUsers } from './pages/BlockedUsers';
 import { Logout } from './pages/Logout';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Terms } from './pages/Terms';
 import { DesktopSidebar } from './components/Layout/DesktopSidebar';
 import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
 import { DesktopFloatingComposer } from './components/Layout/DesktopFloatingComposer';
@@ -69,6 +71,8 @@ import { DesktopFloatingComposer } from './components/Layout/DesktopFloatingComp
 const AppRoutes: React.FC = () => (
   <Routes>
     <Route path="/" element={<Landing />} />
+    <Route path="/privacy" element={<PrivacyPolicy />} />
+    <Route path="/terms" element={<Terms />} />
     <Route path="/logout" element={<Logout />} />
     <Route path="/auth" element={<AuthPage />} />
     <Route path="/x-auth" element={<XAuthPage />} />

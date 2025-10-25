@@ -150,8 +150,19 @@ export const Landing: React.FC = () => {
         {/* Terms */}
         <div className="text-center text-sm text-gray-400 max-w-sm mb-8">
           By entering WEGRAM you agree to our{' '}
-          <span className="text-white underline">terms of use</span> and{' '}
-          <span className="text-white underline">privacy policy</span>.
+          <button
+            onClick={() => navigate('/terms')}
+            className="text-white underline hover:text-purple-400 transition-colors"
+          >
+            terms of use
+          </button>{' '}
+          and{' '}
+          <button
+            onClick={() => navigate('/privacy')}
+            className="text-white underline hover:text-purple-400 transition-colors"
+          >
+            privacy policy
+          </button>.
         </div>
       </div>
 
