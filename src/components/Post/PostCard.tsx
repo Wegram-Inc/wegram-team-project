@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2, UserX, Eye } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, Gift, Bookmark, Smile, Link, Copy, Flag, CheckCircle, Trash2, UserX, Eye, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme';
 import { useNeonAuth } from '../../hooks/useNeonAuth';
@@ -424,13 +424,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
         <button
           onClick={handleGift}
           className={`flex items-center gap-2 transition-all duration-200 ${
-            isGifted 
-              ? 'text-yellow-500 scale-110' 
-              : 'hover:text-yellow-400 hover:scale-105'
+            isGifted
+              ? 'text-green-500 scale-110'
+              : 'hover:text-green-400 hover:scale-105'
           }`}
         >
-          <Gift className={`w-4 h-4 transition-all duration-200 ${
-            isGifted ? 'animate-bounce' : ''
+          <DollarSign className={`w-4 h-4 transition-all duration-200 ${
+            isGifted ? 'animate-pulse' : ''
           }`} />
           <span className="text-sm font-medium">{giftsCount}</span>
         </button>

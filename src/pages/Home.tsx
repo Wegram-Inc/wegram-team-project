@@ -70,12 +70,11 @@ export const Home: React.FC = () => {
     const post = posts.find(p => p.id === postId);
     if (!post) return;
 
-    const giftOptions = ['🎁 1 WGM', '💎 5 WGM', '🚀 10 WGM', '👑 25 WGM'];
-    const selectedGift = prompt(`Send a gift to @${post.username}:\n\n${giftOptions.join('\n')}\n\nEnter gift (1, 5, 10, or 25):`);
-    
-    if (selectedGift && ['1', '5', '10', '25'].includes(selectedGift)) {
-      await giftPost(postId);
-      alert(`🎁 Sent ${selectedGift} WGM to @${post.username}!`);
+    const tipOptions = ['🎁 1 WGM', '💎 5 WGM', '🚀 10 WGM', '👑 25 WGM'];
+    const selectedTip = prompt(`🚧 COMING SOON 🚧\n\nGive a tip to @${post.username}:\n\n${tipOptions.join('\n')}\n\nEnter tip (1, 5, 10, or 25):`);
+
+    if (selectedTip && ['1', '5', '10', '25'].includes(selectedTip)) {
+      alert(`🚧 Tipping feature coming soon! This will send ${selectedTip} WGM to @${post.username}`);
     }
   };
 
