@@ -61,6 +61,26 @@ export default async function handler(
 
     const user = result[0];
 
+    // Handle referral if referralCode was provided
+    if (twitterData.referralCode) {
+      try {
+        const referralResponse = await fetch(`${req.headers.origin || 'https://wegram.social'}/api/referrals`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            referrer_username: twitterData.referralCode,
+            referred_user_id: user.id
+          })
+        });
+
+        const referralData = await referralResponse.json();
+        console.log('Referral processed:', referralData);
+      } catch (referralError) {
+        console.error('Failed to process referral:', referralError);
+        // Don't fail user creation if referral processing fails
+      }
+    }
+
     return res.status(200).json({
       success: true,
       user: user

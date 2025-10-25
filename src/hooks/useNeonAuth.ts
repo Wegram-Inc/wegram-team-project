@@ -76,6 +76,9 @@ export const useNeonAuth = () => {
       if (result.success && result.user) {
         console.log('🔍 Twitter user data received:', result.user);
 
+        // Get referral code from localStorage if it exists
+        const referralCode = localStorage.getItem('referralCode');
+
         // Save user via API endpoint
         const response = await fetch('/api/users', {
           method: 'POST',
@@ -89,7 +92,8 @@ export const useNeonAuth = () => {
             verified: result.user.verified || false,
             followers_count: result.user.followers_count || 0,
             following_count: result.user.following_count || 0,
-            posts_count: result.user.tweet_count || 0
+            posts_count: result.user.tweet_count || 0,
+            referralCode: referralCode
           })
         });
 
@@ -98,6 +102,11 @@ export const useNeonAuth = () => {
         if (response.ok && apiResult.success) {
           const user = apiResult.user;
           console.log('✅ User saved to database:', user);
+
+          // Clear referral code after successful signup
+          if (referralCode) {
+            localStorage.removeItem('referralCode');
+          }
 
           // Store in localStorage
           localStorage.setItem('wegram_user', JSON.stringify(user));
