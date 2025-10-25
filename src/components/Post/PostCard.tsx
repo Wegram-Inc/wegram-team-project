@@ -128,12 +128,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   };
 
   const handleGift = () => {
-    setIsGifted(true);
-    setGiftsCount(prev => prev + 1);
+    // Just trigger the popup, don't increment count until tipping is actually implemented
     onGift?.(post.id);
-    
-    // Reset gift state after animation
-    setTimeout(() => setIsGifted(false), 1000);
   };
 
   const handleBookmark = () => {
