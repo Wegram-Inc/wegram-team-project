@@ -892,10 +892,16 @@ export const UserProfile: React.FC = () => {
     console.log('Report this profile');
   };
 
-  const handleShareProfile = () => {
+  const handleShareProfile = async () => {
     setShowActionMenu(false);
-    // TODO: Implement share functionality
-    console.log('Share this profile');
+    const profileUrl = `${window.location.origin}/user/${username}`;
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      alert('Profile link copied to clipboard! 🔗');
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      alert('Failed to copy profile link');
+    }
   };
 
   const handleBlockUser = async () => {
@@ -1197,7 +1203,7 @@ export const UserProfile: React.FC = () => {
 
           <div className="text-secondary text-sm mb-4">{user.username}</div>
 
-          {/* Action Buttons Row - Message and Follow */}
+          {/* Action Buttons Row - Message, Follow, and Three Dots */}
           <div className="flex gap-2 mb-4">
             {/* Message Button (envelope) - in Delete Account position */}
             <button
@@ -1216,6 +1222,15 @@ export const UserProfile: React.FC = () => {
               className="flex-1 btn-primary px-3 py-1.5 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
             >
               {isLoading ? '...' : (isFollowing ? 'Unfollow' : 'Follow')}
+            </button>
+
+            {/* Three Dots Menu Button */}
+            <button
+              onClick={handleProfileMenu}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              title="More options"
+            >
+              <MoreHorizontal className="w-5 h-5 text-primary" />
             </button>
           </div>
 
