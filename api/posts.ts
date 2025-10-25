@@ -229,8 +229,8 @@ export default async function handler(
         }
 
         const newPost = await sql`
-          INSERT INTO posts (content, user_id, image_url, likes_count, comments_count, shares_count)
-          VALUES (${content}, ${user_id}, ${image_url || null}, 0, 0, 0)
+          INSERT INTO posts (content, user_id, image_url, likes_count, comments_count, shares_count, views_count)
+          VALUES (${content}, ${user_id}, ${image_url || null}, 0, 0, 0, 0)
           RETURNING *
         `;
 

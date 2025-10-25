@@ -20,6 +20,13 @@ export default async function handler(
       ADD COLUMN IF NOT EXISTS views_count INTEGER DEFAULT 0
     `;
 
+    // Update any existing posts that have NULL views_count to 0
+    await sql`
+      UPDATE posts
+      SET views_count = 0
+      WHERE views_count IS NULL
+    `;
+
     // Create index for faster queries
     await sql`
       CREATE INDEX IF NOT EXISTS idx_posts_views ON posts(views_count DESC)
@@ -27,7 +34,7 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      message: 'Post views column created successfully'
+      message: 'Post views column created successfully and existing posts updated'
     });
   } catch (error) {
     console.error('Setup post views error:', error);
