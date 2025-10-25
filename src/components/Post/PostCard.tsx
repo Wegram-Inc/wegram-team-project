@@ -69,11 +69,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
             setViewsCount(prev => prev + 1);
 
             // Send view to API
+            console.log('📊 Tracking view for post ID:', post.id);
             fetch('/api/post-views', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ post_id: post.id })
-            }).catch(error => console.error('Failed to track view:', error));
+            })
+              .then(res => res.json())
+              .then(data => console.log('✅ View API response:', data))
+              .catch(error => console.error('❌ Failed to track view:', error));
           }
         });
       },
