@@ -73,7 +73,8 @@ export const EditProfile1A: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: profile.id,
+          id: profile.id,
+          username: editUsername,
           bio: editBio,
           avatar_url: editAvatar,
           twitter_link: formattedTwitterLink,
