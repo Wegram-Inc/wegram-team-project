@@ -62,6 +62,7 @@ import { BlockedUsers } from './pages/BlockedUsers';
 import { Logout } from './pages/Logout';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Terms } from './pages/Terms';
+import { Compose1A } from './pages/Compose1A';
 import { DesktopSidebar } from './components/Layout/DesktopSidebar';
 import { DesktopRightSidebar } from './components/Layout/DesktopRightSidebar';
 import { DesktopFloatingComposer } from './components/Layout/DesktopFloatingComposer';
@@ -83,6 +84,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/profile" element={<Profile />} />
     <Route path="/analytics" element={<Analytics />} />
     <Route path="/compose" element={<Compose />} />
+    <Route path="/compose1a" element={<Compose1A />} />
     <Route path="/wallet" element={<Wallet />} />
     <Route path="/wallet/settings" element={<WalletSettings />} />
     <Route path="/help" element={<Help />} />

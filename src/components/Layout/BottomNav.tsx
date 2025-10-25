@@ -38,14 +38,7 @@ export const BottomNav: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => {
-                    setTextContent('');
-                    setSelectedFiles([]);
-                    setUploadedImageUrl('');
-                    setUploadedImage(null);
-                    setIsUploading(false);
-                    setShowCreateModal(true);
-                  }}
+                  onClick={() => navigate('/compose1a')}
                   className="fab"
                   style={{ position: 'relative', bottom: 'auto', right: 'auto', margin: '0 8px' }}
                 >
