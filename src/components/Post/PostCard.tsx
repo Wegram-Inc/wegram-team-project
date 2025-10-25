@@ -309,8 +309,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                 onClick={() => setShowMenu(false)}
               />
               
-              {/* Menu */}
-              <div className={`absolute right-0 top-8 z-20 rounded-lg shadow-lg py-2 min-w-48 ${
+              {/* Menu - positioned to avoid cutoff */}
+              <div className={`absolute right-0 bottom-8 z-20 rounded-lg shadow-lg py-2 min-w-48 ${
                 isDark
                   ? 'bg-gray-800 border border-gray-700'
                   : 'bg-white border border-gray-300'
