@@ -255,11 +255,24 @@ export const PostComments: React.FC = () => {
           <p className="text-primary leading-relaxed">{post.content}</p>
           {post.image_url && (
             <div className="mt-3">
-              <img
-                src={post.image_url}
-                alt="Post image"
-                className="w-full rounded-lg object-cover max-h-96"
-              />
+              {post.image_url.includes('/wegram-videos') ||
+               post.image_url.match(/\.(mp4|mov|avi|webm|mkv)$/i) ? (
+                <video
+                  src={post.image_url}
+                  className="w-full rounded-lg max-h-96 border border-gray-200 dark:border-gray-700"
+                  controls
+                  preload="metadata"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <img
+                  src={post.image_url}
+                  alt="Post image"
+                  className="w-full rounded-lg object-cover max-h-96"
+                />
+              )}
             </div>
           )}
         </div>
