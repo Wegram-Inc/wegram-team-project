@@ -142,17 +142,29 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
     alert('Post reactions feature coming soon! 😍');
   };
 
-  const handleCopyLink = () => {
-    const postUrl = `https://wegram.com/post/${post.id}`;
-    navigator.clipboard?.writeText(postUrl);
-    setShowMenu(false);
-    alert('Post link copied to clipboard! 🔗');
+  const handleCopyLink = async () => {
+    const postUrl = `${window.location.origin}/post/${post.id}`;
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      setShowMenu(false);
+      alert('Post link copied to clipboard! 🔗');
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      setShowMenu(false);
+      alert('Failed to copy link');
+    }
   };
 
-  const handleCopyText = () => {
-    navigator.clipboard?.writeText(post.content);
-    setShowMenu(false);
-    alert('Post text copied to clipboard! 📋');
+  const handleCopyText = async () => {
+    try {
+      await navigator.clipboard.writeText(post.content);
+      setShowMenu(false);
+      alert('Post text copied to clipboard! 📋');
+    } catch (error) {
+      console.error('Failed to copy text:', error);
+      setShowMenu(false);
+      alert('Failed to copy text');
+    }
   };
 
   const handleReportPost = () => {
@@ -299,8 +311,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
               
               {/* Menu */}
               <div className={`absolute right-0 top-8 z-20 rounded-lg shadow-lg py-2 min-w-48 ${
-                isDark 
-                  ? 'bg-gray-800 border border-gray-700' 
+                isDark
+                  ? 'bg-gray-800 border border-gray-700'
                   : 'bg-white border border-gray-300'
               }`}>
                 <button
@@ -312,30 +324,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                   <Smile className="w-4 h-4 text-yellow-400" />
                   <span>Post reactions</span>
                 </button>
-                
-                <button
-                  onClick={handleCopyLink}
-                  className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-primary ${
-                    isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <Link className="w-4 h-4 text-blue-400" />
-                  <span>Copy link</span>
-                </button>
-                
-                <button
-                  onClick={handleCopyText}
-                  className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-primary ${
-                    isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <Copy className="w-4 h-4 text-green-400" />
-                  <span>Copy text</span>
-                </button>
-                
-                <div className={`border-t my-1 ${
-                  isDark ? 'border-gray-700' : 'border-gray-200'
-                }`}></div>
 
                 {/* Show delete button only for current user's posts */}
                 {profile && (post.user_id === profile.id || post.userId === profile.id) && (
@@ -350,27 +338,24 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
                   </button>
                 )}
 
-                {/* Show block button only for other users' posts */}
-                {profile && (post.user_id !== profile.id && post.userId !== profile.id) && (
-                  <button
-                    onClick={handleBlockUser}
-                    className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors ${
-                      isBlocked ? 'text-green-400' : 'text-red-400'
-                    } ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-                  >
-                    <UserX className="w-4 h-4" />
-                    <span>{isBlocked ? 'Unblock user' : 'Block user'}</span>
-                  </button>
-                )}
-
                 <button
-                  onClick={handleReportPost}
-                  className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-red-400 ${
+                  onClick={handleCopyLink}
+                  className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-primary ${
                     isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
                   }`}
                 >
-                  <Flag className="w-4 h-4" />
-                  <span>Report post</span>
+                  <Link className="w-4 h-4 text-blue-400" />
+                  <span>Copy link</span>
+                </button>
+
+                <button
+                  onClick={handleCopyText}
+                  className={`w-full flex items-center gap-3 px-4 py-2 text-left transition-colors text-primary ${
+                    isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <Copy className="w-4 h-4 text-green-400" />
+                  <span>Copy text</span>
                 </button>
               </div>
             </>
