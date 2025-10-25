@@ -58,35 +58,43 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
 
   // Track view when post becomes visible
   React.useEffect(() => {
-    if (hasTrackedView) return;
+    if (hasTrackedView || !postRef.current) return;
+
+    const currentRef = postRef.current;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasTrackedView) {
-            // Post is visible, track the view
+          if (entry.isIntersecting) {
             setHasTrackedView(true);
 
-            // Send view to API (view count will update on next page load)
+            // Optimistically update the view count
+            setViewsCount(prev => prev + 1);
+
+            // Send view to API
             fetch('/api/post-views', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ post_id: post.id })
-            }).catch(error => console.error('Failed to track view:', error));
+            })
+            .then(response => {
+              if (!response.ok) {
+                console.error('Failed to track view:', response.status);
+              }
+            })
+            .catch(error => {
+              console.error('View tracking error:', error);
+            });
           }
         });
       },
-      { threshold: 0.5 } // Track when 50% of post is visible
+      { threshold: 0.5 }
     );
 
-    if (postRef.current) {
-      observer.observe(postRef.current);
-    }
+    observer.observe(currentRef);
 
     return () => {
-      if (postRef.current) {
-        observer.unobserve(postRef.current);
-      }
+      observer.unobserve(currentRef);
     };
   }, [post.id, hasTrackedView]);
 
