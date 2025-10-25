@@ -20,14 +20,7 @@ export const DesktopFloatingComposer: React.FC = () => {
     <>
       {/* Desktop Only Floating Action Button */}
       <button
-        onClick={() => {
-          setTextContent('');
-          setSelectedFiles([]);
-          setUploadedImageUrl('');
-          setUploadedImage(null);
-          setIsUploading(false);
-          setShowCreateModal(true);
-        }}
+        onClick={() => navigate('/compose1a')}
         className="hidden lg:flex fixed bottom-8 w-14 h-14 rounded-full items-center justify-center shadow-lg hover:scale-105 transition-transform z-40"
         style={{
           right: 'calc(320px + 2rem)',
