@@ -50,11 +50,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
   const [giftsCount, setGiftsCount] = React.useState(post.gifts || 0);
   const [commentsCount, setCommentsCount] = React.useState(post.replies);
   const [viewsCount, setViewsCount] = React.useState(post.views || 0);
-
-  // Debug: Log initial views value
-  React.useEffect(() => {
-    console.log('🔍 Post loaded with views:', post.views, 'for post ID:', post.id);
-  }, []);
   const [showCommentComposer, setShowCommentComposer] = React.useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const [isBlocked, setIsBlocked] = React.useState(false);
@@ -71,18 +66,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike, onReply, onSha
           if (entry.isIntersecting && !hasTrackedView) {
             // Post is visible, track the view
             setHasTrackedView(true);
-            setViewsCount(prev => prev + 1);
 
-            // Send view to API
-            console.log('📊 Tracking view for post ID:', post.id);
+            // Send view to API (view count will update on next page load)
             fetch('/api/post-views', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ post_id: post.id })
-            })
-              .then(res => res.json())
-              .then(data => console.log('✅ View API response:', data))
-              .catch(error => console.error('❌ Failed to track view:', error));
+            }).catch(error => console.error('Failed to track view:', error));
           }
         });
       },
