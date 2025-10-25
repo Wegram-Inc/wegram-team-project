@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Users, FileText, MessageCircle, Heart, Eye, Share2, TrendingUp, Calendar, Activity } from 'lucide-react';
+import { ArrowLeft, Users, FileText, MessageCircle, Heart, Eye, Share2, TrendingUp, Calendar, Activity, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Stats {
@@ -19,15 +19,33 @@ interface Stats {
   totalEngagement: number;
 }
 
+const ADMIN_PASSWORD = 'wegram1000';
+
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (isAuthenticated) {
+      fetchStats();
+    }
+  }, [isAuthenticated]);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect password');
+      setPassword('');
+    }
+  };
 
   const fetchStats = async () => {
     setLoading(true);
@@ -44,6 +62,45 @@ export const AdminDashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Password protection screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="w-full max-w-md">
+          <div className="rounded-2xl p-8 shadow-2xl" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <div className="flex justify-center mb-6">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
+                <Lock className="w-12 h-12 text-white" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-white text-center mb-2">Admin Dashboard</h1>
+            <p className="text-white/80 text-center mb-8">Enter password to access</p>
+
+            <form onSubmit={handleLogin}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                className="w-full p-4 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/60 border-2 border-white/30 focus:border-white focus:outline-none mb-4"
+                autoFocus
+              />
+              {error && (
+                <p className="text-red-200 text-sm mb-4 text-center">{error}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full py-4 rounded-lg bg-white text-purple-600 font-bold hover:bg-white/90 transition-colors"
+              >
+                Access Dashboard
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -95,7 +152,7 @@ export const AdminDashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="min-h-screen pb-20 lg:ml-0 lg:mr-0" style={{ backgroundColor: 'var(--bg)' }}>
       {/* Header */}
       <div
         className="sticky top-0 z-50 px-4 py-4 backdrop-blur-md bg-opacity-95"

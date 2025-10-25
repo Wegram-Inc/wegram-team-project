@@ -207,8 +207,8 @@ function AppContent() {
     location.pathname === '/privacy' ||
     location.pathname === '/terms';
 
-  // Hide desktop sidebars only on landing/auth pages, not when loading or logged in
-  const hideDesktopSidebars = hideNavigation;
+  // Hide desktop sidebars only on landing/auth/admin pages
+  const hideDesktopSidebars = hideNavigation || location.pathname === '/admin';
 
   // Hide top navigation (TopBar) on chat-style pages (custom headers)
   const hideTopNav = hideNavigation ||
