@@ -22,13 +22,21 @@ export default async function handler(
       }
 
       // Increment view count
-      await sql`
+      const result = await sql`
         UPDATE posts
-        SET views_count = views_count + 1
+        SET views_count = COALESCE(views_count, 0) + 1
         WHERE id = ${post_id}
+        RETURNING id, views_count
       `;
 
-      return res.status(200).json({ success: true });
+      console.log('View tracked for post:', post_id, 'Result:', result);
+
+      return res.status(200).json({
+        success: true,
+        post_id,
+        updated: result.length > 0,
+        new_count: result[0]?.views_count
+      });
     } else {
       return res.status(405).json({ error: 'Method not allowed' });
     }
