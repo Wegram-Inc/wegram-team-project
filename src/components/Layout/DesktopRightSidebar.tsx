@@ -112,7 +112,7 @@ export const DesktopRightSidebar: React.FC = () => {
         )}
       </div>
 
-      {/* WeRunner Game Section - Real content */}
+      {/* Wegram Miner Game Section - Real content */}
       <div className="rounded-xl p-4 border-2" style={{ backgroundColor: 'var(--card)', borderColor: isDark ? '#6b7280' : '#9ca3af' }}>
         <div className="flex items-center gap-2 mb-4">
           <Gamepad2 className="w-5 h-5 text-green-400" />
@@ -125,25 +125,21 @@ export const DesktopRightSidebar: React.FC = () => {
             backgroundColor: isDark ? 'rgba(55, 65, 81, 0.3)' : 'rgba(243, 244, 246, 0.5)',
             borderColor: isDark ? '#6b7280' : '#9ca3af'
           }}
-          onClick={() => navigate('/werunner')}
+          onClick={() => navigate('/games/wegram-miner')}
         >
           <div className="flex items-center gap-3 mb-3">
-            <div className="text-2xl">⚡</div>
+            <div className="text-2xl">⛏️</div>
             <div>
-              <p className="font-bold text-primary">WeRunner</p>
-              <p className="text-xs text-secondary">Epic anime-style battle runner</p>
+              <p className="font-bold text-primary">Wegram Miner</p>
+              <p className="text-xs text-secondary">Mine, collect, and build</p>
             </div>
           </div>
 
           <p className="text-sm text-secondary mb-3">
-            Stunning visuals and epic battles await in this anime-style runner game.
+            Mine, collect, and build your crypto empire in this addictive clicker game.
           </p>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open('https://centricj20.github.io/We-Runner/', '_blank');
-            }}
             className="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <Play className="w-4 h-4" />
